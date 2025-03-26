@@ -1,1 +1,8 @@
-
+.git
+.vscode
+.pytest_cache
+.venv
+__pycache__
+blender
+bl_ext
+addonname.zip
