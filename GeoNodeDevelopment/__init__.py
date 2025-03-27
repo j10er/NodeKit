@@ -16,7 +16,6 @@ import bpy
 from . import operators
 from . import ui
 
-
 classes = [
     ui.VIEW3D_PT_SidePanel,
     operators.OBJECT_OT_ExportJSON,
