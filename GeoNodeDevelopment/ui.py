@@ -1,6 +1,8 @@
 import bpy
 
 addon_name = "GeoNodeDevelopment"
+
+
 class VIEW3D_PT_SidePanel(bpy.types.Panel):
 
     bl_space_type = "VIEW_3D"
@@ -13,3 +15,4 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
         layout = self.layout
         layout.operator("object.import_assets")
         layout.operator("object.export_json")
+        layout.operator("object.import_json")

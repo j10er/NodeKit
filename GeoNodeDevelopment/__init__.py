@@ -20,6 +20,7 @@ classes = [
     ui.VIEW3D_PT_SidePanel,
     operators.OBJECT_OT_ExportJSON,
     operators.OBJECT_OT_ImportAssets,
+    operators.OBJECT_OT_ImportJSON,
 ]
 
 

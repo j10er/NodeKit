@@ -2,7 +2,7 @@ import bpy
 import os
 
 from . import assets
-from .storage import exporter
+from .storage import exporter, importer
 
 
 class OBJECT_OT_ImportAssets(bpy.types.Operator):
@@ -21,10 +21,8 @@ class OBJECT_OT_ImportAssets(bpy.types.Operator):
 
 
 class OBJECT_OT_ExportJSON(bpy.types.Operator):
-    "Example Operator to import assets"
     bl_idname = "object.export_json"
     bl_label = "Export to JSON"
-    bl_options = {"REGISTER", "UNDO"}
 
     @classmethod
     def poll(cls, context):
@@ -32,4 +30,17 @@ class OBJECT_OT_ExportJSON(bpy.types.Operator):
 
     def execute(self, context):
         exporter.export_groups()
+        return {"FINISHED"}
+
+
+class OBJECT_OT_ImportJSON(bpy.types.Operator):
+    bl_idname = "object.import_json"
+    bl_label = "Import from JSON"
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        importer.import_groups()
         return {"FINISHED"}
