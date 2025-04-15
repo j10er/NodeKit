@@ -27,8 +27,8 @@ def setup():
 
 
 def save(group_data):
-    json.dump(group_data.as_dict(), open(
-        f"{get_folder_path()}/{group_data.name}.json", "w"))
+    json.dump(group_data, open(
+        get_folder_path() + "/" + group_data["name"] + ".json", "w"))
 
 
 def load():

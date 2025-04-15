@@ -13,6 +13,5 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
     def draw(self, context):
 
         layout = self.layout
-        layout.operator("object.import_assets")
         layout.operator("object.export_json")
         layout.operator("object.import_json")
