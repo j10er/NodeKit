@@ -15,3 +15,4 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
         layout = self.layout
         layout.operator("object.export_json")
         layout.operator("object.import_json")
+        layout.operator("object.surprise")

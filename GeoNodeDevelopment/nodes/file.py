@@ -4,6 +4,7 @@ import shutil
 import bpy
 import json
 from pprint import pprint
+from .data import NodeTreeData
 
 
 def get_folder_path():
@@ -26,16 +27,25 @@ def setup():
     os.mkdir(f"{stripped_filepath}_nodes")
 
 
-def save(group_data):
-    json.dump(group_data, open(
-        get_folder_path() + "/" + group_data["name"] + ".json", "w"))
+def save_tree_dict(tree_dict: NodeTreeData):
+    setup()
+    json.dump(
+        tree_dict,
+        open(get_folder_path() + "/" + tree_dict["name"] + ".json", "w"),
+    )
 
 
-def load():
-    group_dicts = []
+def load_tree(file_path: str) -> NodeTreeData:
+    with open(file_path, "r") as f:
+        tree_dict = json.load(f)
+    return NodeTreeData(tree_dict=tree_dict)
+
+
+def load_all() -> list[dict]:
+    tree_dicts = []
     for file in os.listdir(get_folder_path()):
         if file.endswith(".json"):
             with open(f"{get_folder_path()}/{file}", "r") as f:
                 group_dict = json.load(f)
-                group_dicts.append(group_dict)
-    return group_dicts
+                tree_dicts.append(group_dict)
+    return tree_dicts
