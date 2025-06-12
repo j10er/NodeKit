@@ -21,6 +21,7 @@ classes = [
     operators.OBJECT_OT_ExportJSON,
     operators.OBJECT_OT_ImportJSON,
     operators.OBJECT_OT_Surprise,
+    operators.OBJECT_OT_GenerateDefaultValues,
 ]
 
 

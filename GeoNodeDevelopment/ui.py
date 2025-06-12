@@ -16,3 +16,4 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
         layout.operator("object.export_json")
         layout.operator("object.import_json")
         layout.operator("object.surprise")
+        layout.operator("object.generate_default_values")
