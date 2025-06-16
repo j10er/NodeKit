@@ -49,3 +49,13 @@ def load_all() -> list[dict]:
                 group_dict = json.load(f)
                 tree_dicts.append(group_dict)
     return tree_dicts
+
+
+def write_json(data: dict, file_path: str):
+    with open(file_path, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def read_json(file_path: str) -> dict:
+    with open(file_path, "r") as f:
+        return json.load(f)
