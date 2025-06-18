@@ -7,6 +7,7 @@ import subprocess
 addon_name = "GeoNodeDevelopment"
 addon_id = "geo_node_development"
 
+
 def build(fast=False):
     source_dir = f"./{addon_name}"
     filename = addon_name
@@ -14,7 +15,7 @@ def build(fast=False):
         print(f"Building addon: Zipping folder {source_dir} to {filename}.zip")
         shutil.make_archive(addon_name, "zip", addon_name)
     else:
-        version = "4.3.2"
+        version = "4.4.3"
         print(f"Building addon: Using blender version {version} to build")
         setup_blender("./blender", version)
         subprocess.run(
@@ -75,14 +76,11 @@ def setup_blender(blender_path, version):
         )
 
         shutil.unpack_archive(f"blender-{version}-linux-x64.tar.xz")
-        shutil.move(f"blender-{version}-linux-x64",
-                    f"{blender_path}/blender-{version}")
+        shutil.move(f"blender-{version}-linux-x64", f"{blender_path}/blender-{version}")
         os.remove(f"blender-{version}-linux-x64.tar.xz")
         os.mkdir(f"{blender_path}/blender-{version}/portable")
     else:
-        print(
-            f"Blender {version} already downloaded. Resetting existing installation."
-        )
+        print(f"Blender {version} already downloaded. Resetting existing installation.")
         shutil.rmtree(f"{blender_path}/blender-{version}/portable")
         os.mkdir(f"{blender_path}/blender-{version}/portable")
 
@@ -91,20 +89,18 @@ def install_test_deps(blender_path, version):
     major_version = version[:3]
     python_dir = f"{blender_path}/blender-{version}/{major_version}/python/bin/"
     python_executable = f"{python_dir}/{next(name for name in os.listdir(python_dir) if name.startswith('python3.'))}"
-    subprocess.run([python_executable, "-m", "pip",
-                   "install", "pytest", "-q", "-q"])
+    subprocess.run([python_executable, "-m", "pip", "install", "pytest", "-q", "-q"])
 
 
 def test():
-    blender_versions = ["4.3.2"]
+    blender_versions = ["4.4.3"]
     blender_path = "./blender"
     for version in blender_versions:
 
         setup_blender(blender_path, version)
         install_test_deps(blender_path, version)
         print(f"Running tests for Blender version {version}")
-        run_tests(
-            blender_executable=f"{blender_path}/blender-{version}/blender")
+        run_tests(blender_executable=f"{blender_path}/blender-{version}/blender")
 
 
 # COMMAND LINE INTERFACE

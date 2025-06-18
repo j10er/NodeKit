@@ -7,3 +7,4 @@ blender
 bl_ext
 GeoNodeDevelopment.zip
 sample_nodes
+tests/test_nodes_nodes

@@ -1,13 +1,20 @@
 import bpy
 
-from .data import NodeTreeData
-from . import file
+from pprint import pprint
+from . import file, data
 
 
 def export_groups():
-    file.setup()
-    groups = bpy.data.node_groups
-    for group in groups:
-        group_data = NodeTreeData(tree=group)
-        print("Exporting", group_data["name"])
-        file.save(group_data)
+    export_group("TestNodes")
+
+
+def export_group(group_name):
+    if group_name not in bpy.data.node_groups:
+        print(f"Node group '{group_name}' not found.")
+        return
+    tree = bpy.data.node_groups.get(group_name)
+    tree_data = data.NodeTreeData.from_tree(tree)
+    tree_dict = tree_data.to_dict()
+    print("=" * 20)
+    pprint(tree_dict)
+    file.save_tree_dict(tree_dict)
