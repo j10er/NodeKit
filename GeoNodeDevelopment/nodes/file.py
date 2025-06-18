@@ -32,6 +32,7 @@ def save_tree_dict(tree_dict: NodeTreeData):
     json.dump(
         tree_dict,
         open(get_folder_path() + "/" + tree_dict["name"] + ".json", "w"),
+        indent=4,
     )
 
 

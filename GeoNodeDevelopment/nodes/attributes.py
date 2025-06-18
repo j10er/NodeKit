@@ -1,6 +1,5 @@
 from .attributes_dict import DEFAULTS
 from typing import Any
-from pprint import pprint
 
 CONVERTERS = {
     "str": str,
@@ -12,8 +11,8 @@ CONVERTERS = {
 }
 
 
-def get_attributes(element: Any, defaults: dict[str, list[str, Any]]) -> dict[str, Any]:
-
+def from_element(element: Any, class_name: str) -> dict[str, Any]:
+    defaults = defaults_for(class_name)
     attribute_dict = {}
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
@@ -22,20 +21,31 @@ def get_attributes(element: Any, defaults: dict[str, list[str, Any]]) -> dict[st
             )
             continue
         value = CONVERTERS[attr_type](getattr(element, attr_name))
-        if value != default_value:
-            attribute_dict[attr_name] = value
+
+        attribute_dict[attr_name] = value
     return attribute_dict
 
 
-def set_attributes(element: Any, attributes: dict[str, Any], defaults: dict[str, Any]):
-    """
-    Set the values of specified attributes on an element based on a predefined attributes dictionary.
+def from_dict(element_dict: dict[str, Any], class_name: str) -> dict[str, Any]:
+    defaults = defaults_for(class_name)
+    attributes = {}
+    for name, (attr_type, default_value) in defaults.items():
+        attributes[name] = element_dict.get(name, default_value)
+    return attributes
 
-    Args:
-        attributes_dict: A dictionary containing attribute names and their default values.
-        element: The object or data structure to set attributes on.
-        attribute_values: A dictionary with attribute names as keys and their corresponding values.
-    """
+
+def to_dict(attributes: dict[str, Any], class_name: str) -> dict[str, Any]:
+    defaults = defaults_for(class_name)
+    for name in list(attributes.keys()):
+        if name not in defaults:
+            print(f"Warning: Attribute '{name}' not found in defaults for {class_name}")
+    return {
+        name: value for name, value in attributes.items() if defaults[name][1] != value
+    }
+
+
+def set_on_element(element: Any, attributes: dict[str, Any], class_name: str):
+    defaults = defaults_for(class_name)
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
             print(
@@ -43,7 +53,13 @@ def set_attributes(element: Any, attributes: dict[str, Any], defaults: dict[str,
             )
             continue
         value = attributes[attr_name] if attr_name in attributes else default_value
-        setattr(element, attr_name, value)
+        try:
+            setattr(element, attr_name, value)
+        except Exception as e:
+            # print(
+            #     f"Error setting attribute '{attr_name}' on {element} of type {type(element)}: {e}"
+            # )
+            continue
     return element
 
 
@@ -86,3 +102,10 @@ def defaults_for(class_name: str):
         print(f"Error navigating class path for {class_name}: {e}")
         return {}
     return defaults
+
+
+def filter_out_keys(dictionary: dict[str, Any], keys: list[str]) -> dict[str, Any]:
+    """
+    Remove specified keys from a dictionary and return a new dictionary.
+    """
+    return {k: v for k, v in dictionary.items() if k not in keys}

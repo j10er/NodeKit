@@ -37,11 +37,9 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
         tree = bpy.data.node_groups.get("Testnodes")
-        tree.interface.new_socket(
-            name="New Socket",
-            socket_type="awdawd",
-        )
-        print(list(socket.default_value))
+        node = tree.nodes.get("Random Value")
+        socket = node.inputs.get("Probability")
+        print(socket.type)
         return {"FINISHED"}
 
 

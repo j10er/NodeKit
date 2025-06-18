@@ -7,6 +7,8 @@ including Node, NodeSocket, NodeTree, and related interface items.
 The structure follows the format: [type, default_value] for each attribute.
 """
 
+SOCKET_TYPES = {}
+
 DEFAULTS = {
     "Element": [
         {},
@@ -29,71 +31,39 @@ DEFAULTS = {
                 }
             ],
             "NodeSocket": [
-                {},
+                {"type": ["str", ""]},
                 {
-                    "NodeSocketBool": [{"default_value": ["bool", False]}],
-                    "NodeSocketCollection": [{"default_value": ["None", None]}],
-                    "NodeSocketColor": [{"default_value": ["list", [0, 0, 0, 1.0]]}],
-                    "NodeSocketFloat": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatAngle": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatColorTemperature": [
-                        {"default_value": ["float", 0]}
-                    ],
-                    "NodeSocketFloatDistance": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatFactor": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatFrequency": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatPercentage": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatTime": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatTimeAbsolute": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatUnsigned": [{"default_value": ["float", 0]}],
-                    "NodeSocketFloatWavelength": [{"default_value": ["float", 0]}],
-                    "NodeSocketGeometry": [{}],
-                    "NodeSocketImage": [{"default_value": ["None", None]}],
-                    "NodeSocketInt": [{"default_value": ["int", 0]}],
-                    "NodeSocketIntFactor": [{"default_value": ["int", 0]}],
-                    "NodeSocketIntPercentage": [{"default_value": ["int", 0]}],
-                    "NodeSocketIntUnsigned": [{"default_value": ["int", 0]}],
-                    "NodeSocketMaterial": [{"default_value": ["None", None]}],
-                    "NodeSocketMatrix": [{}],
-                    "NodeSocketMenu": [{"default_value": ["None", None]}],
-                    "NodeSocketObject": [{"default_value": ["None", None]}],
-                    "NodeSocketRotation": [{"default_value": ["list", [0, 0, 0]]}],
-                    "NodeSocketShader": [{"default_value": ["None", None]}],
-                    "NodeSocketString": [{"default_value": ["str", ""]}],
-                    "NodeSocketStringFilePath": [{"default_value": ["str", ""]}],
-                    "NodeSocketTexture": [{"default_value": ["None", None]}],
-                    "NodeSocketVector": [{"default_value": ["list", [0, 0, 0]]}],
-                    "NodeSocketVectorAcceleration": [
-                        {"default_value": ["list", [0, 0, 0]]}
-                    ],
-                    "NodeSocketVectorDirection": [
-                        {"default_value": ["list", [0, 0, 0]]}
-                    ],
-                    "NodeSocketVectorEuler": [{"default_value": ["list", [0, 0, 0]]}],
-                    "NodeSocketVectorTranslation": [
-                        {"default_value": ["list", [0, 0, 0]]}
-                    ],
-                    "NodeSocketVectorVelocity": [
-                        {"default_value": ["list", [0, 0, 0]]}
-                    ],
-                    "NodeSocketVectorXYZ": [{"default_value": ["list", [0, 0, 0]]}],
+                    "VALUE": [{"default_value": ["float", 0]}],
+                    "INT": [{"default_value": ["int", 0]}],
+                    "BOOLEAN": [{"default_value": ["bool", False]}],
+                    "VECTOR": [{"default_value": ["list", [0, 0, 0]]}],
+                    "ROTATION": [{"default_value": ["list", [0, 0, 0]]}],
+                    "MATRIX": [{}],
+                    "STRING": [{"default_value": ["str", ""]}],
+                    "RGBA": [{"default_value": ["list", [0, 0, 0, 1.0]]}],
+                    "SHADER": [{"default_value": ["None", None]}],
+                    "OBJECT": [{"default_value": ["None", None]}],
+                    "IMAGE": [{"default_value": ["None", None]}],
+                    "GEOMETRY": [{}],
+                    "COLLECTION": [{"default_value": ["None", None]}],
+                    "TEXTURE": [{"default_value": ["None", None]}],
+                    "MATERIAL": [{"default_value": ["None", None]}],
+                    "MENU": [{"default_value": ["None", None]}],
                 },
             ],
             "NodeTree": [
                 {
+                    "name": ["str", ""],
                     "color_tag": ["str", "NONE"],
                     "default_group_node_width": ["int", 140],
                     "description": ["str", ""],
-                    "type": ["str", "SHADER"],
-                    "view_center": ["list", [0, 0]],
                     "is_modifier": ["bool", False],
                     "is_tool": ["bool", False],
                 }
             ],
             "NodeTreeInterfaceItem": [
                 {
-                    "index": ["int", -1],
-                    "item_type": ["str", "PANEL"],
+                    "item_type": ["str", "SOCKET"],
                     "name": ["str", ""],
                     "description": ["str", ""],
                 },

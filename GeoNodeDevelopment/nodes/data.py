@@ -8,19 +8,20 @@ from bpy.types import (
 from typing import Any
 import datetime
 from .interface_data import InterfaceItemData
-from .attributes import get_attributes, set_attributes, defaults_for
+from . import attributes
+from .data_class import Data
 
 
-class NodeTreeData:
+class NodeTreeData(Data):
 
     def __init__(
         self,
-        name: str,
+        attributes: dict[str, Any],
         uuid: str,
         nodes: dict[str, Any],
         interface_items: list[NodeTreeInterfaceItem],
     ):
-        self.name = name
+        self.attributes = attributes
         self.uuid = uuid
         self.nodes = nodes
         self.interface_items = interface_items
@@ -36,7 +37,7 @@ class NodeTreeData:
                 output["index"] = i
 
         return cls(
-            name=tree.name,
+            attributes=attributes.from_element(tree, "NodeTree"),
             uuid=tree["uuid"],
             nodes={node.name: NodeData.from_node(node) for node in tree.nodes},
             interface_items=[
@@ -49,7 +50,7 @@ class NodeTreeData:
     @classmethod
     def from_dict(cls, tree_dict: dict[str, Any]):
         return cls(
-            name=tree_dict["name"],
+            attributes=attributes.from_dict(tree_dict, "NodeTree"),
             uuid=tree_dict["uuid"],
             nodes={
                 name: NodeData.from_dict(node_dict)
@@ -63,7 +64,7 @@ class NodeTreeData:
 
     def to_dict(self):
         return {
-            "name": self.name,
+            **attributes.to_dict(self.attributes, "NodeTree"),
             "uuid": self.uuid,
             "nodes": {
                 name: node_data.to_dict() for name, node_data in self.nodes.items()
@@ -74,17 +75,22 @@ class NodeTreeData:
         }
 
     def to_tree(self):
-        print(f"Creating new node tree: {self.name} with UUID: {self.uuid}")
+        print(f"Creating new node tree: {self.name}...")
         tree = bpy.data.node_groups.new(
-            name=self.name + str(datetime.datetime.now()), type="GeometryNodeTree"
+            name=self.attributes["name"] + str(datetime.datetime.now()),
+            type="GeometryNodeTree",
         )
         tree["uuid"] = self.uuid
-
+        print(f"Created node tree {tree.name} with UUID: {tree['uuid']}")
+        attributes.set_on_element(tree, self.attributes, "NodeTree")
         for item_data in self.interface_items:
             item = item_data.to_item(tree.interface)
-
+        print(
+            f"Created {len(tree.interface.items_tree)} interface items for tree {tree.name}"
+        )
         for node_data in self.nodes.values():
             node = node_data.to_node(tree)
+        print(f"Created {len(tree.nodes)} nodes for tree {tree.name}")
 
         for node_data in self.nodes.values():
             for output_data in node_data.outputs:
@@ -100,7 +106,7 @@ class NodeTreeData:
         return tree
 
 
-class NodeData:
+class NodeData(Data):
 
     def __init__(
         self,
@@ -114,8 +120,8 @@ class NodeData:
 
     @classmethod
     def from_node(cls, node) -> "NodeData":
-        node_attributes = get_attributes(node, defaults_for("Node"))
         return cls(
+            attributes=attributes.from_element(node, "Node"),
             inputs=[
                 SocketData.from_socket(input)
                 for input in node.inputs
@@ -126,57 +132,70 @@ class NodeData:
                 for output in node.outputs
                 if not output.bl_idname == "NodeSocketVirtual"
             ],
-            attributes=node_attributes,
         )
 
     @classmethod
     def from_dict(cls, node_dict: dict[str, Any]) -> "NodeData":
         return cls(
-            inputs=[SocketData.from_dict(s) for s in node_dict["inputs"]],
-            outputs=[SocketData.from_dict(s) for s in node_dict["outputs"]],
-            attributes=node_dict.get("attributes", {}),
+            attributes=attributes.from_dict(node_dict, "Node"),
+            inputs=[SocketData.from_dict(s) for s in node_dict.get("inputs", [])],
+            outputs=[SocketData.from_dict(s) for s in node_dict.get("outputs", [])],
         )
 
     def to_dict(self):
+        inputs = [
+            socket_data.to_dict()
+            for socket_data in self.inputs
+            if "default_value" in socket_data.to_dict()
+            or "to_socket_index" in socket_data.to_dict()
+        ]
+        outputs = [
+            socket_data.to_dict()
+            for socket_data in self.outputs
+            if "default_value" in socket_data.to_dict()
+            or "to_socket_index" in socket_data.to_dict()
+        ]
         return {
-            "inputs": [socket_data.to_dict() for socket_data in self.inputs],
-            "outputs": [socket_data.to_dict() for socket_data in self.outputs],
-            **({} if not self.attributes else {"attributes": self.attributes}),
+            **attributes.to_dict(self.attributes, "Node"),
+            **({"inputs": inputs} if inputs else {}),
+            **({"outputs": outputs} if outputs else {}),
         }
 
     def to_node(self, tree):
         node = tree.nodes.new(
             type=self.bl_idname,
         )
-        set_attributes(node, self.attributes, defaults_for("Node"))
+        attributes.set_on_element(node, self.attributes, "Node")
 
         for socket_data in self.inputs:
-            set_attributes(
+            attributes.set_on_element(
                 node.inputs[socket_data.index],
                 socket_data.attributes,
-                defaults_for("NodeSocket"),
+                socket_data.type,
             )
+
         for socket_data in self.outputs:
-            set_attributes(
+            attributes.set_on_element(
                 node.outputs[socket_data.index],
                 socket_data.attributes,
-                defaults_for("NodeSocket"),
+                socket_data.type,
             )
         return node
 
 
-class SocketData:
+class SocketData(Data):
+
     def __init__(
         self,
+        attributes: dict[str, Any],
         index: int,
         to_socket_index: list[int],
         to_node: list[str],
-        attributes: dict[str, Any],
     ):
+        self.attributes = attributes
         self.to_socket_index = to_socket_index
         self.to_node = to_node
         self.index = index
-        self.attributes = attributes
 
     @classmethod
     def from_socket(cls, socket: NodeSocket) -> "SocketData":
@@ -187,26 +206,25 @@ class SocketData:
                 to_socket_index.append(link.to_socket["index"])
                 to_node.append(link.to_node.name)
 
-        socket_attributes = get_attributes(socket, defaults_for(socket.bl_idname))
-
         return cls(
             to_socket_index=to_socket_index,
             to_node=to_node,
             index=socket["index"],
-            attributes=socket_attributes,
+            attributes=attributes.from_element(socket, socket.type),
         )
 
     @classmethod
     def from_dict(cls, socket_dict: dict[str, Any]) -> "SocketData":
         return cls(
+            attributes=attributes.from_dict(socket_dict, socket_dict["type"]),
             to_socket_index=socket_dict.get("to_socket_index", []),
             to_node=socket_dict.get("to_node", []),
             index=socket_dict["index"],
-            attributes=socket_dict.get("attributes", {}),
         )
 
     def to_dict(self):
         return {
+            **attributes.to_dict(self.attributes, self.type),
             **(
                 {"to_socket_index": self.to_socket_index}
                 if self.to_socket_index
@@ -214,5 +232,4 @@ class SocketData:
             ),
             **({"to_node": self.to_node} if self.to_node else {}),
             "index": self.index,
-            **({} if not self.attributes else {"attributes": self.attributes}),
         }

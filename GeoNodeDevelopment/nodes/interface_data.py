@@ -1,9 +1,10 @@
 from bpy.types import NodeTreeInterfaceSocket, NodeTreeInterfacePanel
 from typing import Any
-from .attributes import get_attributes, set_attributes, defaults_for
+from . import attributes
+from .data_class import Data
 
 
-class InterfaceItemData:
+class InterfaceItemData(Data):
 
     @classmethod
     def from_item(cls, item) -> "InterfaceItemData":
@@ -15,7 +16,7 @@ class InterfaceItemData:
 
     @classmethod
     def from_dict(cls, item_dict) -> "InterfaceItemData":
-        match item_dict["item_type"]:
+        match item_dict.get("item_type", "SOCKET"):
             case "SOCKET":
                 return InterfaceSocketData.from_socket_dict(item_dict)
             case "PANEL":
@@ -34,42 +35,42 @@ class InterfaceSocketData(InterfaceItemData):
 
     @classmethod
     def from_socket(cls, socket: NodeTreeInterfaceSocket) -> "InterfaceSocketData":
-        print(f"Creating InterfaceSocketData from socket: {socket.name}")
-        print(f"Socket type: {socket.socket_type}")
-        print(get_attributes(socket, defaults_for(socket.socket_type)))
         return cls(
-            attributes=get_attributes(socket, defaults_for(socket.socket_type)),
+            attributes=attributes.from_element(
+                socket,
+                socket.socket_type,
+            ),
             parent_index=socket.parent.index,
         )
 
     @classmethod
     def from_socket_dict(cls, socket_dict: dict[str, Any]) -> "InterfaceSocketData":
         return cls(
-            attributes=socket_dict["attributes"],
+            attributes=attributes.from_dict(socket_dict, socket_dict["socket_type"]),
             parent_index=socket_dict.get("parent_index", -1),
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            **self.attributes,
+            **attributes.to_dict(self.attributes, self.socket_type),
             **({"parent_index": self.parent_index} if self.parent_index != -1 else {}),
         }
 
     def to_item(self, interface) -> NodeTreeInterfaceSocket:
         socket = interface.new_socket(
-            name=self.attributes.get["name"],
+            name=self.name,
             parent=(
                 interface.items_tree[self.parent_index]
                 if self.parent_index != -1
                 else None
             ),
-            socket_type=self.attributes["socket_type"],
-            in_out=self.attributes.get["in_out"],
+            socket_type=self.socket_type,
+            in_out=self.in_out,
         )
-        set_attributes(
+        attributes.set_on_element(
             element=socket,
             attributes=self.attributes,
-            defaults=defaults_for(self.attributes["socket_type"]),
+            class_name=self.socket_type,
         )
         return socket
 
@@ -83,9 +84,9 @@ class InterfacePanelData(InterfaceItemData):
     @classmethod
     def from_panel(cls, panel: NodeTreeInterfacePanel) -> "InterfacePanelData":
         return cls(
-            attributes=get_attributes(
+            attributes=attributes.from_element(
                 panel,
-                defaults_for("NodeTreeInterfacePanel"),
+                "NodeTreeInterfacePanel",
             ),
             items=[InterfaceItemData.from_item(item) for item in panel.interface_items],
         )
@@ -93,7 +94,7 @@ class InterfacePanelData(InterfaceItemData):
     @classmethod
     def from_panel_dict(cls, panel_dict: dict[str, Any]) -> "InterfacePanelData":
         return cls(
-            attributes=panel_dict.get("attributes", {}),
+            attributes=attributes.from_dict(panel_dict, "NodeTreeInterfacePanel"),
             items=[
                 InterfaceItemData.from_dict(item)
                 for item in panel_dict.get("items", [])
@@ -102,18 +103,18 @@ class InterfacePanelData(InterfaceItemData):
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            **self.attributes,
+            **attributes.to_dict(self.attributes, "NodeTreeInterfacePanel"),
             **(
                 {"items": [item.to_dict() for item in self.items]} if self.items else {}
             ),
         }
 
     def to_item(self, interface) -> NodeTreeInterfacePanel:
-        panel = interface.new_panel()
-        set_attributes(
+        panel = interface.new_panel(self.name)
+        attributes.set_on_element(
             element=panel,
             attributes=self.attributes,
-            defaults=defaults_for("NodeTreeInterfacePanel"),
+            class_name="NodeTreeInterfacePanel",
         )
         for item in self.items:
             item.to_item(interface)
