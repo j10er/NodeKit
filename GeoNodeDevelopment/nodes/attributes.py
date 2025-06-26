@@ -1,65 +1,80 @@
 from .attributes_dict import DEFAULTS
 from typing import Any
 
-CONVERTERS = {
+GETTER = {
     "str": str,
     "int": int,
     "float": float,
     "bool": bool,
     "list": list,
+    "node": lambda node: node.name,
     "None": lambda x: None,
+    "zone_items": lambda items: [[item.name, item.socket_type] for item in items],
+}
+SETTER = {
+    "str": setattr,
+    "int": setattr,
+    "float": setattr,
+    "float": setattr,
+    "bool": setattr,
+    "list": setattr,
+    "node": lambda element, name, value: None,
+    "None": lambda element, name, value: None,
+    "zone_items": lambda element, name, value: [
+        getattr(element, name).new(item[1], item[0])
+        for item in value
+        if item[0] not in getattr(element, name)
+    ],
 }
 
 
-def from_element(element: Any, class_name: str) -> dict[str, Any]:
-    defaults = defaults_for(class_name)
+def from_element(element: Any, defaults: dict[str, Any]) -> dict[str, Any]:
     attribute_dict = {}
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
-            print(
-                f"Warning while getting: {element} of type {type(element)} has no attribute '{attr_name}'"
-            )
             continue
-        value = CONVERTERS[attr_type](getattr(element, attr_name))
+        value = GETTER[attr_type](getattr(element, attr_name))
 
         attribute_dict[attr_name] = value
     return attribute_dict
 
 
-def from_dict(element_dict: dict[str, Any], class_name: str) -> dict[str, Any]:
-    defaults = defaults_for(class_name)
+def from_dict(element_dict: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
     attributes = {}
     for name, (attr_type, default_value) in defaults.items():
         attributes[name] = element_dict.get(name, default_value)
     return attributes
 
 
-def to_dict(attributes: dict[str, Any], class_name: str) -> dict[str, Any]:
-    defaults = defaults_for(class_name)
+def to_dict(attributes: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
     for name in list(attributes.keys()):
         if name not in defaults:
-            print(f"Warning: Attribute '{name}' not found in defaults for {class_name}")
+            print(f"Warning: Attribute '{name}' not found in defaults")
     return {
         name: value for name, value in attributes.items() if defaults[name][1] != value
     }
 
 
-def set_on_element(element: Any, attributes: dict[str, Any], class_name: str):
-    defaults = defaults_for(class_name)
+def set_on_element(
+    element: Any,
+    attributes: dict[str, Any],
+    defaults: dict[str, Any],
+):
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
             print(
                 f"Warning while setting: {element} of type {type(element)} has no attribute '{attr_name}'"
             )
             continue
+
         value = attributes[attr_name] if attr_name in attributes else default_value
+        setter = SETTER[attr_type]
         try:
-            setattr(element, attr_name, value)
+            setter(element, attr_name, value)
         except Exception as e:
-            # print(
-            #     f"Error setting attribute '{attr_name}' on {element} of type {type(element)}: {e}"
-            # )
-            continue
+            print(
+                f"Error setting attribute '{attr_name}' on {element} of type {type(element)}: {e}"
+            )
     return element
 
 
@@ -78,10 +93,12 @@ def find_class_path(
     return []
 
 
-def defaults_for(class_name: str):
-    class_path = find_class_path(class_name)
+def defaults_for(subtype_class: str, base_class: str = "Element") -> dict[str, Any]:
+    class_path = find_class_path(subtype_class)
     if not class_path:
-        print(f"Warning: No class path found for {class_name}")
+        class_path = find_class_path(base_class)
+    if not class_path:
+        print(f"Warning: No class path found for {subtype_class} or {base_class}")
         return {}
     current_subtype = DEFAULTS["Element"]
     defaults = {}
@@ -99,7 +116,7 @@ def defaults_for(class_name: str):
             if len(current_subtype) > 0:
                 defaults.update(current_subtype[0])
     except (IndexError, KeyError, TypeError) as e:
-        print(f"Error navigating class path for {class_name}: {e}")
+        print(f"Error navigating class path for {subtype_class}: {e}")
         return {}
     return defaults
 

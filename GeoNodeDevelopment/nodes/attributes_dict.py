@@ -28,10 +28,36 @@ DEFAULTS = {
                     "use_custom_color": ["bool", False],
                     "warning_propagation": ["str", "ALL"],
                     "width": ["float", 140],
-                }
+                },
+                {
+                    "GeometryNodeForeachGeometryElementInput": [
+                        {"paired_output": ["node", ""]}
+                    ],
+                    "GeometryNodeForeachGeometryElementOutput": [
+                        {
+                            "domain": ["str", ""],
+                            "main_items": ["zone_items", []],
+                            "generation_items": [
+                                "zone_items",
+                                [["Geometry", "GEOMETRY"]],
+                            ],
+                            "input_items": ["zone_items", []],
+                        },
+                    ],
+                    "GeometryNodeRepeatInput": [{"paired_output": ["node", ""]}],
+                    "GeometryNodeRepeatOutput": [
+                        {
+                            "repeat_items": ["zone_items", [["Geometry", "GEOMETRY"]]],
+                        }
+                    ],
+                    "GeometryNodeSimulationInput": [{"paired_output": ["node", ""]}],
+                    "GeometryNodeSimulationOutput": [
+                        {"state_items": ["zone_items", []]}
+                    ],
+                },
             ],
             "NodeSocket": [
-                {"type": ["str", ""]},
+                {"type": ["str", ""], "name": ["str", ""]},
                 {
                     "VALUE": [{"default_value": ["float", 0]}],
                     "INT": [{"default_value": ["int", 0]}],

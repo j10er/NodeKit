@@ -20,7 +20,7 @@ class OBJECT_OT_ImportJSON(bpy.types.Operator):
     bl_label = "Import from JSON"
 
     def execute(self, context):
-
+        import_groups()
         return {"FINISHED"}
 
 
@@ -30,9 +30,14 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
         tree = bpy.data.node_groups.get("TestNodes")
-        node = tree.nodes.get("Random Value")
-        socket = node.inputs.get("Probability")
-        print(socket.type)
+        # Create a new for each element zone
+        # input = tree.nodes.new("GeometryNodeRepeatInput")
+        # output = tree.nodes.new("GeometryNodeRepeatOutput")
+        # input.pair_with_output(output)
+        input = tree.nodes.get("Repeat Input")
+        output = tree.nodes.get("Repeat Output")
+        output.repeat_items.new("GEOMETRY", "Geometry")
+        print(output.repeat_items)
         return {"FINISHED"}
 
 
