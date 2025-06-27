@@ -2,25 +2,24 @@ from .attributes_dict import DEFAULTS
 from typing import Any
 
 GETTER = {
-    "str": str,
-    "int": int,
-    "float": float,
-    "bool": bool,
-    "list": list,
-    "node": lambda node: node.name,
-    "None": lambda x: None,
-    "zone_items": lambda items: [[item.name, item.socket_type] for item in items],
+    "FLOAT": float,
+    "INT": int,
+    "BOOLEAN": bool,
+    "LIST": list,
+    "STR": str,
+    "NODE": lambda node: node.name,
+    "NONE": lambda x: None,
+    "NODE_ITEMS": lambda items: [[item.name, item.socket_type] for item in items],
 }
 SETTER = {
-    "str": setattr,
-    "int": setattr,
-    "float": setattr,
-    "float": setattr,
-    "bool": setattr,
-    "list": setattr,
-    "node": lambda element, name, value: None,
-    "None": lambda element, name, value: None,
-    "zone_items": lambda element, name, value: [
+    "STR": setattr,
+    "INT": setattr,
+    "FLOAT": setattr,
+    "BOOLEAN": setattr,
+    "LIST": setattr,
+    "NODE": lambda element, name, value: None,
+    "NONE": lambda element, name, value: None,
+    "NODE_ITEMS": lambda element, name, value: [
         getattr(element, name).new(item[1], item[0])
         for item in value
         if item[0] not in getattr(element, name)

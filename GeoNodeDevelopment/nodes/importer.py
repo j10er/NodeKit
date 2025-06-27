@@ -11,4 +11,3 @@ def import_groups():
     for tree_dict in tree_dicts:
         node_tree_data = data.NodeTreeData.from_dict(tree_dict)
         new_tree = node_tree_data.to_tree()
-        # bpy.data.node_groups.append(new_tree)
