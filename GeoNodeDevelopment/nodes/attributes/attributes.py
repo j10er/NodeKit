@@ -11,8 +11,35 @@ GETTER = {
     "NODE": lambda node: node.name,
     "NODE_TREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
     "NONE": lambda x: None,
-    "COLLECTION": lambda items: [[item.name, item.socket_type] for item in items],
+    "COLLECTION": lambda items: [get_item_info(item) for item in items],
 }
+
+
+def get_item_info(item: Any) -> list[str]:
+    """
+    Get the name and socket type of an item, if it has a socket type.
+    """
+    if not hasattr(item, "name"):
+        return []
+    if not hasattr(item, "socket_type"):
+        return [item.name]
+
+    return [item.name, item.socket_type]
+
+
+def add_item(item_info: list[str], collection: Any) -> Any:
+    """
+    Add an item to a collection, creating it if it doesn't exist.
+    """
+    match len(item_info):
+        case 0:
+            collection.new()
+        case 1:
+            return collection.new(item_info[0])
+        case 2:
+            return collection.new(item_info[0], item_info[1])
+
+
 none = lambda element, name, value: None
 SETTER = {
     "STRING": setattr,
@@ -28,7 +55,7 @@ SETTER = {
     ),
     "NONE": none,
     "COLLECTION": lambda element, name, value: [
-        getattr(element, name).new(item[1], item[0])
+        add_item(item, getattr(element, name))
         for item in value
         if item[0] not in getattr(element, name)
     ],

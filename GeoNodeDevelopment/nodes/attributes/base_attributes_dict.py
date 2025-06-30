@@ -15,6 +15,7 @@ classes = {
             "use_custom_color": ["BOOLEAN", False],
             "warning_propagation": ["STRING", "ALL"],
             "width": ["FLOAT", 140],
+            "bl_idname": ["STRING", ""],
         },
         "subtypes": {
             bpy.types.NodeInternal: {
@@ -38,6 +39,7 @@ classes = {
             "color_tag": ["STRING", "NONE"],
             "default_group_node_width": ["INT", 140],
             "description": ["STRING", ""],
+            "bl_idname": ["STRING", ""],
         },
         "subtypes": {
             bpy.types.GeometryNodeTree: {
@@ -76,7 +78,11 @@ classes = {
         },
     },
     bpy.types.NodeSocket: {
-        "attributes": {"type": ["STRING", ""], "name": ["STRING", ""]},
+        "attributes": {
+            "type": ["STRING", ""],
+            "name": ["STRING", ""],
+            "bl_idname": ["STRING", ""],
+        },
         "subtypes": {bpy.types.NodeSocketStandard: {"find_subtypes": "NodeSocket"}},
     },
 }

@@ -30,11 +30,6 @@ class NodeTreeData(Data):
             raise ValueError(
                 f"Expected GeometryNodeTree, got {tree.bl_idname} for tree {tree.name}"
             )
-        for node in tree.nodes:
-            for i, input in enumerate(node.inputs):
-                input["index"] = i
-            for i, output in enumerate(node.outputs):
-                output["index"] = i
 
         defaults = attributes.defaults_for(tree.bl_idname)
         return cls(
@@ -52,8 +47,6 @@ class NodeTreeData(Data):
     @classmethod
     def from_dict(cls, tree_dict: dict[str, Any]) -> "NodeTreeData":
         defaults = attributes.defaults_for(tree_dict["bl_idname"])
-        print(defaults)
-        print(tree_dict.get("is_modifier", False))
         return cls(
             attributes=attributes.from_dict(tree_dict, defaults),
             defaults=defaults,

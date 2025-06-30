@@ -6,11 +6,15 @@ import json
 from pprint import pprint
 
 
+def make_valid_filename(name: str) -> str:
+    invalid_chars = r'<>:"/\|?*.'
+    for char in invalid_chars:
+        name = name.replace(char, "_")
+    return name.strip()
+
+
 def get_folder_path():
-    blend_path = bpy.data.filepath
-    stripped_filepath = Path(blend_path).with_suffix("")
-    folder_path = f"{stripped_filepath}_nodes"
-    return folder_path
+    return bpy.context.scene.gnd_props.json_folder_path
 
 
 def setup():
@@ -27,9 +31,10 @@ def setup():
 
 
 def save_tree_dict(tree_dict: dict):
+    filepath = f"{get_folder_path()}/{make_valid_filename(tree_dict['name'])}.json"
     json.dump(
         tree_dict,
-        open(get_folder_path() + "/" + tree_dict["name"] + ".json", "w"),
+        open(filepath, "w"),
         indent=4,
     )
 

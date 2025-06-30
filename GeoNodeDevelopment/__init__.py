@@ -14,7 +14,7 @@
 import bpy
 
 from . import operators
-from . import ui
+from . import ui, properties
 
 classes = [
     ui.VIEW3D_PT_SidePanel,
@@ -22,14 +22,19 @@ classes = [
     operators.OBJECT_OT_ImportJSON,
     operators.OBJECT_OT_Surprise,
     operators.OBJECT_OT_GenerateDefaultValues,
+    properties.GNDProperties,
 ]
 
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
+    bpy.types.Scene.gnd_props = bpy.props.PointerProperty(type=properties.GNDProperties)
+    if operators.save_handler not in bpy.app.handlers.save_post:
+        bpy.app.handlers.save_post.append(operators.save_handler)
 
 
 def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+    del bpy.types.Scene.gnd_props

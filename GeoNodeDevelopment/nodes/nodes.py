@@ -29,6 +29,11 @@ def setup():
     for tree in bpy.data.node_groups:
         if not hasattr(tree, "uuid"):
             tree["uuid"] = str(uuid.uuid4())
+        for node in tree.nodes:
+            for i, input in enumerate(node.inputs):
+                input["index"] = i
+            for i, output in enumerate(node.outputs):
+                output["index"] = i
 
 
 def import_groups():

@@ -3,6 +3,7 @@ from pprint import pprint
 
 from .nodes.nodes import export_groups, import_groups
 from .nodes.attributes import generate_attributes_dict
+import bpy_extras
 
 
 class OBJECT_OT_ExportJSON(bpy.types.Operator):
@@ -28,9 +29,14 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-        tree = bpy.data.node_groups.get("TestNodes")
-        tree.is_modifier = True
-        print(tree.is_modifier)
+        tree = bpy.data.node_groups.get("Boolean Attribute At")
+        socket = tree.interface.items_tree[1]
+        print(
+            [
+                (prop.type, prop.identifier)
+                for prop in socket.__class__.bl_rna.properties
+            ]
+        )
 
         return {"FINISHED"}
 
@@ -42,3 +48,7 @@ class OBJECT_OT_GenerateDefaultValues(bpy.types.Operator):
     def execute(self, context):
         attributes = generate_attributes_dict.generate_attributes_dict()
         return {"FINISHED"}
+
+
+def save_handler(scene):
+    bpy.ops.object.export_json()
