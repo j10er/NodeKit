@@ -32,13 +32,9 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
 
-        base = bpy.types.GeometryNode.bl_rna  # The RNA struct we want subclasses of
-
-        print(f"Subclasses of {base.identifier}:")
-
-        for cls in bpy.types.GeometryNode.__subclasses__():
+        print("awd")
+        for cls in sorted(operator_classes, key=lambda c: c.__name__):
             print(cls.__name__)
-
         return {"FINISHED"}
 
 
@@ -48,20 +44,4 @@ class OBJECT_OT_GenerateDefaultValues(bpy.types.Operator):
 
     def execute(self, context):
         pprint(generate_attributes_dict.generate_attributes_dict())
-        return {"FINISHED"}
-
-
-class OBJECT_OT_DebugGeometryNodes(bpy.types.Operator):
-    bl_idname = "object.debug_geometry_nodes"
-    bl_label = "Debug Geometry Nodes"
-
-    def execute(self, context):
-        generate_attributes_dict.debug_geometry_node_classes()
-
-        print("\n=== Geometry Nodes Only Dictionary ===")
-        geo_dict = generate_attributes_dict.filter_geometry_nodes_only()
-        from pprint import pprint
-
-        pprint(geo_dict)
-
         return {"FINISHED"}

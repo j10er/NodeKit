@@ -20,56 +20,91 @@ defaults = {
 }
 
 classes = {
-    bpy.types.bpy_struct: {
-        bpy.types.Node: {
+    bpy.types.Node: {
+        "subtypes": {
             bpy.types.NodeInternal: {
-                bpy.types.GeometryNode: False,
-                bpy.types.FunctionNode: True,
+                "subtypes": {
+                    bpy.types.GeometryNode: {"generate_subtypes": True},
+                    bpy.types.FunctionNode: {"generate_subtypes": True},
+                },
             }
         },
-        bpy.types.NodeTree: {bpy.types.GeometryNodeTree: False},
-        bpy.types.NodeTreeInterfaceItem: {
-            bpy.types.NodeTreeInterfaceSocket: True,
-            bpy.types.NodeTreeInterfacePanel: False,
+    },
+    bpy.types.NodeTree: {
+        "subtypes": {
+            bpy.types.GeometryNodeTree: {
+                "attributes": {
+                    "name": ["STRING", ""],
+                    "color_tag": ["STRING", "NONE"],
+                    "default_group_node_width": ["INT", 140],
+                    "description": ["STRING", ""],
+                    "is_modifier": ["BOOLEAN", False],
+                    "is_tool": ["BOOLEAN", False],
+                },
+                "subtypes": {},
+            }
         },
-        bpy.types.NodeSocket: True,
-    }
+    },
+    bpy.types.NodeTreeInterfaceItem: {
+        "subtypes": {
+            bpy.types.NodeTreeInterfacePanel: {
+                "subtypes": {},
+            },
+            bpy.types.NodeTreeInterfaceSocket: {"generate_subtypes": True},
+        },
+    },
+    bpy.types.NodeSocket: {
+        "subtypes": {bpy.types.NodeSocketStandard: {"generate_subtypes": True}}
+    },
 }
 
 
-def generate_attributes_for(
-    current_class: type, base_class: type, values: Any
-) -> Dict[str, Union[str, List[Any]]]:
-    attributes = {}
-    if type(values) is not dict:
-        if values == True:
-            return {
-                cls.__name__: generate_attributes_for(
-                    current_class=cls, base_class=current_class, values=False
-                )
-                for cls in current_class.__subclasses__()
-            }
-        elif values == False:
-            base_attributes = [prop.identifier for prop in base_class.bl_rna.properties]
-            return {attr_name: [prop.type, defaults[prop.type]] for attr_name, prop in base_class.bl_rna.properties.items() if attr_name not in base_attributes}
-    elif type(values) is dict:
-        return {cls.}generate_attributes_for(
-
-    return attributes
+def attributes_for(cls, base_class):
+    base_attributes = (
+        [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
+    )
+    return {
+        prop.identifier: prop.type
+        for prop in cls.bl_rna.properties
+        if prop.identifier not in base_attributes
+    }
 
 
-# Keep the original simple function for backward compatibility
-def generate_simple_attributes_dict():
-    base_classes = [bpy.types.GeometryNode]
-    attributes = {}
-    for base_class in base_classes:
-        subtypes = {}
-        base_attributes =
-        for cls in base_class.__subclasses__():
-            subtypes[cls.__name__] = {
-                prop.identifier: prop.type
-                for prop in cls.bl_rna.properties
-                if prop.identifier not in base_attributes
-            }
-        attributes[base_class.__name__] = [{}, subtypes]
-    return attributes
+def subtypes_with_attributes(subtype_classes, base_class):
+    return
+
+
+def attributes_dict_for(
+    curr_class: type, params: dict[str, Any], base_class=None
+) -> Any:
+    attributes = params.get(
+        "attributes", attributes_for(cls=curr_class, base_class=base_class)
+    )
+    if params.get("generate_subtypes", False):
+        subtypes = {
+            cls.__name__: attributes_dict_for(
+                cls, params={"subtypes": {}}, base_class=curr_class
+            )
+            for cls in curr_class.__subclasses__()
+        }
+    else:
+        subtypes = (
+            {
+                cls.__name__: attributes_dict_for(cls, params=p, base_class=curr_class)
+                for cls, p in params.get("subtypes", {}).items()
+            },
+        )
+
+    return [attributes, subtypes] if subtypes else [attributes]
+
+
+def generate_attributes_dict():
+    return {
+        "Element": [
+            {},
+            {
+                cls.__name__: attributes_dict_for(curr_class=cls, params=params)
+                for cls, params in classes.items()
+            },
+        ]
+    }
