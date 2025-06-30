@@ -27,19 +27,13 @@ def setup():
     os.mkdir(f"{stripped_filepath}_nodes")
 
 
-def save_tree_dict(tree_dict: NodeTreeData):
+def save_tree_dict(tree_dict: dict):
     setup()
     json.dump(
         tree_dict,
         open(get_folder_path() + "/" + tree_dict["name"] + ".json", "w"),
         indent=4,
     )
-
-
-def load_tree(file_path: str) -> NodeTreeData:
-    with open(file_path, "r") as f:
-        tree_dict = json.load(f)
-    return NodeTreeData(tree_dict=tree_dict)
 
 
 def load_all() -> list[dict]:

@@ -1,2 +1,4 @@
 # Only needed for syntax highlighting
 fake-bpy-module
+black
+pytest

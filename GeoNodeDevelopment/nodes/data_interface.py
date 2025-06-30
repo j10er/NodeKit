@@ -1,6 +1,6 @@
 from bpy.types import NodeTreeInterfaceSocket, NodeTreeInterfacePanel
 from typing import Any, Union
-from . import attributes
+from .attributes import attributes
 from .data_base_class import Data
 
 
@@ -35,13 +35,16 @@ class InterfaceSocketData(InterfaceItemData):
         attributes: dict[str, Any],
         defaults: dict[str, Any],
         parent_index: int,
+        bl_idname: str,
     ) -> None:
         super().__init__(attributes, defaults)
         self.parent_index = parent_index
+        self.attributes["bl_idname"] = bl_idname
 
     @classmethod
     def from_socket(cls, socket: NodeTreeInterfaceSocket) -> "InterfaceSocketData":
-        defaults = attributes.defaults_for(socket.socket_type)
+        bl_idname = socket.__class__.__name__
+        defaults = attributes.defaults_for(bl_idname)
         return cls(
             attributes=attributes.from_element(
                 socket,
@@ -49,15 +52,17 @@ class InterfaceSocketData(InterfaceItemData):
             ),
             defaults=defaults,
             parent_index=socket.parent.index,
+            bl_idname=bl_idname,
         )
 
     @classmethod
     def from_socket_dict(cls, socket_dict: dict[str, Any]) -> "InterfaceSocketData":
-        defaults = attributes.defaults_for(socket_dict["socket_type"])
+        defaults = attributes.defaults_for(socket_dict["bl_idname"])
         return cls(
             attributes=attributes.from_dict(socket_dict, defaults),
             defaults=defaults,
             parent_index=socket_dict.get("parent_index", -1),
+            bl_idname=socket_dict["bl_idname"],
         )
 
     def to_dict(self) -> dict[str, Any]:

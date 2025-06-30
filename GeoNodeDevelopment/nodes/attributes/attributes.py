@@ -6,20 +6,20 @@ GETTER = {
     "INT": int,
     "BOOLEAN": bool,
     "LIST": list,
-    "STR": str,
+    "STRING": str,
     "NODE": lambda node: node.name,
     "NONE": lambda x: None,
-    "NODE_ITEMS": lambda items: [[item.name, item.socket_type] for item in items],
+    "COLLECTION": lambda items: [[item.name, item.socket_type] for item in items],
 }
 SETTER = {
-    "STR": setattr,
+    "STRING": setattr,
     "INT": setattr,
     "FLOAT": setattr,
     "BOOLEAN": setattr,
     "LIST": setattr,
     "NODE": lambda element, name, value: None,
     "NONE": lambda element, name, value: None,
-    "NODE_ITEMS": lambda element, name, value: [
+    "COLLECTION": lambda element, name, value: [
         getattr(element, name).new(item[1], item[0])
         for item in value
         if item[0] not in getattr(element, name)

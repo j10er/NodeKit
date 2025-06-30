@@ -1,16 +1,11 @@
 import bpy
 import uuid
-from bpy.types import (
-    Node,
-    NodeTree,
-    NodeSocket,
-    NodeTreeInterfaceItem,
-)
-from typing import Any, Union
-import datetime
-from .interface_data import InterfaceItemData
-from . import attributes
+from bpy.types import Node, NodeTree, NodeSocket
+from typing import Any
+from .data_interface import InterfaceItemData
+from .attributes import attributes
 from .data_base_class import Data
+from pprint import pprint
 
 
 class NodeTreeData(Data):
@@ -83,7 +78,7 @@ class NodeTreeData(Data):
     def to_tree(self) -> NodeTree:
         print(f"Creating new node tree: {self.name}...")
         tree = bpy.data.node_groups.new(
-            name=self.attributes["name"] + str(datetime.datetime.now()),
+            name=self.attributes["name"],
             type="GeometryNodeTree",
         )
         tree["uuid"] = self.uuid
@@ -232,7 +227,7 @@ class SocketData(Data):
                 to_socket_index.append(link.to_socket["index"])
                 to_node.append(link.to_node.name)
 
-        defaults = attributes.defaults_for(socket.type)
+        defaults = attributes.defaults_for(socket.bl_idname)
         return cls(
             to_socket_index=to_socket_index,
             to_node=to_node,
@@ -243,7 +238,7 @@ class SocketData(Data):
 
     @classmethod
     def from_dict(cls, socket_dict: dict[str, Any]) -> "SocketData":
-        defaults = attributes.defaults_for(socket_dict["type"])
+        defaults = attributes.defaults_for(socket_dict["bl_idname"])
         return cls(
             attributes=attributes.from_dict(socket_dict, defaults),
             defaults=defaults,

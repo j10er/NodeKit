@@ -1,11 +1,9 @@
 import bpy
 from pprint import pprint
-from .nodes import attributes_dict, exporter, importer
-from .nodes import data, file
+
 from .nodes.exporter import export_groups
 from .nodes.importer import import_groups
-from bpy.types import GeometryNodeRepeatOutput, GeometryNodeInputCollection
-from .nodes import generate_attributes_dict
+from .nodes.attributes import generate_attributes_dict
 
 
 class OBJECT_OT_ExportJSON(bpy.types.Operator):
@@ -31,10 +29,9 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-
-        print("awd")
-        for cls in sorted(operator_classes, key=lambda c: c.__name__):
-            print(cls.__name__)
+        tree = bpy.data.node_groups.get("TestNodes")
+        socket = tree.interface.items_tree[0]
+        print(socket.__class__.__name__)
         return {"FINISHED"}
 
 
@@ -43,5 +40,5 @@ class OBJECT_OT_GenerateDefaultValues(bpy.types.Operator):
     bl_label = "Generate Default Values"
 
     def execute(self, context):
-        pprint(generate_attributes_dict.generate_attributes_dict())
+        attributes = generate_attributes_dict.generate_attributes_dict()
         return {"FINISHED"}
