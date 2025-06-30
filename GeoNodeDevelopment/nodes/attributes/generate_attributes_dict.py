@@ -21,7 +21,7 @@ def convert_type(cls, prop) -> str:
                 return "FLOAT"
         case "POINTER":
             identifier = prop.identifier.upper()
-            if identifier != "NODE":
+            if identifier not in ("NODE", "NODE_TREE"):
                 identifier = "NONE"
             all_attribute_types.add(identifier)
             return identifier

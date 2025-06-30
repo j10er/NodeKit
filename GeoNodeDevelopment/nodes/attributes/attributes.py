@@ -1,5 +1,6 @@
 from .attributes_dict import DEFAULTS
 from typing import Any
+import bpy
 
 GETTER = {
     "FLOAT": float,
@@ -8,17 +9,24 @@ GETTER = {
     "LIST": list,
     "STRING": str,
     "NODE": lambda node: node.name,
+    "NODE_TREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
     "NONE": lambda x: None,
     "COLLECTION": lambda items: [[item.name, item.socket_type] for item in items],
 }
+none = lambda element, name, value: None
 SETTER = {
     "STRING": setattr,
     "INT": setattr,
     "FLOAT": setattr,
     "BOOLEAN": setattr,
     "LIST": setattr,
-    "NODE": lambda element, name, value: None,
-    "NONE": lambda element, name, value: None,
+    "NODE": none,
+    "NODE_TREE": lambda element, name, value: setattr(
+        element,
+        name,
+        next((tree for tree in bpy.data.node_groups if tree["uuid"] == value), None),
+    ),
+    "NONE": none,
     "COLLECTION": lambda element, name, value: [
         getattr(element, name).new(item[1], item[0])
         for item in value

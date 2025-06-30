@@ -1,8 +1,7 @@
 import bpy
 from pprint import pprint
 
-from .nodes.exporter import export_groups
-from .nodes.importer import import_groups
+from .nodes.nodes import export_groups, import_groups
 from .nodes.attributes import generate_attributes_dict
 
 
@@ -30,8 +29,9 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
         tree = bpy.data.node_groups.get("TestNodes")
-        socket = tree.interface.items_tree[0]
-        print(socket.__class__.__name__)
+        tree.is_modifier = True
+        print(tree.is_modifier)
+
         return {"FINISHED"}
 
 

@@ -25,15 +25,18 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
-        if not hasattr(tree, "uuid"):
-            tree["uuid"] = str(uuid.uuid4())
+        print(f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}")
+        if tree.bl_idname != "GeometryNodeTree":
+            raise ValueError(
+                f"Expected GeometryNodeTree, got {tree.bl_idname} for tree {tree.name}"
+            )
         for node in tree.nodes:
             for i, input in enumerate(node.inputs):
                 input["index"] = i
             for i, output in enumerate(node.outputs):
                 output["index"] = i
 
-        defaults = attributes.defaults_for("NodeTree")
+        defaults = attributes.defaults_for(tree.bl_idname)
         return cls(
             attributes=attributes.from_element(tree, defaults),
             defaults=defaults,
@@ -48,7 +51,9 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_dict(cls, tree_dict: dict[str, Any]) -> "NodeTreeData":
-        defaults = attributes.defaults_for("NodeTree")
+        defaults = attributes.defaults_for(tree_dict["bl_idname"])
+        print(defaults)
+        print(tree_dict.get("is_modifier", False))
         return cls(
             attributes=attributes.from_dict(tree_dict, defaults),
             defaults=defaults,
@@ -75,20 +80,22 @@ class NodeTreeData(Data):
             ],
         }
 
-    def to_tree(self) -> NodeTree:
-        print(f"Creating new node tree: {self.name}...")
-        tree = bpy.data.node_groups.new(
-            name=self.attributes["name"],
-            type="GeometryNodeTree",
-        )
+    def create_tree_hull(self) -> NodeTree:
+        tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
+        self.tree = tree
         tree["uuid"] = self.uuid
-        print(f"Created node tree {tree.name} with UUID: {tree['uuid']}")
+        attributes.set_on_element(tree, self.attributes, self.defaults)
+        print(f"Created node tree: {tree.name} with UUID: {self.uuid}")
         attributes.set_on_element(tree, self.attributes, self.defaults)
         for item_data in self.interface_items:
             item = item_data.to_item(tree.interface)
         print(
             f"Created {len(tree.interface.items_tree)} interface items for tree {tree.name}"
         )
+        return tree
+
+    def add_nodes(self) -> NodeTree:
+        tree = self.tree
         for node_data in self.nodes.values():
             node = node_data.to_node(tree)
         print(f"Created {len(tree.nodes)} nodes for tree {tree.name}")
