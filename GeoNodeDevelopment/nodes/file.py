@@ -1,7 +1,7 @@
-import os
-from pathlib import Path
-import shutil
 import bpy
+import os
+import shutil
+
 import json
 from pprint import pprint
 

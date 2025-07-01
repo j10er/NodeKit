@@ -1,12 +1,12 @@
 import bpy
-from bpy.types import Node, NodeTree, NodeSocket
+from bpy.types import NodeTree
 from typing import Any
 from pprint import pprint
 
 from ..attributes import attributes
 from .base_class import Data
 from .tree_interface import InterfaceItemData
-from .node import NodeData
+from .node import NodeData, EXCLUDED_NODE_TYPES
 
 
 class NodeTreeData(Data):
@@ -27,6 +27,7 @@ class NodeTreeData(Data):
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
         print(f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}")
+
         if tree.bl_idname != "GeometryNodeTree":
             raise ValueError(
                 f"Expected GeometryNodeTree, got {tree.bl_idname} for tree {tree.name}"
@@ -37,7 +38,11 @@ class NodeTreeData(Data):
             attributes=attributes.from_element(tree, defaults),
             defaults=defaults,
             uuid=tree["uuid"],
-            nodes={node.name: NodeData.from_node(node) for node in tree.nodes},
+            nodes={
+                node.name: NodeData.from_node(node)
+                for node in tree.nodes
+                if node.bl_idname not in EXCLUDED_NODE_TYPES
+            },
             interface_items=[
                 InterfaceItemData.from_item(item)
                 for item in tree.interface.items_tree
@@ -75,11 +80,11 @@ class NodeTreeData(Data):
         }
 
     def create_tree_hull(self) -> NodeTree:
+        print(f"Creating node tree hull for: {self.name} with UUID: {self.uuid}")
         tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
         self.tree = tree
         tree["uuid"] = self.uuid
         attributes.set_on_element(tree, self.attributes, self.defaults)
-        print(f"Created node tree: {tree.name} with UUID: {self.uuid}")
         attributes.set_on_element(tree, self.attributes, self.defaults)
         for item_data in self.interface_items:
             item = item_data.to_item(tree.interface)
@@ -89,6 +94,8 @@ class NodeTreeData(Data):
         return tree
 
     def add_nodes(self) -> NodeTree:
+
+        print(f"Adding {len(self.nodes)} nodes to tree: {self.name}")
         tree = self.tree
         for node_data in self.nodes.values():
             node = node_data.to_node(tree)

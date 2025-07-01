@@ -4,6 +4,8 @@ from bpy.types import Node, NodeTree, NodeSocket
 from ..attributes import attributes
 from .base_class import Data
 
+EXCLUDED_NODE_TYPES = ["GeometryNodeViewer"]
+
 
 class NodeData(Data):
 
@@ -113,7 +115,10 @@ class SocketData(Data):
         to_socket_index = []
         to_node = []
         for link in socket.links:
-            if link.from_socket == socket:
+            if (
+                link.from_socket == socket
+                and link.to_node.bl_idname not in EXCLUDED_NODE_TYPES
+            ):
                 to_socket_index.append(link.to_socket["index"])
                 to_node.append(link.to_node.name)
 
