@@ -27,7 +27,12 @@ def setup():
 
 
 def save_tree_dict(tree_dict: dict):
-    filepath = f"{get_folder_path()}/{make_valid_filename(tree_dict['name'])}.json"
+    directory = os.path.join(
+        get_folder_path(), tree_dict["tree_type"], tree_dict["category"]
+    )
+    os.makedirs(directory, exist_ok=True)
+    filename = f"{make_valid_filename(tree_dict['name'])}.json"
+    filepath = os.path.join(directory, filename)
     json.dump(
         tree_dict,
         open(filepath, "w"),

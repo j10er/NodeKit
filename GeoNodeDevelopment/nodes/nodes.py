@@ -21,6 +21,8 @@ def export_tree(tree):
         "name": tree_dict["name"],
         "tree": tree_dict,
         "blender_version": bpy.app.version_string,
+        "tree_type": tree.bl_idname,
+        "category": "Tests" if tree.name.startswith(".test: ") else "Groups",
     }
     file.save_tree_dict(data_dict)
 
