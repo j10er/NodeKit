@@ -1,12 +1,14 @@
 import bpy
 from bpy.types import NodeTree
 from typing import Any
-from pprint import pprint
-
+import logging
 from ..attributes import attributes
 from .base_class import Data
 from .tree_interface import InterfaceItemData
 from .node import NodeData, EXCLUDED_NODE_TYPES
+
+
+log = logging.getLogger(__name__.split(".")[2])
 
 
 class NodeTreeData(Data):
@@ -26,12 +28,15 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
-        print(f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}")
+        log.info(
+            f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}"
+        )
 
         if tree.bl_idname != "GeometryNodeTree":
-            raise ValueError(
+            log.error(
                 f"Expected GeometryNodeTree, got {tree.bl_idname} for tree {tree.name}"
             )
+            return None
 
         defaults = attributes.defaults_for(tree.bl_idname)
         return cls(
@@ -52,6 +57,7 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_dict(cls, tree_dict: dict[str, Any]) -> "NodeTreeData":
+        log.debug(f"{tree_dict['name']}: Creating NodeTreeData from dict")
         defaults = attributes.defaults_for(tree_dict["bl_idname"])
         return cls(
             attributes=attributes.from_dict(tree_dict, defaults),
@@ -68,6 +74,7 @@ class NodeTreeData(Data):
         )
 
     def to_dict(self) -> dict[str, Any]:
+        log.debug(f"{self.name}: Converting to dict")
         return {
             **attributes.to_dict(self.attributes, self.defaults),
             "uuid": self.uuid,
@@ -80,47 +87,59 @@ class NodeTreeData(Data):
         }
 
     def create_tree_hull(self) -> NodeTree:
-        print(f"{self.name}: Creating node tree hull")
+        log.debug(f"{self.name}: Creating node tree hull")
         tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
         self.tree = tree
         tree["uuid"] = self.uuid
         attributes.set_on_element(tree, self.attributes, self.defaults)
         attributes.set_on_element(tree, self.attributes, self.defaults)
         for item_data in self.interface_items:
+            log.debug(
+                f"{self.name}: Creating interface item {item_data.name} with type {item_data.bl_idname}"
+            )
             item = item_data.to_item(tree.interface)
-        print(f"{self.name}: Created {len(tree.interface.items_tree)} interface items")
+        log.debug(
+            f"{self.name}: Created {len(tree.interface.items_tree)} interface items"
+        )
         return tree
 
     def add_nodes(self) -> NodeTree:
-
-        print(f"{self.name}: Adding {len(self.nodes)} nodes")
+        log.debug("=" * 40)
+        log.debug(f"{self.name}: Adding {len(self.nodes)} nodes")
         tree = self.tree
         for node_data in self.nodes.values():
             node = node_data.to_node(tree)
-        print(f"{self.name}: Created {len(tree.nodes)} nodes")
+        log.debug(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
             if hasattr(node_data, "paired_output"):
-                print(
+                log.debug(
                     f"{self.name}: Pairing zone node '{node_data.name}' to output '{node_data.paired_output}'"
                 )
                 tree.nodes[node_data.name].pair_with_output(
                     tree.nodes[node_data.paired_output]
                 )
-        print(f"{self.name}: Setting socket attributes")
+
+        log.debug(f"{self.name}: Setting socket attributes")
         for node_data in self.nodes.values():
             node = tree.nodes[node_data.name]
+            log.debug(f"{self.name}: Setting attributes for node {node.name}")
             node_data.set_socket_attributes(node)
-        print(f"{self.name}: Connecting nodes with links")
+        log.debug(f"{self.name}: Connecting nodes with links")
         for node_data in self.nodes.values():
+            log.debug(f"{self.name}: Adding links for node {node_data.name}")
             for output_data in node_data.outputs:
                 if output_data.to_node and output_data.to_socket_index:
                     from_node = tree.nodes.get(node_data.name)
                     from_socket = from_node.outputs[output_data.index]
 
                     for i in range(len(output_data.to_node)):
+
                         to_node = tree.nodes.get(output_data.to_node[i])
                         to_socket = to_node.inputs[output_data.to_socket_index[i]]
-
+                        log.debug(
+                            f"{self.name}: Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
+                        )
                         tree.links.new(from_socket, to_socket)
-        print(f"{self.name}: Done.")
+        log.debug(f"{self.name}: Done.")
+        log.debug("=" * 40)
         return tree

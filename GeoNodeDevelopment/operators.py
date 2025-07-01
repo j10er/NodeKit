@@ -5,6 +5,10 @@ from .nodes.nodes import export_groups, import_groups
 from .nodes.attributes import generate_attributes_dict
 from .nodes import file
 import bpy_extras
+import logging
+
+log = logging.getLogger(__name__.split(".")[2])
+log.setLevel(logging.INFO)
 
 
 class OBJECT_OT_ExportJSON(bpy.types.Operator):
@@ -44,8 +48,7 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     def execute(self, context):
         cls = bpy.types.GeometryNodeGroup
         prop = cls.bl_rna.properties.get("node_tree")
-        print(dir(prop))
-        print(prop.fixed_type.identifier)
+        log.debug(__name__[2])
         return {"FINISHED"}
 
 

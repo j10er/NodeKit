@@ -4,6 +4,9 @@ import shutil
 
 import json
 from pprint import pprint
+import logging
+
+log = logging.getLogger(__name__.split(".")[2])
 
 
 def make_valid_filename(name: str) -> str:

@@ -5,14 +5,21 @@ from . import file
 from .data.node_tree import NodeTreeData
 import uuid
 
+import logging
+
+log = logging.getLogger(__name__.split(".")[2])
+
 
 def export_groups():
+    log.info(f"Exporting all node groups to {file.get_folder_path()}")
     setup()
     for tree in bpy.data.node_groups:
         if tree.bl_idname != "GeometryNodeTree":
             continue
         export_tree(tree)
-    print(f"Exported {len(bpy.data.node_groups)} node groups.")
+    log.info(s
+        f"Exported {len(bpy.data.node_groups)} node groups to {file.get_folder_path()}."
+    )
 
 
 def export_tree(tree):
@@ -25,6 +32,9 @@ def export_tree(tree):
         "tree_type": tree.bl_idname,
         "category": "Tests" if tree.name.startswith(".test: ") else "Groups",
     }
+    log.debug(
+        f"Exporting {data_dict['tree_type']}: {data_dict['name']} with category {data_dict['category']}"
+    )
     file.save_tree_dict(data_dict)
 
 

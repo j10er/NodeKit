@@ -1,8 +1,12 @@
 import bpy
 from typing import Any
+import logging
 from bpy.types import Node, NodeTree, NodeSocket
 from ..attributes import attributes
 from .base_class import Data
+
+
+log = logging.getLogger(__name__.split(".")[2])
 
 EXCLUDED_NODE_TYPES = ["GeometryNodeViewer"]
 
