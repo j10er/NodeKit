@@ -20,11 +20,11 @@ def convert_type(cls, prop) -> str:
                 all_attribute_types.add("FLOAT")
                 return "FLOAT"
         case "POINTER":
-            identifier = prop.identifier.upper()
-            if identifier not in ("NODE", "NODE_TREE"):
-                identifier = "NONE"
-            all_attribute_types.add(identifier)
-            return identifier
+            type_identifier = prop.fixed_type.identifier.upper()
+            if type_identifier not in ("NODE", "NODETREE"):
+                type_identifier = "NONE"
+            all_attribute_types.add(type_identifier)
+            return type_identifier
         case "ENUM":
             all_attribute_types.add("STRING")
             return "STRING"
@@ -79,6 +79,7 @@ def attributes_dict_for(
 
 
 def generate_attributes_dict():
+    print("Generating attributes dictionary...")
     attributes = {
         "Element": [
             {},
@@ -90,9 +91,11 @@ def generate_attributes_dict():
     }
 
     file_path = Path(__file__).parent / "attributes_dict.py"
+    print(f"Saving attributes dictionary in {file_path}")
     with open(file_path, "w") as file:
         file.write("DEFAULTS = ")
         pprint(attributes, stream=file)
         file.write("\nALL_ATTRIBUTE_TYPES = ")
         pprint(sorted(all_attribute_types), stream=file)
+    print("Attributes dictionary generated successfully.")
     return attributes

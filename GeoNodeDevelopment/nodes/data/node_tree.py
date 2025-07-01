@@ -80,7 +80,7 @@ class NodeTreeData(Data):
         }
 
     def create_tree_hull(self) -> NodeTree:
-        print(f"Creating node tree hull for: {self.name} with UUID: {self.uuid}")
+        print(f"{self.name}: Creating node tree hull")
         tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
         self.tree = tree
         tree["uuid"] = self.uuid
@@ -88,27 +88,29 @@ class NodeTreeData(Data):
         attributes.set_on_element(tree, self.attributes, self.defaults)
         for item_data in self.interface_items:
             item = item_data.to_item(tree.interface)
-        print(
-            f"Created {len(tree.interface.items_tree)} interface items for tree {tree.name}"
-        )
+        print(f"{self.name}: Created {len(tree.interface.items_tree)} interface items")
         return tree
 
     def add_nodes(self) -> NodeTree:
 
-        print(f"Adding {len(self.nodes)} nodes to tree: {self.name}")
+        print(f"{self.name}: Adding {len(self.nodes)} nodes")
         tree = self.tree
         for node_data in self.nodes.values():
             node = node_data.to_node(tree)
-        print(f"Created {len(tree.nodes)} nodes for tree {tree.name}")
+        print(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
             if hasattr(node_data, "paired_output"):
+                print(
+                    f"{self.name}: Pairing zone node '{node_data.name}' to output '{node_data.paired_output}'"
+                )
                 tree.nodes[node_data.name].pair_with_output(
                     tree.nodes[node_data.paired_output]
                 )
+        print(f"{self.name}: Setting socket attributes")
         for node_data in self.nodes.values():
             node = tree.nodes[node_data.name]
             node_data.set_socket_attributes(node)
-
+        print(f"{self.name}: Connecting nodes with links")
         for node_data in self.nodes.values():
             for output_data in node_data.outputs:
                 if output_data.to_node and output_data.to_socket_index:
@@ -120,4 +122,5 @@ class NodeTreeData(Data):
                         to_socket = to_node.inputs[output_data.to_socket_index[i]]
 
                         tree.links.new(from_socket, to_socket)
+        print(f"{self.name}: Done.")
         return tree

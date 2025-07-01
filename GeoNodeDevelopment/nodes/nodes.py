@@ -12,6 +12,7 @@ def export_groups():
         if tree.bl_idname != "GeometryNodeTree":
             continue
         export_tree(tree)
+    print(f"Exported {len(bpy.data.node_groups)} node groups.")
 
 
 def export_tree(tree):

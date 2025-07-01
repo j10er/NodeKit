@@ -13,7 +13,9 @@ class OBJECT_OT_ExportJSON(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene.gnd_props.json_folder_path != ""
+        return (
+            bpy.context.scene.gnd_props.json_folder_path != "" and file.path_is_valid()
+        )
 
     def execute(self, context):
         export_groups()
@@ -26,7 +28,9 @@ class OBJECT_OT_ImportJSON(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return bpy.context.scene.gnd_props.json_folder_path != ""
+        return (
+            bpy.context.scene.gnd_props.json_folder_path != "" and file.path_is_valid()
+        )
 
     def execute(self, context):
         import_groups()
@@ -38,15 +42,10 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-        tree = bpy.data.node_groups.get("Boolean Attribute At")
-        socket = tree.interface.items_tree[1]
-        print(
-            [
-                (prop.type, prop.identifier)
-                for prop in socket.__class__.bl_rna.properties
-            ]
-        )
-
+        cls = bpy.types.GeometryNodeGroup
+        prop = cls.bl_rna.properties.get("node_tree")
+        print(dir(prop))
+        print(prop.fixed_type.identifier)
         return {"FINISHED"}
 
 

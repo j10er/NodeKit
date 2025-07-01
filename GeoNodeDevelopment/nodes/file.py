@@ -17,6 +17,10 @@ def get_folder_path():
     return bpy.context.scene.gnd_props.json_folder_path
 
 
+def path_is_valid():
+    return os.path.exists(get_folder_path()) and os.path.isdir(get_folder_path())
+
+
 def setup():
     folder_path = get_folder_path()
     if not get_folder_path():
@@ -41,12 +45,19 @@ def save_tree_dict(tree_dict: dict):
 
 
 def load_all() -> list[dict]:
+    return load_from_folder(get_folder_path())
+
+
+def load_from_folder(folder_path: str) -> list[dict]:
     data_dicts = []
-    for file in os.listdir(get_folder_path()):
+    for file in os.listdir(folder_path):
         if file.endswith(".json"):
-            with open(f"{get_folder_path()}/{file}", "r") as f:
+            with open(f"{folder_path}/{file}", "r") as f:
                 data_dict = json.load(f)
                 data_dicts.append(data_dict)
+        if os.path.isdir(f"{folder_path}/{file}"):
+            subfolder_data = load_from_folder(f"{folder_path}/{file}")
+            data_dicts.extend(subfolder_data)
     return data_dicts
 
 

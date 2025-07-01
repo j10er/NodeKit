@@ -9,7 +9,7 @@ def get_item_info(item: Any) -> list[str]:
     if not hasattr(item, "socket_type"):
         return [item.name]
 
-    return [item.name, item.socket_type]
+    return [item.socket_type, item.name]
 
 
 def add_item(item_info: list[str], collection: Any) -> Any:
@@ -30,8 +30,8 @@ GETTER = {
     "BOOLEAN": bool,
     "LIST": list,
     "STRING": str,
-    "NODE": lambda node: node.name,
-    "NODE_TREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
+    "NODE": lambda node: node.name if node else None,
+    "NODETREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
     "NONE": lambda x: None,
     "COLLECTION": lambda items: [get_item_info(item) for item in items],
 }
@@ -44,7 +44,7 @@ SETTER = {
     "BOOLEAN": setattr,
     "LIST": setattr,
     "NODE": none,
-    "NODE_TREE": lambda element, name, value: setattr(
+    "NODETREE": lambda element, name, value: setattr(
         element,
         name,
         next((tree for tree in bpy.data.node_groups if tree["uuid"] == value), None),
@@ -53,7 +53,7 @@ SETTER = {
     "COLLECTION": lambda element, name, value: [
         add_item(item, getattr(element, name))
         for item in value
-        if item[0] not in getattr(element, name)
+        if item[1] not in getattr(element, name)
     ],
 }
 
@@ -93,19 +93,19 @@ def set_on_element(
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
             print(
-                f"Warning while setting: {element} of type {type(element)} has no attribute '{attr_name}'"
+                f"Error: {element} of type {type(element)} has no attribute '{attr_name}'"
             )
             continue
 
         value = attributes[attr_name] if attr_name in attributes else default_value
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
-        if not readonly:
+        if not readonly or attr_type == "COLLECTION":
             setter = SETTER[attr_type]
             try:
                 setter(element, attr_name, value)
             except Exception as e:
                 print(
-                    f"Error setting attribute '{attr_name}' on {element} of type {type(element)}: {e}"
+                    f"Error: attribute '{attr_name}' on {element} of type {type(element)}: {e}"
                 )
     return element
 
@@ -130,7 +130,7 @@ def defaults_for(subtype_class: str, base_class: str = "Element") -> dict[str, A
     if not class_path:
         class_path = find_class_path(base_class)
     if not class_path:
-        print(f"Warning: No class path found for {subtype_class} or {base_class}")
+        print(f"Error: No class path found for {subtype_class} or {base_class}")
         return {}
     current_subtype = DEFAULTS["Element"]
     defaults = {}
@@ -139,7 +139,7 @@ def defaults_for(subtype_class: str, base_class: str = "Element") -> dict[str, A
 
     for subtype_name in class_path:
         if len(current_subtype) < 2 or subtype_name not in current_subtype[1]:
-            print(f"Warning: Subtype '{subtype_name}' not found in current path")
+            print(f"Error: Subtype '{subtype_name}' not found in current path")
             break
         current_subtype = current_subtype[1][subtype_name]
         if len(current_subtype) > 0:
