@@ -39,7 +39,7 @@ class InterfaceSocketData(InterfaceItemData):
     ) -> None:
         super().__init__(attributes, defaults)
         self.parent_index = parent_index
-        self.attributes["bl_idname"] = bl_idname
+        self.bl_idname = bl_idname
 
     @classmethod
     def from_socket(cls, socket: NodeTreeInterfaceSocket) -> "InterfaceSocketData":
@@ -69,6 +69,7 @@ class InterfaceSocketData(InterfaceItemData):
         return {
             **attributes.to_dict(self.attributes, self.defaults),
             **({"parent_index": self.parent_index} if self.parent_index != -1 else {}),
+            "bl_idname": self.bl_idname,
         }
 
     def to_item(self, interface: Any) -> NodeTreeInterfaceSocket:

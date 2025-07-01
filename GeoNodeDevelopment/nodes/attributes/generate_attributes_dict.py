@@ -82,7 +82,7 @@ def attributes_dict_for(
 def generate_attributes_dict():
     attributes = {
         "Element": [
-            {"bl_idname": ["STRING", ""]},
+            {},
             {
                 cls.__name__: attributes_dict_for(curr_class=cls, params=params)
                 for cls, params in classes.items()

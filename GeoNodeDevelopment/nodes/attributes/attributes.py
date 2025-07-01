@@ -2,6 +2,28 @@ from .attributes_dict import DEFAULTS
 from typing import Any
 import bpy
 
+
+def get_item_info(item: Any) -> list[str]:
+    if not hasattr(item, "name"):
+        return []
+    if not hasattr(item, "socket_type"):
+        return [item.name]
+
+    return [item.name, item.socket_type]
+
+
+def add_item(item_info: list[str], collection: Any) -> Any:
+    match len(item_info):
+        case 0:
+            collection.new()
+        case 1:
+            return collection.new(item_info[0])
+        case 2:
+            return collection.new(item_info[0], item_info[1])
+
+
+none = lambda element, name, value: None
+
 GETTER = {
     "FLOAT": float,
     "INT": int,
@@ -15,32 +37,6 @@ GETTER = {
 }
 
 
-def get_item_info(item: Any) -> list[str]:
-    """
-    Get the name and socket type of an item, if it has a socket type.
-    """
-    if not hasattr(item, "name"):
-        return []
-    if not hasattr(item, "socket_type"):
-        return [item.name]
-
-    return [item.name, item.socket_type]
-
-
-def add_item(item_info: list[str], collection: Any) -> Any:
-    """
-    Add an item to a collection, creating it if it doesn't exist.
-    """
-    match len(item_info):
-        case 0:
-            collection.new()
-        case 1:
-            return collection.new(item_info[0])
-        case 2:
-            return collection.new(item_info[0], item_info[1])
-
-
-none = lambda element, name, value: None
 SETTER = {
     "STRING": setattr,
     "INT": setattr,
@@ -102,13 +98,15 @@ def set_on_element(
             continue
 
         value = attributes[attr_name] if attr_name in attributes else default_value
-        setter = SETTER[attr_type]
-        try:
-            setter(element, attr_name, value)
-        except Exception as e:
-            print(
-                f"Error setting attribute '{attr_name}' on {element} of type {type(element)}: {e}"
-            )
+        readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
+        if not readonly:
+            setter = SETTER[attr_type]
+            try:
+                setter(element, attr_name, value)
+            except Exception as e:
+                print(
+                    f"Error setting attribute '{attr_name}' on {element} of type {type(element)}: {e}"
+                )
     return element
 
 
