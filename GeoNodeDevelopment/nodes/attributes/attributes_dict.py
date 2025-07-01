@@ -147,7 +147,7 @@ DEFAULTS = {
                                         {
                                             "active_index": ["INT", 0],
                                             "active_item": ["NONE", None],
-                                            "bake_items": ["COLLECTION", None, True],
+                                            "bake_items": ["COLLECTION", None],
                                         }
                                     ],
                                     "GeometryNodeBlurAttribute": [
@@ -158,7 +158,7 @@ DEFAULTS = {
                                         {
                                             "active_index": ["INT", 0],
                                             "active_item": ["NONE", None],
-                                            "capture_items": ["COLLECTION", None, True],
+                                            "capture_items": ["COLLECTION", None],
                                             "domain": ["STRING", "POINT"],
                                         }
                                     ],
@@ -265,7 +265,7 @@ DEFAULTS = {
                                     ],
                                     "GeometryNodeFlipFaces": [{}],
                                     "GeometryNodeForeachGeometryElementInput": [
-                                        {"paired_output": ["NONE", None, True]}
+                                        {"paired_output": ["NONE", None]}
                                     ],
                                     "GeometryNodeForeachGeometryElementOutput": [
                                         {
@@ -273,14 +273,10 @@ DEFAULTS = {
                                             "active_input_index": ["INT", 0],
                                             "active_main_index": ["INT", 0],
                                             "domain": ["STRING", "POINT"],
-                                            "generation_items": [
-                                                "COLLECTION",
-                                                None,
-                                                True,
-                                            ],
-                                            "input_items": ["COLLECTION", None, True],
+                                            "generation_items": ["COLLECTION", None],
+                                            "input_items": ["COLLECTION", None],
                                             "inspection_index": ["INT", 0],
-                                            "main_items": ["COLLECTION", None, True],
+                                            "main_items": ["COLLECTION", None],
                                         }
                                     ],
                                     "GeometryNodeGeometryToInstance": [{}],
@@ -328,11 +324,7 @@ DEFAULTS = {
                                     "GeometryNodeIndexSwitch": [
                                         {
                                             "data_type": ["STRING", "GEOMETRY"],
-                                            "index_switch_items": [
-                                                "COLLECTION",
-                                                None,
-                                                True,
-                                            ],
+                                            "index_switch_items": ["COLLECTION", None],
                                         }
                                     ],
                                     "GeometryNodeInputActiveCamera": [{}],
@@ -391,8 +383,8 @@ DEFAULTS = {
                                             "active_index": ["INT", 0],
                                             "active_item": ["NONE", None],
                                             "data_type": ["STRING", "GEOMETRY"],
-                                            "enum_definition": ["NONE", None, True],
-                                            "enum_items": ["COLLECTION", None, True],
+                                            "enum_definition": ["NONE", None],
+                                            "enum_items": ["COLLECTION", None],
                                         }
                                     ],
                                     "GeometryNodeMergeByDistance": [
@@ -463,14 +455,14 @@ DEFAULTS = {
                                         {"pattern_mode": ["STRING", "EXACT"]}
                                     ],
                                     "GeometryNodeRepeatInput": [
-                                        {"paired_output": ["NONE", None, True]}
+                                        {"paired_output": ["NONE", None]}
                                     ],
                                     "GeometryNodeRepeatOutput": [
                                         {
                                             "active_index": ["INT", 0],
                                             "active_item": ["NONE", None],
                                             "inspection_index": ["INT", 0],
-                                            "repeat_items": ["COLLECTION", None, True],
+                                            "repeat_items": ["COLLECTION", None],
                                         }
                                     ],
                                     "GeometryNodeReplaceMaterial": [{}],
@@ -553,13 +545,13 @@ DEFAULTS = {
                                     "GeometryNodeSetSplineCyclic": [{}],
                                     "GeometryNodeSetSplineResolution": [{}],
                                     "GeometryNodeSimulationInput": [
-                                        {"paired_output": ["NONE", None, True]}
+                                        {"paired_output": ["NONE", None]}
                                     ],
                                     "GeometryNodeSimulationOutput": [
                                         {
                                             "active_index": ["INT", 0],
                                             "active_item": ["NONE", None],
-                                            "state_items": ["COLLECTION", None, True],
+                                            "state_items": ["COLLECTION", None],
                                         }
                                     ],
                                     "GeometryNodeSortElements": [

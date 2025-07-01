@@ -3,12 +3,17 @@ from pprint import pprint
 
 from .nodes.nodes import export_groups, import_groups
 from .nodes.attributes import generate_attributes_dict
+from .nodes import file
 import bpy_extras
 
 
 class OBJECT_OT_ExportJSON(bpy.types.Operator):
     bl_idname = "object.export_json"
     bl_label = "Export to JSON"
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene.gnd_props.json_folder_path != ""
 
     def execute(self, context):
         export_groups()
@@ -18,6 +23,10 @@ class OBJECT_OT_ExportJSON(bpy.types.Operator):
 class OBJECT_OT_ImportJSON(bpy.types.Operator):
     bl_idname = "object.import_json"
     bl_label = "Import from JSON"
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene.gnd_props.json_folder_path != ""
 
     def execute(self, context):
         import_groups()

@@ -1,6 +1,6 @@
-from .attributes_dict import DEFAULTS
-from typing import Any
 import bpy
+from typing import Any
+from .attributes_dict import DEFAULTS
 
 
 def get_item_info(item: Any) -> list[str]:
@@ -70,10 +70,10 @@ def from_element(element: Any, defaults: dict[str, Any]) -> dict[str, Any]:
 
 
 def from_dict(element_dict: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
-    attributes = {}
-    for name, (attr_type, default_value) in defaults.items():
-        attributes[name] = element_dict.get(name, default_value)
-    return attributes
+    return {
+        name: element_dict.get(name, default_value)
+        for name, (attr_type, default_value) in defaults.items()
+    }
 
 
 def to_dict(attributes: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
@@ -135,26 +135,13 @@ def defaults_for(subtype_class: str, base_class: str = "Element") -> dict[str, A
     current_subtype = DEFAULTS["Element"]
     defaults = {}
 
-    # Start with base Element attributes
     defaults.update(current_subtype[0])
 
-    # Navigate through the class path and merge attributes
-    try:
-        for subtype_name in class_path:
-            if len(current_subtype) < 2 or subtype_name not in current_subtype[1]:
-                print(f"Warning: Subtype '{subtype_name}' not found in current path")
-                break
-            current_subtype = current_subtype[1][subtype_name]
-            if len(current_subtype) > 0:
-                defaults.update(current_subtype[0])
-    except (IndexError, KeyError, TypeError) as e:
-        print(f"Error navigating class path for {subtype_class}: {e}")
-        return {}
+    for subtype_name in class_path:
+        if len(current_subtype) < 2 or subtype_name not in current_subtype[1]:
+            print(f"Warning: Subtype '{subtype_name}' not found in current path")
+            break
+        current_subtype = current_subtype[1][subtype_name]
+        if len(current_subtype) > 0:
+            defaults.update(current_subtype[0])
     return defaults
-
-
-def filter_out_keys(dictionary: dict[str, Any], keys: list[str]) -> dict[str, Any]:
-    """
-    Remove specified keys from a dictionary and return a new dictionary.
-    """
-    return {k: v for k, v in dictionary.items() if k not in keys}

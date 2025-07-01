@@ -41,7 +41,6 @@ def attributes_for(cls, base_class):
         prop.identifier: [
             (convert_type(cls, prop)),
             getattr(prop, "default", None),
-            *([True] if prop.is_readonly else []),
         ]
         for prop in cls.bl_rna.properties
         if prop.identifier not in base_attributes

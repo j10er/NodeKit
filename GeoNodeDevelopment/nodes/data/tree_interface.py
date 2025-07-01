@@ -1,7 +1,8 @@
 from bpy.types import NodeTreeInterfaceSocket, NodeTreeInterfacePanel
 from typing import Any, Union
-from .attributes import attributes
-from .data_base_class import Data
+
+from ..attributes import attributes
+from .base_class import Data
 
 
 class InterfaceItemData(Data):

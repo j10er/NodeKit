@@ -18,16 +18,12 @@ def get_folder_path():
 
 
 def setup():
-    blend_path = bpy.data.filepath
-    stripped_filepath = Path(blend_path).with_suffix("")
-    folder_path = f"{stripped_filepath}_nodes"
-    if not blend_path:
-        print("Save the blend file first")
-        return
-
+    folder_path = get_folder_path()
+    if not get_folder_path():
+        raise ValueError("JSON folder path is not set.")
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
-    os.mkdir(f"{stripped_filepath}_nodes")
+    os.makedirs(folder_path, exist_ok=True)
 
 
 def save_tree_dict(tree_dict: dict):
