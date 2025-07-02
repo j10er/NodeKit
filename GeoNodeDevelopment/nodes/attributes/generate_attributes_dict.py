@@ -1,8 +1,11 @@
 import bpy
 from typing import Dict, Any
-from pathlib import Path
 from pprint import pprint
-from .base_attributes_dict import classes
+from .base_dict import classes
+import os
+import logging
+
+log = logging.getLogger(__name__)
 
 all_prop_types = set()
 all_attribute_types = set()
@@ -79,7 +82,7 @@ def attributes_dict_for(
 
 
 def generate_attributes_dict():
-    print("Generating attributes dictionary...")
+    log.info("Generating attributes dictionary...")
     attributes = {
         "Element": [
             {},
@@ -90,12 +93,12 @@ def generate_attributes_dict():
         ]
     }
 
-    file_path = Path(__file__).parent / "attributes_dict.py"
-    print(f"Saving attributes dictionary in {file_path}")
+    file_path = os.path.join(os.path.dirname(__file__), "attributes_dict.py")
+    log.info(f"Saving attributes dictionary in {file_path}")
     with open(file_path, "w") as file:
         file.write("DEFAULTS = ")
         pprint(attributes, stream=file)
         file.write("\nALL_ATTRIBUTE_TYPES = ")
         pprint(sorted(all_attribute_types), stream=file)
-    print("Attributes dictionary generated successfully.")
+    log.info("Attributes dictionary generated successfully.")
     return attributes

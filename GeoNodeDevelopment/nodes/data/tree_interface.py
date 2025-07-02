@@ -1,8 +1,10 @@
 from bpy.types import NodeTreeInterfaceSocket, NodeTreeInterfacePanel
 from typing import Any, Union
-
+import logging
 from ..attributes import attributes
 from .base_class import Data
+
+log = logging.getLogger(__name__)
 
 
 class InterfaceItemData(Data):

@@ -14,6 +14,7 @@
 import bpy
 from . import operators
 from . import ui, properties
+import logging
 
 classes = [
     ui.VIEW3D_PT_SidePanel,
@@ -31,6 +32,11 @@ def register():
     bpy.types.Scene.gnd_props = bpy.props.PointerProperty(type=properties.GNDProperties)
     if operators.save_handler not in bpy.app.handlers.save_post:
         bpy.app.handlers.save_post.append(operators.save_handler)
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="[%(levelname)s] %(message)s",
+    )
 
 
 def unregister():

@@ -6,7 +6,7 @@ from ..attributes import attributes
 from .base_class import Data
 
 
-log = logging.getLogger(__name__.split(".")[2])
+log = logging.getLogger(__name__)
 
 EXCLUDED_NODE_TYPES = ["GeometryNodeViewer"]
 

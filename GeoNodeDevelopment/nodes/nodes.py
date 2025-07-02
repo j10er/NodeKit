@@ -7,7 +7,7 @@ import uuid
 
 import logging
 
-log = logging.getLogger(__name__.split(".")[2])
+log = logging.getLogger(__name__)
 
 
 def export_groups():
@@ -17,7 +17,7 @@ def export_groups():
         if tree.bl_idname != "GeometryNodeTree":
             continue
         export_tree(tree)
-    log.info(s
+    log.info(
         f"Exported {len(bpy.data.node_groups)} node groups to {file.get_folder_path()}."
     )
 

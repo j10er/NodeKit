@@ -7,8 +7,7 @@ from .nodes import file
 import bpy_extras
 import logging
 
-log = logging.getLogger(__name__.split(".")[2])
-log.setLevel(logging.INFO)
+log = logging.getLogger(__name__)
 
 
 class OBJECT_OT_ExportJSON(bpy.types.Operator):

@@ -3,7 +3,7 @@ from typing import Any
 from .attributes_dict import DEFAULTS
 import logging
 
-log = logging.getLogger(__name__.split(".")[2])
+log = logging.getLogger(__name__)
 
 
 def get_item_info(item: Any) -> list[str]:

@@ -8,7 +8,7 @@ from .tree_interface import InterfaceItemData
 from .node import NodeData, EXCLUDED_NODE_TYPES
 
 
-log = logging.getLogger(__name__.split(".")[2])
+log = logging.getLogger(__name__)
 
 
 class NodeTreeData(Data):
@@ -29,7 +29,7 @@ class NodeTreeData(Data):
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
         log.info(
-            f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}"
+            f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}..."
         )
 
         if tree.bl_idname != "GeometryNodeTree":
@@ -57,7 +57,7 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_dict(cls, tree_dict: dict[str, Any]) -> "NodeTreeData":
-        log.debug(f"{tree_dict['name']}: Creating NodeTreeData from dict")
+        log.debug(f"{tree_dict['name']}: Creating NodeTreeData from dict...")
         defaults = attributes.defaults_for(tree_dict["bl_idname"])
         return cls(
             attributes=attributes.from_dict(tree_dict, defaults),
@@ -87,20 +87,25 @@ class NodeTreeData(Data):
         }
 
     def create_tree_hull(self) -> NodeTree:
-        log.debug(f"{self.name}: Creating node tree hull")
-        tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
-        self.tree = tree
-        tree["uuid"] = self.uuid
-        attributes.set_on_element(tree, self.attributes, self.defaults)
-        attributes.set_on_element(tree, self.attributes, self.defaults)
-        for item_data in self.interface_items:
+        try:
+            log.debug(f"{self.name}: Creating node tree hull")
+            tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
+            self.tree = tree
+            tree["uuid"] = self.uuid
+            attributes.set_on_element(tree, self.attributes, self.defaults)
+            attributes.set_on_element(tree, self.attributes, self.defaults)
+            for item_data in self.interface_items:
+                log.debug(
+                    f"{self.name}: Creating interface item {item_data.name} with type {item_data.bl_idname}"
+                )
+                item = item_data.to_item(tree.interface)
             log.debug(
-                f"{self.name}: Creating interface item {item_data.name} with type {item_data.bl_idname}"
+                f"{self.name}: Created {len(tree.interface.items_tree)} interface items"
             )
-            item = item_data.to_item(tree.interface)
-        log.debug(
-            f"{self.name}: Created {len(tree.interface.items_tree)} interface items"
-        )
+        except Exception as e:
+            bpy.data.node_groups.remove(tree, do_unlink=True)
+            log.error(f"{self.name}: Error creating tree hull: {e}")
+            raise e
         return tree
 
     def add_nodes(self) -> NodeTree:
