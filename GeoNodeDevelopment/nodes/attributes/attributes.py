@@ -1,12 +1,12 @@
 import bpy
-from typing import Any
+from typing import Any, Callable
 from .attributes_dict import DEFAULTS
 import logging
 
 log = logging.getLogger(__name__)
 
 
-def get_item_info(item: Any) -> list[str]:
+def collection_get_item_info(item: Any) -> list[str]:
     if not hasattr(item, "name"):
         return []
     if not hasattr(item, "socket_type"):
@@ -15,7 +15,7 @@ def get_item_info(item: Any) -> list[str]:
     return [item.socket_type, item.name]
 
 
-def add_item(item_info: list[str], collection: Any) -> Any:
+def collection_add_item(item_info: list[str], collection: Any) -> Any:
     match len(item_info):
         case 0:
             collection.new()
@@ -23,6 +23,14 @@ def add_item(item_info: list[str], collection: Any) -> Any:
             return collection.new(item_info[0])
         case 2:
             return collection.new(item_info[0], item_info[1])
+
+
+def node_tree_setter(element: Any, name: str, value: str) -> None:
+    tree = next((tree for tree in bpy.data.node_groups if tree["uuid"] == value), None)
+    if not tree:
+        log.error(f"Node tree with uuid {value} not found")
+        return
+    setattr(element, name, tree)
 
 
 none = lambda element, name, value: None
@@ -36,7 +44,7 @@ GETTER = {
     "NODE": lambda node: node.name if node else None,
     "NODETREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
     "NONE": lambda x: None,
-    "COLLECTION": lambda items: [get_item_info(item) for item in items],
+    "COLLECTION": lambda items: [collection_get_item_info(item) for item in items],
 }
 
 
@@ -47,21 +55,17 @@ SETTER = {
     "BOOLEAN": setattr,
     "LIST": setattr,
     "NODE": none,
-    "NODETREE": lambda element, name, value: setattr(
-        element,
-        name,
-        next((tree for tree in bpy.data.node_groups if tree["uuid"] == value), None),
-    ),
+    "NODETREE": node_tree_setter,
     "NONE": none,
     "COLLECTION": lambda element, name, value: [
-        add_item(item, getattr(element, name))
+        collection_add_item(item, getattr(element, name))
         for item in value
         if item[1] not in getattr(element, name)
     ],
 }
 
 
-def from_element(element: Any, defaults: dict[str, Any]) -> dict[str, Any]:
+def from_element(element: Any, defaults: dict[str, tuple[str, Any]]) -> dict[str, Any]:
     attribute_dict = {}
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
@@ -72,17 +76,21 @@ def from_element(element: Any, defaults: dict[str, Any]) -> dict[str, Any]:
     return attribute_dict
 
 
-def from_dict(element_dict: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
+def from_dict(
+    element_dict: dict[str, Any], defaults: dict[str, tuple[str, Any]]
+) -> dict[str, Any]:
     return {
         name: element_dict.get(name, default_value)
         for name, (attr_type, default_value) in defaults.items()
     }
 
 
-def to_dict(attributes: dict[str, Any], defaults: dict[str, Any]) -> dict[str, Any]:
+def to_dict(
+    attributes: dict[str, Any], defaults: dict[str, tuple[str, Any]]
+) -> dict[str, Any]:
     for name in list(attributes.keys()):
         if name not in defaults:
-            print(f"Warning: Attribute '{name}' not found in defaults")
+            log.warning(f"Attribute '{name}' not found in defaults")
     return {
         name: value for name, value in attributes.items() if defaults[name][1] != value
     }
@@ -91,12 +99,12 @@ def to_dict(attributes: dict[str, Any], defaults: dict[str, Any]) -> dict[str, A
 def set_on_element(
     element: Any,
     attributes: dict[str, Any],
-    defaults: dict[str, Any],
-):
+    defaults: dict[str, tuple[str, Any]],
+) -> Any:
     for attr_name, (attr_type, default_value) in defaults.items():
         if not hasattr(element, attr_name):
-            print(
-                f"Error: {element} of type {type(element)} has no attribute '{attr_name}'"
+            log.warning(
+                f"{element} of type {type(element)} has no attribute '{attr_name}'"
             )
             continue
 
@@ -107,14 +115,16 @@ def set_on_element(
             try:
                 setter(element, attr_name, value)
             except Exception as e:
-                print(
-                    f"Error: attribute '{attr_name}' on {element} of type {type(element)}: {e}"
+                log.warning(
+                    f"Error when setting attribute '{attr_name}' on {element.name} of type {type(element).__name__}: {e}"
                 )
     return element
 
 
 def find_class_path(
-    target_name: str, subtype=DEFAULTS["Element"], path=None
+    target_name: str,
+    subtype: Any = DEFAULTS["Element"],
+    path: list[str] | None = None,
 ) -> list[str]:
     if path is None:
         path = []
@@ -128,7 +138,9 @@ def find_class_path(
     return []
 
 
-def defaults_for(subtype_class: str, base_class: str = "Element") -> dict[str, Any]:
+def defaults_for(
+    subtype_class: str, base_class: str = "Element"
+) -> dict[str, tuple[str, Any]]:
     class_path = find_class_path(subtype_class)
     if not class_path:
         class_path = find_class_path(base_class)

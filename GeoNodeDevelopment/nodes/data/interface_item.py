@@ -1,5 +1,5 @@
 from bpy.types import NodeTreeInterfaceSocket, NodeTreeInterfacePanel
-from typing import Any, Union
+from typing import Any
 import logging
 from ..attributes import attributes
 from .base_class import Data
@@ -14,7 +14,7 @@ class InterfaceItemData(Data):
 
     @classmethod
     def from_item(
-        cls, item: Union[NodeTreeInterfaceSocket, NodeTreeInterfacePanel]
+        cls, item: NodeTreeInterfaceSocket | NodeTreeInterfacePanel
     ) -> "InterfaceItemData":
         match item.item_type:
             case "SOCKET":
@@ -76,7 +76,7 @@ class InterfaceSocketData(InterfaceItemData):
         }
 
     def to_item(self, interface: Any) -> NodeTreeInterfaceSocket:
-        socket = interface.new_socket(
+        self.socket = interface.new_socket(
             name=self.name,
             parent=(
                 interface.items_tree[self.parent_index]
@@ -86,12 +86,14 @@ class InterfaceSocketData(InterfaceItemData):
             socket_type=self.socket_type,
             in_out=self.in_out,
         )
-        attributes.set_on_element(
-            element=socket,
+
+    def set_attributes(self) -> NodeTreeInterfaceSocket:
+
+        return attributes.set_on_element(
+            element=self.socket,
             attributes=self.attributes,
             defaults=self.defaults,
         )
-        return socket
 
 
 class InterfacePanelData(InterfaceItemData):
@@ -147,3 +149,7 @@ class InterfacePanelData(InterfaceItemData):
         for item in self.items:
             item.to_item(interface)
         return panel
+
+    def set_attributes(self) -> NodeTreeInterfacePanel:
+        for item in self.items:
+            item.set_attributes()

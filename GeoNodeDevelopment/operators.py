@@ -1,10 +1,7 @@
 import bpy
-from pprint import pprint
-
 from .nodes.nodes import export_groups, import_groups
 from .nodes.attributes import generate_attributes_dict
 from .nodes import file
-import bpy_extras
 import logging
 
 log = logging.getLogger(__name__)
@@ -45,9 +42,8 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-        cls = bpy.types.GeometryNodeGroup
-        prop = cls.bl_rna.properties.get("node_tree")
-        log.debug(__name__[2])
+        socket = bpy.types.NodeSocketFloat
+        print(issubclass(socket, socket))
         return {"FINISHED"}
 
 

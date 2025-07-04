@@ -1,7 +1,7 @@
 import bpy
 import os
 import shutil
-
+from typing import Any
 import json
 from pprint import pprint
 import logging
@@ -16,15 +16,15 @@ def make_valid_filename(name: str) -> str:
     return name.strip()
 
 
-def get_folder_path():
+def get_folder_path() -> str:
     return bpy.context.scene.gnd_props.json_folder_path
 
 
-def path_is_valid():
+def path_is_valid() -> bool:
     return os.path.exists(get_folder_path()) and os.path.isdir(get_folder_path())
 
 
-def setup():
+def setup() -> None:
     folder_path = get_folder_path()
     if not get_folder_path():
         raise ValueError("JSON folder path is not set.")
@@ -33,7 +33,7 @@ def setup():
     os.makedirs(folder_path, exist_ok=True)
 
 
-def save_tree_dict(tree_dict: dict):
+def save_tree_dict(tree_dict: dict[str, Any]) -> None:
     directory = os.path.join(
         get_folder_path(), tree_dict["tree_type"], tree_dict["category"]
     )
@@ -47,11 +47,11 @@ def save_tree_dict(tree_dict: dict):
     )
 
 
-def load_all() -> list[dict]:
+def load_all() -> list[dict[str, Any]]:
     return load_from_folder(get_folder_path())
 
 
-def load_from_folder(folder_path: str) -> list[dict]:
+def load_from_folder(folder_path: str) -> list[dict[str, Any]]:
     data_dicts = []
     for file in os.listdir(folder_path):
         if file.endswith(".json"):
@@ -64,11 +64,11 @@ def load_from_folder(folder_path: str) -> list[dict]:
     return data_dicts
 
 
-def write_json(data: dict, file_path: str):
+def write_json(data: dict[str, Any], file_path: str) -> None:
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
 
 
-def read_json(file_path: str) -> dict:
+def read_json(file_path: str) -> dict[str, Any]:
     with open(file_path, "r") as f:
         return json.load(f)

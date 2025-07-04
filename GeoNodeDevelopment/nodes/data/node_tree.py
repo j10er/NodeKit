@@ -4,7 +4,7 @@ from typing import Any
 import logging
 from ..attributes import attributes
 from .base_class import Data
-from .tree_interface import InterfaceItemData
+from .interface_item import InterfaceItemData
 from .node import NodeData, EXCLUDED_NODE_TYPES
 
 
@@ -95,9 +95,7 @@ class NodeTreeData(Data):
             attributes.set_on_element(tree, self.attributes, self.defaults)
             attributes.set_on_element(tree, self.attributes, self.defaults)
             for item_data in self.interface_items:
-                log.debug(
-                    f"{self.name}: Creating interface item {item_data.name} with type {item_data.bl_idname}"
-                )
+                log.debug(f"{self.name}: Creating interface item {item_data.name}")
                 item = item_data.to_item(tree.interface)
             log.debug(
                 f"{self.name}: Created {len(tree.interface.items_tree)} interface items"
@@ -113,6 +111,7 @@ class NodeTreeData(Data):
         log.debug(f"{self.name}: Adding {len(self.nodes)} nodes")
         tree = self.tree
         for node_data in self.nodes.values():
+            log.debug(f"{self.name}: Creating node {node_data.name}")
             node = node_data.to_node(tree)
         log.debug(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
@@ -145,6 +144,12 @@ class NodeTreeData(Data):
                             f"{self.name}: Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
                         )
                         tree.links.new(from_socket, to_socket)
+
+        log.debug(f"{self.name}: Setting interface items attributes")
+        for item_data in self.interface_items:
+            log.debug(f"{self.name}: Setting attributes for item {item_data.name}")
+            item_data.set_attributes()
+
         log.debug(f"{self.name}: Done.")
         log.debug("=" * 40)
         return tree

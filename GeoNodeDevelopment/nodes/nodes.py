@@ -1,5 +1,5 @@
 import bpy
-
+from typing import Any
 from pprint import pprint
 from . import file
 from .data.node_tree import NodeTreeData
@@ -10,7 +10,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export_groups():
+def export_groups() -> None:
     log.info(f"Exporting all node groups to {file.get_folder_path()}")
     setup()
     for tree in bpy.data.node_groups:
@@ -22,7 +22,7 @@ def export_groups():
     )
 
 
-def export_tree(tree):
+def export_tree(tree: bpy.types.NodeTree) -> None:
     tree_data = NodeTreeData.from_tree(tree)
     tree_dict = tree_data.to_dict()
     data_dict = {
@@ -38,7 +38,7 @@ def export_tree(tree):
     file.save_tree_dict(data_dict)
 
 
-def setup():
+def setup() -> None:
     file.setup()
     for tree in bpy.data.node_groups:
         if not hasattr(tree, "uuid"):
@@ -50,7 +50,7 @@ def setup():
                 output["index"] = i
 
 
-def import_groups():
+def import_groups() -> None:
 
     data_dicts = file.load_all()
     tree_datas = [NodeTreeData.from_dict(data_dict["tree"]) for data_dict in data_dicts]

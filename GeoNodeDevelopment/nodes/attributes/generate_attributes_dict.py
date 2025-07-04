@@ -1,9 +1,11 @@
 import bpy
-from typing import Dict, Any
+from typing import Any
 from pprint import pprint
 from .base_dict import classes
 import os
 import logging
+import re
+import inspect
 
 log = logging.getLogger(__name__)
 
@@ -11,7 +13,7 @@ all_prop_types = set()
 all_attribute_types = set()
 
 
-def convert_type(cls, prop) -> str:
+def convert_type(cls: type, prop: bpy.types.Property) -> str:
     all_prop_types.add(prop.type)
 
     match prop.type:
@@ -36,41 +38,74 @@ def convert_type(cls, prop) -> str:
             return prop.type
 
 
-def attributes_for(cls, base_class):
+def attribute_params(
+    cls: type, base_cls: type | None, prop: bpy.types.Property
+) -> list[str | Any]:
+    default_value = getattr(prop, "default", None)
+    default_value = update_default_value_socket_type(cls, prop, default_value)
+    return [
+        convert_type(cls, prop),
+        default_value,
+    ]
+
+
+def update_default_value_socket_type(
+    cls: type, prop: bpy.types.Property, default_value: Any
+) -> Any:
+
+    if prop.identifier == "type" and cls == bpy.types.NodeSocketStandard:
+        socket_type = re.findall("[A-Z][a-z]*", cls.__name__)[2].upper()
+        mappings = {
+            "COLOR": "RGBA",
+            "BOOL": "BOOLEAN",
+        }
+        if socket_type in mappings:
+            socket_type = mappings[socket_type]
+        return socket_type
+    return default_value
+
+
+def attributes_for(
+    cls: type, base_class: type | None, additional_attrs: list[str]
+) -> dict[str, Any]:
     base_attributes = (
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
-        prop.identifier: [
-            (convert_type(cls, prop)),
-            getattr(prop, "default", None),
-        ]
+        prop.identifier: attribute_params(cls, base_class, prop)
         for prop in cls.bl_rna.properties
         if prop.identifier not in base_attributes
+    } | {
+        cls.bl_rna.properties[attr].identifier: attribute_params(
+            cls, base_class, cls.bl_rna.properties[attr]
+        )
+        for attr in additional_attrs
     }
 
 
-SEARCH_EXCLUDE = ["GeometryNodeTree"]
-
-
 def attributes_dict_for(
-    curr_class: type, params: dict[str, Any], base_class=None
-) -> Any:
+    curr_class: type, params: dict[str, Any], base_class: type | None = None
+) -> list[dict[str, Any]] | list[tuple[dict[str, Any], dict[str, Any]]]:
+    log.debug(
+        f"Generating attributes for {curr_class.__name__} with base class {base_class.__name__ if base_class else 'None'}"
+    )
+
+    additional_attrs = params.get("add_attributes", [])
     attributes = params.get(
-        "attributes", attributes_for(cls=curr_class, base_class=base_class)
+        "attributes",
+        attributes_for(
+            cls=curr_class, base_class=base_class, additional_attrs=additional_attrs
+        ),
     )
     if params.get("find_subtypes", False):
         subtypes = {
-            cls.__name__: attributes_dict_for(
-                cls, params={"subtypes": {}}, base_class=curr_class
+            cls_name: attributes_dict_for(
+                cls,
+                params=params.get("subtype_params", {}),
+                base_class=curr_class,
             )
-            for cls in [
-                getattr(bpy.types, subtype)
-                for subtype in dir(bpy.types)
-                if subtype.startswith(params["find_subtypes"])
-                and subtype != params["find_subtypes"]
-                and not subtype in SEARCH_EXCLUDE
-            ]
+            for cls_name, cls in inspect.getmembers(bpy.types, inspect.isclass)
+            if issubclass(cls, curr_class) and cls != curr_class
         }
     else:
         subtypes = {
@@ -81,7 +116,7 @@ def attributes_dict_for(
     return [attributes, subtypes] if subtypes else [attributes]
 
 
-def generate_attributes_dict():
+def generate_attributes_dict() -> dict[str, Any]:
     log.info("Generating attributes dictionary...")
     attributes = {
         "Element": [

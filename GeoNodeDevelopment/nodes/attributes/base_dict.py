@@ -23,11 +23,11 @@ classes = {
                 "subtypes": {
                     bpy.types.GeometryNode: {
                         "attributes": {},
-                        "find_subtypes": "GeometryNode",
+                        "find_subtypes": True,
                     },
                     bpy.types.FunctionNode: {
                         "attributes": {},
-                        "find_subtypes": "FunctionNode",
+                        "find_subtypes": True,
                     },
                 },
             }
@@ -73,16 +73,20 @@ classes = {
                     "socket_type": ["STRING", "DEFAULT"],
                     "in_out": ["STRING", "INPUT"],
                 },
-                "find_subtypes": "NodeTreeInterfaceSocket",
+                "find_subtypes": True,
             },
         },
     },
     bpy.types.NodeSocket: {
         "attributes": {
-            "type": ["STRING", ""],
             "name": ["STRING", ""],
             "bl_idname": ["STRING", ""],
         },
-        "subtypes": {bpy.types.NodeSocketStandard: {"find_subtypes": "NodeSocket"}},
+        "subtypes": {
+            bpy.types.NodeSocketStandard: {
+                "find_subtypes": True,
+                "subtype_params": {"add_attributes": ["type"]},
+            }
+        },
     },
 }
