@@ -85,7 +85,6 @@ classes = {
         "subtypes": {
             bpy.types.NodeSocketStandard: {
                 "find_subtypes": True,
-                "subtype_params": {"add_attributes": ["type"]},
             }
         },
     },
