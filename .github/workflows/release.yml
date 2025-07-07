@@ -14,8 +14,10 @@ jobs:
           python-version: 3.11
       - name: Run tests
         run: python dev.py build
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload and release
+        uses: softprops/action-gh-release@v1
         with:
-          path: GeoNodeDevelopment.zip
-          name: build-artifacts
+          files: dist/*
+          tag_name: v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
