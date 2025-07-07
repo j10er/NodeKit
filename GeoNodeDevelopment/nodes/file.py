@@ -17,7 +17,7 @@ def make_valid_filename(name: str) -> str:
 
 
 def get_folder_path() -> str:
-    return bpy.context.scene.gnd_props.json_folder_path
+    return bpy.context.scene.gnd_props.folder_path
 
 
 def path_is_valid() -> bool:

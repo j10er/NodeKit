@@ -13,9 +13,7 @@ class OBJECT_OT_ExportJSON(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return (
-            bpy.context.scene.gnd_props.json_folder_path != "" and file.path_is_valid()
-        )
+        return not bpy.context.scene.gnd_props.directory_error
 
     def execute(self, context):
         export_groups()
@@ -28,9 +26,7 @@ class OBJECT_OT_ImportJSON(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return (
-            bpy.context.scene.gnd_props.json_folder_path != "" and file.path_is_valid()
-        )
+        return not bpy.context.scene.gnd_props.directory_error
 
     def execute(self, context):
         import_groups()
