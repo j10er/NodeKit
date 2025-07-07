@@ -88,8 +88,22 @@ class NodeTreeData(Data):
 
     def create_tree_hull(self) -> NodeTree:
         try:
-            log.debug(f"{self.name}: Creating node tree hull")
-            tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
+            if [
+                tree
+                for tree in bpy.data.node_groups.values()
+                if tree.get("uuid", "") == self.uuid
+            ]:
+                log.info(
+                    f"Warning: Overwriting existing node tree {self.name} with UUID {self.uuid}"
+                )
+                tree = bpy.data.node_groups[self.name]
+                for node in tree.nodes:
+                    tree.nodes.remove(node)
+                tree.interface.clear()
+
+            else:
+                log.debug(f"{self.name}: Creating new node tree")
+                tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
             self.tree = tree
             tree["uuid"] = self.uuid
             attributes.set_on_element(tree, self.attributes, self.defaults)
@@ -101,7 +115,8 @@ class NodeTreeData(Data):
                 f"{self.name}: Created {len(tree.interface.items_tree)} interface items"
             )
         except Exception as e:
-            bpy.data.node_groups.remove(tree, do_unlink=True)
+            if tree:
+                bpy.data.node_groups.remove(tree, do_unlink=True)
             log.error(f"{self.name}: Error creating tree hull: {e}")
             raise e
         return tree

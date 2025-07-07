@@ -31,13 +31,11 @@ class GNDProperties(PropertyGroup):
     def directory_is_valid(self, path) -> bool:
         """Check recursively if the directory only contains jsons and directories."""
         for file in os.listdir(path):
-            print(file)
             if not file.endswith(".json") and not os.path.isdir(
-                os.path.join(self.folder_path, file)
+                os.path.join(path, file)
             ):
                 return False
             if os.path.isdir(os.path.join(self.folder_path, file)):
-                subfolder_path = os.path.join(self.folder_path, file)
-                return self.directory_is_valid(subfolder_path)
+                return self.directory_is_valid(os.path.join(path, file))
 
         return True

@@ -34,7 +34,7 @@ def register():
         bpy.app.handlers.save_post.append(operators.save_handler)
 
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="[%(levelname)s] %(message)s",
     )
 
