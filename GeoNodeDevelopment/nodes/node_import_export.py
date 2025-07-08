@@ -2,7 +2,7 @@ import bpy
 from typing import Any
 from pprint import pprint
 from . import file
-from .data.node_tree import NodeTreeData
+from .representations.node_tree import NodeTreeData
 import uuid
 
 import logging
