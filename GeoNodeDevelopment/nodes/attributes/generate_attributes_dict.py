@@ -4,7 +4,6 @@ from pprint import pprint
 from .base_dict import classes
 import os
 import logging
-import re
 import inspect
 
 log = logging.getLogger(__name__)
@@ -30,9 +29,6 @@ def convert_type(cls: type, prop: bpy.types.Property) -> str:
                 type_identifier = "NONE"
             all_attribute_types.add(type_identifier)
             return type_identifier
-        case "ENUM":
-            all_attribute_types.add("STRING")
-            return "STRING"
         case _:
             all_attribute_types.add(prop.type)
             return prop.type

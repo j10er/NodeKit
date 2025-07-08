@@ -15,17 +15,24 @@ def collection_get_item_info(item: Any) -> list[str]:
     return [item.socket_type, item.name]
 
 
-def collection_add_item(item_info: list[str], collection: Any) -> Any:
-    match len(item_info):
-        case 0:
-            collection.new()
-        case 1:
-            return collection.new(item_info[0])
-        case 2:
-            return collection.new(item_info[0], item_info[1])
+def set_collection(element, name, value):
+    log.debug(f"Setting collection {name} on {element.name} with value: {value}")
+    collection = getattr(element, name)
+    collection.clear()
+    for item_info in value:
+        match len(item_info):
+            case 0:
+                collection.new()
+            case 1:
+                log.debug(
+                    f"Adding item {item_info[0]} to collection {name} on {element.name}"
+                )
+                collection.new(item_info[0])
+            case 2:
+                collection.new(item_info[0], item_info[1])
 
 
-def node_tree_setter(element: Any, name: str, value: str) -> None:
+def set_node_tree(element: Any, name: str, value: str) -> None:
     tree = next((tree for tree in bpy.data.node_groups if tree["uuid"] == value), None)
     if not tree:
         log.error(f"Node tree with uuid {value} not found")
@@ -41,6 +48,7 @@ GETTER = {
     "BOOLEAN": bool,
     "LIST": list,
     "STRING": str,
+    "ENUM": str,
     "NODE": lambda node: node.name if node else None,
     "NODETREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
     "NONE": lambda x: None,
@@ -53,15 +61,12 @@ SETTER = {
     "INT": setattr,
     "FLOAT": setattr,
     "BOOLEAN": setattr,
+    "ENUM": setattr,
     "LIST": setattr,
     "NODE": none,
-    "NODETREE": node_tree_setter,
+    "NODETREE": set_node_tree,
     "NONE": none,
-    "COLLECTION": lambda element, name, value: [
-        collection_add_item(item, getattr(element, name))
-        for item in value
-        if item[1] not in getattr(element, name)
-    ],
+    "COLLECTION": set_collection,
 }
 
 
@@ -110,7 +115,8 @@ def set_on_element(
 
         value = attributes[attr_name] if attr_name in attributes else default_value
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
-        if not readonly or attr_type == "COLLECTION":
+        if value != default_value and (not readonly or attr_type == "COLLECTION"):
+
             setter = SETTER[attr_type]
             try:
                 setter(element, attr_name, value)

@@ -113,7 +113,8 @@ Each exported file contains:
 ## Exporting
 ## Importing
 - Create empty node trees with interfaces
-- add nodes
+- add nodes and set their attributes (includes item lists in eg. foreach)
 - connect paired nodes (of zones)
 - connect nodes with links
 - set default values of interface items
+- set attributes (here: only default_value) on node sockets

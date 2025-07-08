@@ -107,7 +107,6 @@ class NodeTreeData(Data):
             self.tree = tree
             tree["uuid"] = self.uuid
             attributes.set_on_element(tree, self.attributes, self.defaults)
-            attributes.set_on_element(tree, self.attributes, self.defaults)
             for item_data in self.interface_items:
                 log.debug(f"{self.name}: Creating interface item {item_data.name}")
                 item = item_data.to_item(tree.interface)
@@ -116,6 +115,7 @@ class NodeTreeData(Data):
             )
         except Exception as e:
             if tree:
+                return tree
                 bpy.data.node_groups.remove(tree, do_unlink=True)
             log.error(f"{self.name}: Error creating tree hull: {e}")
             raise e
@@ -125,6 +125,7 @@ class NodeTreeData(Data):
         log.debug("=" * 40)
         log.debug(f"{self.name}: Adding {len(self.nodes)} nodes")
         tree = self.tree
+
         for node_data in self.nodes.values():
             log.debug(f"{self.name}: Creating node {node_data.name}")
             node = node_data.to_node(tree)
@@ -141,8 +142,7 @@ class NodeTreeData(Data):
         log.debug(f"{self.name}: Setting socket attributes")
         for node_data in self.nodes.values():
             node = tree.nodes[node_data.name]
-            log.debug(f"{self.name}: Setting attributes for node {node.name}")
-            node_data.set_socket_attributes(node)
+
         log.debug(f"{self.name}: Connecting nodes with links")
         for node_data in self.nodes.values():
             log.debug(f"{self.name}: Adding links for node {node_data.name}")
@@ -162,9 +162,15 @@ class NodeTreeData(Data):
 
         log.debug(f"{self.name}: Setting interface items attributes")
         for item_data in self.interface_items:
-            log.debug(f"{self.name}: Setting attributes for item {item_data.name}")
+            log.debug(
+                f"{self.name}: Setting interface item attributes for {item_data.name}"
+            )
             item_data.set_attributes()
 
+        log.debug(f"{self.name}: Setting NodeSocket attributes")
+        for node_data in self.nodes.values():
+            log.debug(f"{self.name}: Setting socket attributes for node {node.name}")
+            node_data.set_socket_attributes()
         log.debug(f"{self.name}: Done.")
         log.debug("=" * 40)
         return tree
