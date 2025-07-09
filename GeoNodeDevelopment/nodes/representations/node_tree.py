@@ -94,7 +94,7 @@ class NodeTreeData(Data):
                 if tree.get("uuid", "") == self.uuid
             ]:
                 log.info(
-                    f"Warning: Overwriting existing node tree {self.name} with UUID {self.uuid}"
+                    f"Warning: Resetting existing node tree {self.name} with UUID {self.uuid}"
                 )
                 tree = bpy.data.node_groups[self.name]
                 for node in tree.nodes:
@@ -160,7 +160,7 @@ class NodeTreeData(Data):
                         )
                         tree.links.new(from_socket, to_socket)
 
-        log.debug(f"{self.name}: Setting interface items attributes")
+        log.debug(f"{self.name}: Setting interface item attributes")
         for item_data in self.interface_items:
             log.debug(
                 f"{self.name}: Setting interface item attributes for {item_data.name}"
