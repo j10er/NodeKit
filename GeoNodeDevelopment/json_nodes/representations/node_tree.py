@@ -127,25 +127,21 @@ class NodeTreeData(Data):
         tree = self.tree
 
         for node_data in self.nodes.values():
-            log.debug(f"{self.name}: Creating node {node_data.name}")
+            log.debug(f"{self.name}: - Creating node {node_data.name}")
             node = node_data.to_node(tree)
         log.debug(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
             if hasattr(node_data, "paired_output"):
                 log.debug(
-                    f"{self.name}: Pairing zone node '{node_data.name}' to output '{node_data.paired_output}'"
+                    f"{self.name}: - Pairing zone node '{node_data.name}' to output '{node_data.paired_output}'"
                 )
                 tree.nodes[node_data.name].pair_with_output(
                     tree.nodes[node_data.paired_output]
                 )
 
-        log.debug(f"{self.name}: Setting socket attributes")
-        for node_data in self.nodes.values():
-            node = tree.nodes[node_data.name]
-
         log.debug(f"{self.name}: Connecting nodes with links")
         for node_data in self.nodes.values():
-            log.debug(f"{self.name}: Adding links for node {node_data.name}")
+            log.debug(f"{self.name}: - Adding links for node {node_data.name}")
             for output_data in node_data.outputs:
                 if output_data.to_node and output_data.to_socket_index:
                     from_node = tree.nodes.get(node_data.name)
@@ -156,20 +152,22 @@ class NodeTreeData(Data):
                         to_node = tree.nodes.get(output_data.to_node[i])
                         to_socket = to_node.inputs[output_data.to_socket_index[i]]
                         log.debug(
-                            f"{self.name}: Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
+                            f"{self.name}: -- Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
                         )
                         tree.links.new(from_socket, to_socket)
 
         log.debug(f"{self.name}: Setting interface item attributes")
         for item_data in self.interface_items:
             log.debug(
-                f"{self.name}: Setting interface item attributes for {item_data.name}"
+                f"{self.name}: - Setting interface item attributes for {item_data.name}"
             )
             item_data.set_attributes()
 
-        log.debug(f"{self.name}: Setting NodeSocket attributes")
+        log.debug(f"{self.name}: - Setting NodeSocket attributes")
         for node_data in self.nodes.values():
-            log.debug(f"{self.name}: Setting socket attributes for node {node.name}")
+            log.debug(
+                f"{self.name}: -- Setting socket attributes for node {node_data.name}"
+            )
             node_data.set_socket_attributes()
         log.debug(f"{self.name}: Done.")
         log.debug("=" * 40)

@@ -1,7 +1,6 @@
 import bpy
-from .nodes.node_import_export import export_groups, import_groups
-from .nodes.attributes import generate_attributes_dict
-from .nodes import file
+from .json_nodes.import_export import export_groups, import_groups
+from .json_nodes.attributes import generate_attributes_dict
 import logging
 
 log = logging.getLogger(__name__)

@@ -6,74 +6,8 @@
 
 A comprehensive Blender addon for developing, testing, and managing Geometry Node Trees. This addon provides tools for exporting node trees to JSON format, importing them back into Blender, and maintaining a robust development workflow for geometry nodes.
 
-## Features
 
-### 🔄 Import/Export System
-- **Export to JSON**: Convert Geometry Node Trees to structured JSON files
-- **Import from JSON**: Recreate node trees from JSON data with full fidelity
-- **Automatic File Organization**: Organizes exported files by tree type and category
-- **Version Tracking**: Includes Blender version information in exports
-
-### 🧩 Node Tree Management
-- **Complete Tree Serialization**: Preserves all node properties, connections, and interface items
-- **Socket Management**: Handles all socket types including custom attributes
-- **Interface Preservation**: Maintains input/output panels and their organization
-- **UUID Tracking**: Automatic UUID assignment for consistent tree identification
-
-### 🔧 Development Tools
-- **Attribute Dictionary Generation**: Automatically generates type definitions for all Blender node types
-- **Modern Python Typing**: Uses Python 3.9+ type hints with modern syntax
-- **Extensible Architecture**: Modular design for easy extension and customization
-- **Auto-save Integration**: Optional automatic export on file save
-
-### 🧪 Testing Framework
-- **Automated Testing**: Pytest-based test suite for reliability
-- **Multi-version Support**: Tests against multiple Blender versions
-- **CI/CD Ready**: Automated build and test pipeline
-
-## Installation
-
-### Method 1: From Release
-1. Download the latest `GeoNodeDevelopment.zip` from the releases page
-2. In Blender, go to `Edit > Preferences > Add-ons`
-3. Click `Install` and select the downloaded zip file
-4. Enable the "GeoNodeDevelopment" addon
-
-### Method 2: Development Installation
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/GeoNodeDevelopment.git
-   cd GeoNodeDevelopment
-   ```
-
-2. Build the addon:
-   ```bash
-   python dev.py build
-   ```
-
-3. Install in Blender using the generated `GeoNodeDevelopment.zip`
-
-## Usage
-
-### Basic Workflow
-
-1. **Set Export Path**: In the 3D Viewport sidebar (N key), find the GeoNodeDevelopment panel and set your JSON folder path
-
-2. **Export Node Trees**:
-   - Click "Export to JSON" to export all Geometry Node Trees in your current file
-   - Files are organized as: `{tree_type}/{category}/{tree_name}.json`
-   - Test trees (starting with ".test: ") are categorized separately
-
-3. **Import Node Trees**:
-   - Click "Import from JSON" to recreate all node trees from the JSON folder
-   - Existing trees with the same UUID will be updated
-
-### Panel Controls
-
-- **Export to JSON**: Exports all geometry node trees to the specified folder
-- **Import from JSON**: Imports all node trees from JSON files in the folder
-- **Generate Default Values**: Regenerates the internal attribute dictionary
-- **JSON Folder Path**: Set the directory for import/export operations
+# Notes
 
 ### File Organization
 
@@ -109,8 +43,22 @@ Each exported file contains:
 ```
 
 
-# Procedure
+# Workflow
+## First Setup
+### From empty json storage, empty blend:
+- create empty folder, open with
+-
+## Path Setup
+On changing the directory path:
+- validate path and folder contents, if anything other than jsons cancel
+- message popup:
+  - if contains jsons:
+    - ask if import or overwrite existing node trees
+  - if is empty:
+    - continue
+  - ask if export is wanted
 ## Exporting
+- check if node trees are in the files that arent in the blend
 ## Importing
 - Create empty node trees with interfaces
 - add nodes and set their attributes (includes item lists in eg. foreach)
@@ -118,3 +66,59 @@ Each exported file contains:
 - connect nodes with links
 - set default values of interface items
 - set attributes (here: only default_value) on node sockets
+
+
+# Names
+NodeDev | nodedev
+Node Development
+NodeFlow
+NodeOps
+
+
+
+# TODO
+## Path Management/Workflow
+- determine setup workflow
+- integration with git workflow
+
+## Only sync changed trees
+
+## Assets
+### Export
+- asset:
+  - Object
+  - Collection
+  - Material
+  - Texture
+
+- determine all assets
+- set a uuid for each used asset
+- store uuid of asset in node
+- export asset to separate file with uuid as filename
+What to do if asset is used in multiple contexts? collection with objects, but objects also used on its own
+### Import
+- Find file with correct uuid
+- append to current scene, extra collection?
+- set asset pointer as attribute
+
+## Tests
+### Based on attributes_dict
+- find way to genericallý create each data type
+
+- for each class (except nodetree):
+  - create nodetree
+  - add this item
+  - for each attribute:
+    - set random attribute for this datatype
+      - int/float: trivial
+      - str: random, except filepaths?
+      - vector: store size in attributes_dict?
+      - enum: ??
+      - bpy_collection: find type of collection, add 3 items
+      - assets/other objets: future
+=> attributes_dict wouldn't be backwards compatible
+### Test the behavior of a complex tree
+- needs node tester
+### Manually
+- find key features/node types
+- useful?

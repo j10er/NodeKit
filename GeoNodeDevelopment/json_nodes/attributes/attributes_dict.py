@@ -1,0 +1,997 @@
+DEFAULTS = {
+    "Element": [
+        {},
+        {
+            "Node": [
+                {
+                    "bl_idname": ["STRING", ""],
+                    "color": [
+                        "LIST",
+                        [0.6079999804496765, 0.6079999804496765, 0.6079999804496765],
+                    ],
+                    "height": ["FLOAT", 100],
+                    "label": ["STRING", ""],
+                    "location": ["LIST", [0, 0]],
+                    "mute": ["BOOLEAN", False],
+                    "name": ["STRING", ""],
+                    "use_custom_color": ["BOOLEAN", False],
+                    "warning_propagation": ["STRING", "ALL"],
+                    "width": ["FLOAT", 140],
+                },
+                {
+                    "NodeInternal": [
+                        {},
+                        {
+                            "FunctionNode": [
+                                {},
+                                {
+                                    "FunctionNodeAlignEulerToVector": [
+                                        {
+                                            "axis": ["ENUM", "X"],
+                                            "pivot_axis": ["ENUM", "AUTO"],
+                                        }
+                                    ],
+                                    "FunctionNodeAlignRotationToVector": [
+                                        {
+                                            "axis": ["ENUM", "X"],
+                                            "pivot_axis": ["ENUM", "AUTO"],
+                                        }
+                                    ],
+                                    "FunctionNodeAxesToRotation": [
+                                        {
+                                            "primary_axis": ["ENUM", "X"],
+                                            "secondary_axis": ["ENUM", "X"],
+                                        }
+                                    ],
+                                    "FunctionNodeAxisAngleToRotation": [{}],
+                                    "FunctionNodeBooleanMath": [
+                                        {"operation": ["ENUM", "AND"]}
+                                    ],
+                                    "FunctionNodeCombineColor": [
+                                        {"mode": ["ENUM", "RGB"]}
+                                    ],
+                                    "FunctionNodeCombineMatrix": [{}],
+                                    "FunctionNodeCombineTransform": [{}],
+                                    "FunctionNodeCompare": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "mode": ["ENUM", "ELEMENT"],
+                                            "operation": ["ENUM", "EQUAL"],
+                                        }
+                                    ],
+                                    "FunctionNodeEulerToRotation": [{}],
+                                    "FunctionNodeFindInString": [{}],
+                                    "FunctionNodeFloatToInt": [
+                                        {"rounding_mode": ["ENUM", "ROUND"]}
+                                    ],
+                                    "FunctionNodeHashValue": [
+                                        {"data_type": ["ENUM", "INT"]}
+                                    ],
+                                    "FunctionNodeInputBool": [
+                                        {"boolean": ["BOOLEAN", False]}
+                                    ],
+                                    "FunctionNodeInputColor": [
+                                        {"value": ["LIST", 0.0]}
+                                    ],
+                                    "FunctionNodeInputInt": [{"integer": ["INT", 1]}],
+                                    "FunctionNodeInputRotation": [
+                                        {"rotation_euler": ["LIST", 0.0]}
+                                    ],
+                                    "FunctionNodeInputSpecialCharacters": [{}],
+                                    "FunctionNodeInputString": [
+                                        {"string": ["STRING", ""]}
+                                    ],
+                                    "FunctionNodeInputVector": [
+                                        {"vector": ["LIST", 0.0]}
+                                    ],
+                                    "FunctionNodeIntegerMath": [
+                                        {"operation": ["ENUM", "ADD"]}
+                                    ],
+                                    "FunctionNodeInvertMatrix": [{}],
+                                    "FunctionNodeInvertRotation": [{}],
+                                    "FunctionNodeMatrixDeterminant": [{}],
+                                    "FunctionNodeMatrixMultiply": [{}],
+                                    "FunctionNodeProjectPoint": [{}],
+                                    "FunctionNodeQuaternionToRotation": [{}],
+                                    "FunctionNodeRandomValue": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "FunctionNodeReplaceString": [{}],
+                                    "FunctionNodeRotateEuler": [
+                                        {
+                                            "rotation_type": ["ENUM", "EULER"],
+                                            "space": ["ENUM", "OBJECT"],
+                                        }
+                                    ],
+                                    "FunctionNodeRotateRotation": [
+                                        {"rotation_space": ["ENUM", "GLOBAL"]}
+                                    ],
+                                    "FunctionNodeRotateVector": [{}],
+                                    "FunctionNodeRotationToAxisAngle": [{}],
+                                    "FunctionNodeRotationToEuler": [{}],
+                                    "FunctionNodeRotationToQuaternion": [{}],
+                                    "FunctionNodeSeparateColor": [
+                                        {"mode": ["ENUM", "RGB"]}
+                                    ],
+                                    "FunctionNodeSeparateMatrix": [{}],
+                                    "FunctionNodeSeparateTransform": [{}],
+                                    "FunctionNodeSliceString": [{}],
+                                    "FunctionNodeStringLength": [{}],
+                                    "FunctionNodeTransformDirection": [{}],
+                                    "FunctionNodeTransformPoint": [{}],
+                                    "FunctionNodeTransposeMatrix": [{}],
+                                    "FunctionNodeValueToString": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                },
+                            ],
+                            "GeometryNode": [
+                                {},
+                                {
+                                    "GeometryNodeAccumulateField": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeAttributeDomainSize": [
+                                        {"component": ["ENUM", "MESH"]}
+                                    ],
+                                    "GeometryNodeAttributeStatistic": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeBake": [
+                                        {
+                                            "active_index": ["INT", 0],
+                                            "active_item": ["NONE", None],
+                                            "bake_items": ["COLLECTION", None],
+                                        }
+                                    ],
+                                    "GeometryNodeBlurAttribute": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeBoundBox": [{}],
+                                    "GeometryNodeCaptureAttribute": [
+                                        {
+                                            "active_index": ["INT", 0],
+                                            "active_item": ["NONE", None],
+                                            "capture_items": ["COLLECTION", None],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeCollectionInfo": [
+                                        {"transform_space": ["ENUM", "ORIGINAL"]}
+                                    ],
+                                    "GeometryNodeConvexHull": [{}],
+                                    "GeometryNodeCornersOfEdge": [{}],
+                                    "GeometryNodeCornersOfFace": [{}],
+                                    "GeometryNodeCornersOfVertex": [{}],
+                                    "GeometryNodeCurveArc": [
+                                        {"mode": ["ENUM", "RADIUS"]}
+                                    ],
+                                    "GeometryNodeCurveEndpointSelection": [{}],
+                                    "GeometryNodeCurveHandleTypeSelection": [
+                                        {
+                                            "handle_type": ["ENUM", "FREE"],
+                                            "mode": ["ENUM", ""],
+                                        }
+                                    ],
+                                    "GeometryNodeCurveLength": [{}],
+                                    "GeometryNodeCurveOfPoint": [{}],
+                                    "GeometryNodeCurvePrimitiveBezierSegment": [
+                                        {"mode": ["ENUM", "POSITION"]}
+                                    ],
+                                    "GeometryNodeCurvePrimitiveCircle": [
+                                        {"mode": ["ENUM", "RADIUS"]}
+                                    ],
+                                    "GeometryNodeCurvePrimitiveLine": [
+                                        {"mode": ["ENUM", "POINTS"]}
+                                    ],
+                                    "GeometryNodeCurvePrimitiveQuadrilateral": [
+                                        {"mode": ["ENUM", "RECTANGLE"]}
+                                    ],
+                                    "GeometryNodeCurveQuadraticBezier": [{}],
+                                    "GeometryNodeCurveSetHandles": [
+                                        {
+                                            "handle_type": ["ENUM", "FREE"],
+                                            "mode": ["ENUM", ""],
+                                        }
+                                    ],
+                                    "GeometryNodeCurveSpiral": [{}],
+                                    "GeometryNodeCurveSplineType": [
+                                        {"spline_type": ["ENUM", "POLY"]}
+                                    ],
+                                    "GeometryNodeCurveStar": [{}],
+                                    "GeometryNodeCurveToMesh": [{}],
+                                    "GeometryNodeCurveToPoints": [
+                                        {"mode": ["ENUM", "COUNT"]}
+                                    ],
+                                    "GeometryNodeCurvesToGreasePencil": [{}],
+                                    "GeometryNodeCustomGroup": [
+                                        {"node_tree": ["NODETREE", None]}
+                                    ],
+                                    "GeometryNodeDeformCurvesOnSurface": [{}],
+                                    "GeometryNodeDeleteGeometry": [
+                                        {
+                                            "domain": ["ENUM", "POINT"],
+                                            "mode": ["ENUM", "ALL"],
+                                        }
+                                    ],
+                                    "GeometryNodeDistributePointsInGrid": [
+                                        {"mode": ["ENUM", "DENSITY_RANDOM"]}
+                                    ],
+                                    "GeometryNodeDistributePointsInVolume": [
+                                        {"mode": ["ENUM", "DENSITY_RANDOM"]}
+                                    ],
+                                    "GeometryNodeDistributePointsOnFaces": [
+                                        {
+                                            "distribute_method": ["ENUM", "RANDOM"],
+                                            "use_legacy_normal": ["BOOLEAN", False],
+                                        }
+                                    ],
+                                    "GeometryNodeDualMesh": [{}],
+                                    "GeometryNodeDuplicateElements": [
+                                        {"domain": ["ENUM", "POINT"]}
+                                    ],
+                                    "GeometryNodeEdgePathsToCurves": [{}],
+                                    "GeometryNodeEdgePathsToSelection": [{}],
+                                    "GeometryNodeEdgesOfCorner": [{}],
+                                    "GeometryNodeEdgesOfVertex": [{}],
+                                    "GeometryNodeEdgesToFaceGroups": [{}],
+                                    "GeometryNodeExtrudeMesh": [
+                                        {"mode": ["ENUM", "FACES"]}
+                                    ],
+                                    "GeometryNodeFaceOfCorner": [{}],
+                                    "GeometryNodeFieldAtIndex": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeFieldOnDomain": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeFillCurve": [
+                                        {"mode": ["ENUM", "TRIANGLES"]}
+                                    ],
+                                    "GeometryNodeFilletCurve": [
+                                        {"mode": ["ENUM", "BEZIER"]}
+                                    ],
+                                    "GeometryNodeFlipFaces": [{}],
+                                    "GeometryNodeForeachGeometryElementInput": [
+                                        {"paired_output": ["NODE", None]}
+                                    ],
+                                    "GeometryNodeForeachGeometryElementOutput": [
+                                        {
+                                            "active_generation_index": ["INT", 0],
+                                            "active_input_index": ["INT", 0],
+                                            "active_main_index": ["INT", 0],
+                                            "domain": ["ENUM", "POINT"],
+                                            "generation_items": ["COLLECTION", None],
+                                            "input_items": ["COLLECTION", None],
+                                            "inspection_index": ["INT", 0],
+                                            "main_items": ["COLLECTION", None],
+                                        }
+                                    ],
+                                    "GeometryNodeGeometryToInstance": [{}],
+                                    "GeometryNodeGetNamedGrid": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeGizmoDial": [
+                                        {"color_id": ["ENUM", "PRIMARY"]}
+                                    ],
+                                    "GeometryNodeGizmoLinear": [
+                                        {
+                                            "color_id": ["ENUM", "PRIMARY"],
+                                            "draw_style": ["ENUM", "ARROW"],
+                                        }
+                                    ],
+                                    "GeometryNodeGizmoTransform": [
+                                        {
+                                            "use_rotation_x": ["BOOLEAN", False],
+                                            "use_rotation_y": ["BOOLEAN", False],
+                                            "use_rotation_z": ["BOOLEAN", False],
+                                            "use_scale_x": ["BOOLEAN", False],
+                                            "use_scale_y": ["BOOLEAN", False],
+                                            "use_scale_z": ["BOOLEAN", False],
+                                            "use_translation_x": ["BOOLEAN", False],
+                                            "use_translation_y": ["BOOLEAN", False],
+                                            "use_translation_z": ["BOOLEAN", False],
+                                        }
+                                    ],
+                                    "GeometryNodeGreasePencilToCurves": [{}],
+                                    "GeometryNodeGridToMesh": [{}],
+                                    "GeometryNodeGroup": [
+                                        {"node_tree": ["NODETREE", None]}
+                                    ],
+                                    "GeometryNodeImageInfo": [{}],
+                                    "GeometryNodeImageTexture": [
+                                        {
+                                            "extension": ["ENUM", "REPEAT"],
+                                            "interpolation": ["ENUM", "Linear"],
+                                        }
+                                    ],
+                                    "GeometryNodeImportOBJ": [{}],
+                                    "GeometryNodeImportPLY": [{}],
+                                    "GeometryNodeImportSTL": [{}],
+                                    "GeometryNodeIndexOfNearest": [{}],
+                                    "GeometryNodeIndexSwitch": [
+                                        {
+                                            "data_type": ["ENUM", "GEOMETRY"],
+                                            "index_switch_items": ["COLLECTION", None],
+                                        }
+                                    ],
+                                    "GeometryNodeInputActiveCamera": [{}],
+                                    "GeometryNodeInputCollection": [
+                                        {"collection": ["NONE", None]}
+                                    ],
+                                    "GeometryNodeInputCurveHandlePositions": [{}],
+                                    "GeometryNodeInputCurveTilt": [{}],
+                                    "GeometryNodeInputEdgeSmooth": [{}],
+                                    "GeometryNodeInputID": [{}],
+                                    "GeometryNodeInputImage": [
+                                        {"image": ["NONE", None]}
+                                    ],
+                                    "GeometryNodeInputIndex": [{}],
+                                    "GeometryNodeInputInstanceRotation": [{}],
+                                    "GeometryNodeInputInstanceScale": [{}],
+                                    "GeometryNodeInputMaterial": [
+                                        {"material": ["NONE", None]}
+                                    ],
+                                    "GeometryNodeInputMaterialIndex": [{}],
+                                    "GeometryNodeInputMeshEdgeAngle": [{}],
+                                    "GeometryNodeInputMeshEdgeNeighbors": [{}],
+                                    "GeometryNodeInputMeshEdgeVertices": [{}],
+                                    "GeometryNodeInputMeshFaceArea": [{}],
+                                    "GeometryNodeInputMeshFaceIsPlanar": [{}],
+                                    "GeometryNodeInputMeshFaceNeighbors": [{}],
+                                    "GeometryNodeInputMeshIsland": [{}],
+                                    "GeometryNodeInputMeshVertexNeighbors": [{}],
+                                    "GeometryNodeInputNamedAttribute": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeInputNamedLayerSelection": [{}],
+                                    "GeometryNodeInputNormal": [
+                                        {"legacy_corner_normals": ["BOOLEAN", False]}
+                                    ],
+                                    "GeometryNodeInputObject": [
+                                        {"object": ["NONE", None]}
+                                    ],
+                                    "GeometryNodeInputPosition": [{}],
+                                    "GeometryNodeInputRadius": [{}],
+                                    "GeometryNodeInputSceneTime": [{}],
+                                    "GeometryNodeInputShadeSmooth": [{}],
+                                    "GeometryNodeInputShortestEdgePaths": [{}],
+                                    "GeometryNodeInputSplineCyclic": [{}],
+                                    "GeometryNodeInputSplineResolution": [{}],
+                                    "GeometryNodeInputTangent": [{}],
+                                    "GeometryNodeInstanceOnPoints": [{}],
+                                    "GeometryNodeInstanceTransform": [{}],
+                                    "GeometryNodeInstancesToPoints": [{}],
+                                    "GeometryNodeInterpolateCurves": [{}],
+                                    "GeometryNodeIsViewport": [{}],
+                                    "GeometryNodeJoinGeometry": [{}],
+                                    "GeometryNodeMaterialSelection": [{}],
+                                    "GeometryNodeMenuSwitch": [
+                                        {
+                                            "active_index": ["INT", 0],
+                                            "active_item": ["NONE", None],
+                                            "data_type": ["ENUM", "GEOMETRY"],
+                                            "enum_definition": ["NODE", None],
+                                            "enum_items": ["COLLECTION", None],
+                                        }
+                                    ],
+                                    "GeometryNodeMergeByDistance": [
+                                        {"mode": ["ENUM", "ALL"]}
+                                    ],
+                                    "GeometryNodeMergeLayers": [
+                                        {"mode": ["ENUM", "MERGE_BY_NAME"]}
+                                    ],
+                                    "GeometryNodeMeshBoolean": [
+                                        {
+                                            "operation": ["ENUM", "INTERSECT"],
+                                            "solver": ["ENUM", "FLOAT"],
+                                        }
+                                    ],
+                                    "GeometryNodeMeshCircle": [
+                                        {"fill_type": ["ENUM", "NONE"]}
+                                    ],
+                                    "GeometryNodeMeshCone": [
+                                        {"fill_type": ["ENUM", "NGON"]}
+                                    ],
+                                    "GeometryNodeMeshCube": [{}],
+                                    "GeometryNodeMeshCylinder": [
+                                        {"fill_type": ["ENUM", "NGON"]}
+                                    ],
+                                    "GeometryNodeMeshFaceSetBoundaries": [{}],
+                                    "GeometryNodeMeshGrid": [{}],
+                                    "GeometryNodeMeshIcoSphere": [{}],
+                                    "GeometryNodeMeshLine": [
+                                        {
+                                            "count_mode": ["ENUM", "TOTAL"],
+                                            "mode": ["ENUM", "OFFSET"],
+                                        }
+                                    ],
+                                    "GeometryNodeMeshToCurve": [{}],
+                                    "GeometryNodeMeshToDensityGrid": [{}],
+                                    "GeometryNodeMeshToPoints": [
+                                        {"mode": ["ENUM", "VERTICES"]}
+                                    ],
+                                    "GeometryNodeMeshToSDFGrid": [{}],
+                                    "GeometryNodeMeshToVolume": [
+                                        {"resolution_mode": ["ENUM", "VOXEL_AMOUNT"]}
+                                    ],
+                                    "GeometryNodeMeshUVSphere": [{}],
+                                    "GeometryNodeObjectInfo": [
+                                        {"transform_space": ["ENUM", "ORIGINAL"]}
+                                    ],
+                                    "GeometryNodeOffsetCornerInFace": [{}],
+                                    "GeometryNodeOffsetPointInCurve": [{}],
+                                    "GeometryNodePoints": [{}],
+                                    "GeometryNodePointsOfCurve": [{}],
+                                    "GeometryNodePointsToCurves": [{}],
+                                    "GeometryNodePointsToSDFGrid": [{}],
+                                    "GeometryNodePointsToVertices": [{}],
+                                    "GeometryNodePointsToVolume": [
+                                        {"resolution_mode": ["ENUM", "VOXEL_AMOUNT"]}
+                                    ],
+                                    "GeometryNodeProximity": [
+                                        {"target_element": ["ENUM", "FACES"]}
+                                    ],
+                                    "GeometryNodeRaycast": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "mapping": ["ENUM", "INTERPOLATED"],
+                                        }
+                                    ],
+                                    "GeometryNodeRealizeInstances": [{}],
+                                    "GeometryNodeRemoveAttribute": [
+                                        {"pattern_mode": ["ENUM", "EXACT"]}
+                                    ],
+                                    "GeometryNodeRepeatInput": [
+                                        {"paired_output": ["NODE", None]}
+                                    ],
+                                    "GeometryNodeRepeatOutput": [
+                                        {
+                                            "active_index": ["INT", 0],
+                                            "active_item": ["NONE", None],
+                                            "inspection_index": ["INT", 0],
+                                            "repeat_items": ["COLLECTION", None],
+                                        }
+                                    ],
+                                    "GeometryNodeReplaceMaterial": [{}],
+                                    "GeometryNodeResampleCurve": [
+                                        {
+                                            "keep_last_segment": ["BOOLEAN", False],
+                                            "mode": ["ENUM", "COUNT"],
+                                        }
+                                    ],
+                                    "GeometryNodeReverseCurve": [{}],
+                                    "GeometryNodeRotateInstances": [{}],
+                                    "GeometryNodeSDFGridBoolean": [
+                                        {"operation": ["ENUM", "DIFFERENCE"]}
+                                    ],
+                                    "GeometryNodeSampleCurve": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "mode": ["ENUM", "FACTOR"],
+                                            "use_all_curves": ["BOOLEAN", False],
+                                        }
+                                    ],
+                                    "GeometryNodeSampleGrid": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "interpolation_mode": ["ENUM", "TRILINEAR"],
+                                        }
+                                    ],
+                                    "GeometryNodeSampleGridIndex": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeSampleIndex": [
+                                        {
+                                            "clamp": ["BOOLEAN", False],
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeSampleNearest": [
+                                        {"domain": ["ENUM", "POINT"]}
+                                    ],
+                                    "GeometryNodeSampleNearestSurface": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeSampleUVSurface": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeScaleElements": [
+                                        {
+                                            "domain": ["ENUM", "FACE"],
+                                            "scale_mode": ["ENUM", "UNIFORM"],
+                                        }
+                                    ],
+                                    "GeometryNodeScaleInstances": [{}],
+                                    "GeometryNodeSelfObject": [{}],
+                                    "GeometryNodeSeparateComponents": [{}],
+                                    "GeometryNodeSeparateGeometry": [
+                                        {"domain": ["ENUM", "POINT"]}
+                                    ],
+                                    "GeometryNodeSetCurveHandlePositions": [
+                                        {"mode": ["ENUM", "LEFT"]}
+                                    ],
+                                    "GeometryNodeSetCurveNormal": [
+                                        {"mode": ["ENUM", "MINIMUM_TWIST"]}
+                                    ],
+                                    "GeometryNodeSetCurveRadius": [{}],
+                                    "GeometryNodeSetCurveTilt": [{}],
+                                    "GeometryNodeSetGeometryName": [{}],
+                                    "GeometryNodeSetID": [{}],
+                                    "GeometryNodeSetInstanceTransform": [{}],
+                                    "GeometryNodeSetMaterial": [{}],
+                                    "GeometryNodeSetMaterialIndex": [{}],
+                                    "GeometryNodeSetPointRadius": [{}],
+                                    "GeometryNodeSetPosition": [{}],
+                                    "GeometryNodeSetShadeSmooth": [
+                                        {"domain": ["ENUM", "EDGE"]}
+                                    ],
+                                    "GeometryNodeSetSplineCyclic": [{}],
+                                    "GeometryNodeSetSplineResolution": [{}],
+                                    "GeometryNodeSimulationInput": [
+                                        {"paired_output": ["NODE", None]}
+                                    ],
+                                    "GeometryNodeSimulationOutput": [
+                                        {
+                                            "active_index": ["INT", 0],
+                                            "active_item": ["NONE", None],
+                                            "state_items": ["COLLECTION", None],
+                                        }
+                                    ],
+                                    "GeometryNodeSortElements": [
+                                        {"domain": ["ENUM", "POINT"]}
+                                    ],
+                                    "GeometryNodeSplineLength": [{}],
+                                    "GeometryNodeSplineParameter": [{}],
+                                    "GeometryNodeSplitEdges": [{}],
+                                    "GeometryNodeSplitToInstances": [
+                                        {"domain": ["ENUM", "POINT"]}
+                                    ],
+                                    "GeometryNodeStoreNamedAttribute": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeStoreNamedGrid": [
+                                        {"data_type": ["ENUM", "FLOAT"]}
+                                    ],
+                                    "GeometryNodeStringJoin": [{}],
+                                    "GeometryNodeStringToCurves": [
+                                        {
+                                            "align_x": ["ENUM", "LEFT"],
+                                            "align_y": ["ENUM", "TOP_BASELINE"],
+                                            "font": ["NONE", None],
+                                            "overflow": ["ENUM", "OVERFLOW"],
+                                            "pivot_mode": ["ENUM", "BOTTOM_LEFT"],
+                                        }
+                                    ],
+                                    "GeometryNodeSubdivideCurve": [{}],
+                                    "GeometryNodeSubdivideMesh": [{}],
+                                    "GeometryNodeSubdivisionSurface": [
+                                        {
+                                            "boundary_smooth": ["ENUM", "ALL"],
+                                            "uv_smooth": [
+                                                "ENUM",
+                                                "PRESERVE_BOUNDARIES",
+                                            ],
+                                        }
+                                    ],
+                                    "GeometryNodeSwitch": [
+                                        {"input_type": ["ENUM", "GEOMETRY"]}
+                                    ],
+                                    "GeometryNodeTool3DCursor": [{}],
+                                    "GeometryNodeToolActiveElement": [
+                                        {"domain": ["ENUM", "POINT"]}
+                                    ],
+                                    "GeometryNodeToolFaceSet": [{}],
+                                    "GeometryNodeToolMousePosition": [{}],
+                                    "GeometryNodeToolSelection": [{}],
+                                    "GeometryNodeToolSetFaceSet": [{}],
+                                    "GeometryNodeToolSetSelection": [
+                                        {
+                                            "domain": ["ENUM", "POINT"],
+                                            "selection_type": ["ENUM", "BOOLEAN"],
+                                        }
+                                    ],
+                                    "GeometryNodeTransform": [
+                                        {"mode": ["ENUM", "COMPONENTS"]}
+                                    ],
+                                    "GeometryNodeTranslateInstances": [{}],
+                                    "GeometryNodeTriangulate": [
+                                        {
+                                            "ngon_method": ["ENUM", "BEAUTY"],
+                                            "quad_method": ["ENUM", "BEAUTY"],
+                                        }
+                                    ],
+                                    "GeometryNodeTrimCurve": [
+                                        {"mode": ["ENUM", "FACTOR"]}
+                                    ],
+                                    "GeometryNodeUVPackIslands": [{}],
+                                    "GeometryNodeUVUnwrap": [
+                                        {"method": ["ENUM", "ANGLE_BASED"]}
+                                    ],
+                                    "GeometryNodeVertexOfCorner": [{}],
+                                    "GeometryNodeViewer": [
+                                        {
+                                            "data_type": ["ENUM", "FLOAT"],
+                                            "domain": ["ENUM", "POINT"],
+                                        }
+                                    ],
+                                    "GeometryNodeViewportTransform": [{}],
+                                    "GeometryNodeVolumeCube": [{}],
+                                    "GeometryNodeVolumeToMesh": [
+                                        {"resolution_mode": ["ENUM", "GRID"]}
+                                    ],
+                                    "GeometryNodeWarning": [
+                                        {"warning_type": ["ENUM", "ERROR"]}
+                                    ],
+                                },
+                            ],
+                        },
+                    ]
+                },
+            ],
+            "NodeSocket": [
+                {"bl_idname": ["STRING", ""], "name": ["STRING", ""]},
+                {
+                    "NodeSocketStandard": [
+                        {},
+                        {
+                            "NodeSocketBool": [{"default_value": ["BOOLEAN", False]}],
+                            "NodeSocketCollection": [{"default_value": ["NONE", None]}],
+                            "NodeSocketColor": [{"default_value": ["LIST", 0.0]}],
+                            "NodeSocketFloat": [{"default_value": ["FLOAT", 0.0]}],
+                            "NodeSocketFloatAngle": [{"default_value": ["FLOAT", 0.0]}],
+                            "NodeSocketFloatColorTemperature": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatDistance": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatFactor": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatFrequency": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatPercentage": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatTime": [{"default_value": ["FLOAT", 0.0]}],
+                            "NodeSocketFloatTimeAbsolute": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatUnsigned": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketFloatWavelength": [
+                                {"default_value": ["FLOAT", 0.0]}
+                            ],
+                            "NodeSocketGeometry": [{}],
+                            "NodeSocketImage": [{"default_value": ["NONE", None]}],
+                            "NodeSocketInt": [{"default_value": ["INT", 0]}],
+                            "NodeSocketIntFactor": [{"default_value": ["INT", 1]}],
+                            "NodeSocketIntPercentage": [
+                                {"default_value": ["INT", 100]}
+                            ],
+                            "NodeSocketIntUnsigned": [{"default_value": ["INT", 0]}],
+                            "NodeSocketMaterial": [{"default_value": ["NONE", None]}],
+                            "NodeSocketMatrix": [{}],
+                            "NodeSocketMenu": [{"default_value": ["ENUM", ""]}],
+                            "NodeSocketObject": [{"default_value": ["NONE", None]}],
+                            "NodeSocketRotation": [{"default_value": ["LIST", 0.0]}],
+                            "NodeSocketShader": [{}],
+                            "NodeSocketString": [{"default_value": ["STRING", ""]}],
+                            "NodeSocketStringFilePath": [
+                                {"default_value": ["STRING", ""]}
+                            ],
+                            "NodeSocketTexture": [{"default_value": ["NONE", None]}],
+                            "NodeSocketVector": [{"default_value": ["LIST", 0.0]}],
+                            "NodeSocketVectorAcceleration": [
+                                {"default_value": ["LIST", 0.0]}
+                            ],
+                            "NodeSocketVectorDirection": [
+                                {"default_value": ["LIST", 0.0]}
+                            ],
+                            "NodeSocketVectorEuler": [{"default_value": ["LIST", 0.0]}],
+                            "NodeSocketVectorTranslation": [
+                                {"default_value": ["LIST", 0.0]}
+                            ],
+                            "NodeSocketVectorVelocity": [
+                                {"default_value": ["LIST", 0.0]}
+                            ],
+                            "NodeSocketVectorXYZ": [{"default_value": ["LIST", 0.0]}],
+                            "NodeSocketVirtual": [{}],
+                        },
+                    ]
+                },
+            ],
+            "NodeTree": [
+                {
+                    "bl_idname": ["STRING", ""],
+                    "color_tag": ["STRING", "NONE"],
+                    "default_group_node_width": ["INT", 140],
+                    "description": ["STRING", ""],
+                    "name": ["STRING", ""],
+                },
+                {
+                    "GeometryNodeTree": [
+                        {
+                            "is_modifier": ["BOOLEAN", False],
+                            "is_tool": ["BOOLEAN", False],
+                        }
+                    ]
+                },
+            ],
+            "NodeTreeInterfaceItem": [
+                {
+                    "description": ["STRING", ""],
+                    "item_type": ["STRING", "SOCKET"],
+                    "name": ["STRING", ""],
+                },
+                {
+                    "NodeTreeInterfacePanel": [{"default_closed": ["BOOLEAN", False]}],
+                    "NodeTreeInterfaceSocket": [
+                        {
+                            "attribute_domain": ["STRING", "POINT"],
+                            "default_attribute_name": ["STRING", ""],
+                            "description": ["STRING", ""],
+                            "force_non_field": ["BOOLEAN", False],
+                            "hide_in_modifier": ["BOOLEAN", False],
+                            "hide_value": ["BOOLEAN", False],
+                            "in_out": ["STRING", "INPUT"],
+                            "socket_type": ["STRING", "DEFAULT"],
+                        },
+                        {
+                            "NodeTreeInterfaceSocketBool": [
+                                {"default_value": ["BOOLEAN", False]}
+                            ],
+                            "NodeTreeInterfaceSocketCollection": [
+                                {"default_value": ["NONE", None]}
+                            ],
+                            "NodeTreeInterfaceSocketColor": [
+                                {"default_value": ["LIST", 0.0]}
+                            ],
+                            "NodeTreeInterfaceSocketFloat": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatAngle": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatColorTemperature": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatDistance": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatFactor": [
+                                {
+                                    "default_value": ["FLOAT", 1.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatFrequency": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatPercentage": [
+                                {
+                                    "default_value": ["FLOAT", 100.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatTime": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatTimeAbsolute": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatUnsigned": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketFloatWavelength": [
+                                {
+                                    "default_value": ["FLOAT", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketGeometry": [{}],
+                            "NodeTreeInterfaceSocketImage": [
+                                {"default_value": ["NONE", None]}
+                            ],
+                            "NodeTreeInterfaceSocketInt": [
+                                {
+                                    "default_value": ["INT", 0],
+                                    "max_value": ["INT", 0],
+                                    "min_value": ["INT", 0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketIntFactor": [
+                                {
+                                    "default_value": ["INT", 0],
+                                    "max_value": ["INT", 0],
+                                    "min_value": ["INT", 0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketIntPercentage": [
+                                {
+                                    "default_value": ["INT", 0],
+                                    "max_value": ["INT", 0],
+                                    "min_value": ["INT", 0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketIntUnsigned": [
+                                {
+                                    "default_value": ["INT", 0],
+                                    "max_value": ["INT", 0],
+                                    "min_value": ["INT", 0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketMaterial": [
+                                {"default_value": ["NONE", None]}
+                            ],
+                            "NodeTreeInterfaceSocketMatrix": [{}],
+                            "NodeTreeInterfaceSocketMenu": [
+                                {"default_value": ["ENUM", ""]}
+                            ],
+                            "NodeTreeInterfaceSocketObject": [
+                                {"default_value": ["NONE", None]}
+                            ],
+                            "NodeTreeInterfaceSocketRotation": [
+                                {"default_value": ["LIST", 0.0]}
+                            ],
+                            "NodeTreeInterfaceSocketShader": [{}],
+                            "NodeTreeInterfaceSocketString": [
+                                {
+                                    "default_value": ["STRING", ""],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketStringFilePath": [
+                                {
+                                    "default_value": ["STRING", ""],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketTexture": [
+                                {"default_value": ["NONE", None]}
+                            ],
+                            "NodeTreeInterfaceSocketVector": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketVectorAcceleration": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketVectorDirection": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketVectorEuler": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketVectorTranslation": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketVectorVelocity": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                            "NodeTreeInterfaceSocketVectorXYZ": [
+                                {
+                                    "default_value": ["LIST", 0.0],
+                                    "max_value": ["FLOAT", 0.0],
+                                    "min_value": ["FLOAT", 0.0],
+                                    "subtype": ["ENUM", "DEFAULT"],
+                                }
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
+    ]
+}
+
+ALL_ATTRIBUTE_TYPES = [
+    "BOOLEAN",
+    "COLLECTION",
+    "ENUM",
+    "FLOAT",
+    "INT",
+    "LIST",
+    "NODE",
+    "NODETREE",
+    "NONE",
+    "STRING",
+]

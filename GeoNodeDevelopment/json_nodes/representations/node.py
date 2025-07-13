@@ -85,6 +85,9 @@ class NodeData(Data):
 
     def set_socket_attributes(self) -> None:
         for socket_data in self.inputs:
+            log.debug(
+                f"Setting attributes on input socket {self.node.inputs[socket_data.index].name}"
+            )
             attributes.set_on_element(
                 self.node.inputs[socket_data.index],
                 socket_data.attributes,
@@ -92,6 +95,9 @@ class NodeData(Data):
             )
 
         for socket_data in self.outputs:
+            log.debug(
+                f"Setting attributes on output socket {self.node.outputs[socket_data.index].name}"
+            )
             attributes.set_on_element(
                 self.node.outputs[socket_data.index],
                 socket_data.attributes,
