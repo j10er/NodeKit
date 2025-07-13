@@ -4,8 +4,9 @@ import os
 import shutil
 import subprocess
 
-addon_name = "GeoNodeDevelopment"
-addon_id = "geo_node_development"
+# Should match the addon name and id in blender_manifest.toml
+addon_name = "NodeDev"
+addon_id = "nodedev"
 
 
 def build(fast=False):

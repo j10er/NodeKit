@@ -1,6 +1,6 @@
 import bpy
 
-addon_name = "GeoNodeDevelopment"
+addon_name = "NodeDev"
 
 
 class VIEW3D_PT_SidePanel(bpy.types.Panel):
@@ -20,4 +20,4 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
         layout.prop(context.scene.gnd_props, "folder_path", text="Nodes Path")
         if context.scene.gnd_props.directory_error:
             box = layout.box()
-            box.label(text=context.scene.gnd_props.directory_error)
+            box.label(text=context.scene.gnd_props.directory_error, icon = "ERROR")

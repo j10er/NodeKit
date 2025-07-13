@@ -2,10 +2,10 @@ schema_version = "1.0.0"
 
 # Example of manifest file for a Blender extension
 # Change the values according to your extension
-id = "geo_node_development"
+id = "nodedev"
 version = "1.0.0"
-name = "GeoNodeDevelopment"
-tagline = "Development Environment for Geometry Nodes"
+name = "NodeDev"
+tagline = "Tools for building better Blender node trees"
 maintainer = "Josua Zehner"
 # Supported types: "add-on", "theme"
 type = "add-on"

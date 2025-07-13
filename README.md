@@ -1,4 +1,4 @@
-# GeoNodeDevelopment
+# NodeDev
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 [![Blender](https://img.shields.io/badge/Blender-4.3%2B-orange.svg)](https://www.blender.org/)
@@ -15,9 +15,11 @@ Exported files follow this structure:
 ```
 JSON_FOLDER/
 ├── GeometryNodeTree/
+│   ├── Assets/
 │   ├── Groups/
 │   │   ├── MyNodeGroup.json
 │   │   └── AnotherGroup.json
+│   ├── Test-Assets/
 │   └── Tests/
 │       └── test_MyTest.json
 └── {other_tree_types}/
