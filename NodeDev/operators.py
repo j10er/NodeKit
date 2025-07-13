@@ -39,8 +39,9 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     def execute(self, context):
         # Get menu switch of tree Geometry Nodes
         tree = bpy.data.node_groups.get("Geometry Nodes")
-        node = tree.nodes.get("Reroute")
-        print(node.outputs[1].name)
+        socket = tree.interface.items_tree[2]
+        print(list(socket.default_value))
+
         return {"FINISHED"}
 
 

@@ -12,7 +12,7 @@ all_prop_types = set()
 all_attribute_types = set()
 
 
-def convert_type(cls: type, prop: bpy.types.Property) -> str:
+def prop_type(cls: type, prop: bpy.types.Property) -> str:
     all_prop_types.add(prop.type)
 
     match prop.type:
@@ -33,13 +33,26 @@ def convert_type(cls: type, prop: bpy.types.Property) -> str:
             all_attribute_types.add(prop.type)
             return prop.type
 
+def prop_default(prop: bpy.types.Property) -> Any:
+    if prop.type == "FLOAT":
+        if prop.identifier == "min_value":
+            return -3.4028234663852886e+38
+        elif prop.identifier == "max_value":
+            return -3.4028234663852886e+38
+    elif prop.type == "INT":
+        if prop.identifier == "min_value":
+            return -2147483648
+        elif prop.identifier == "max_value":
+            return 2147483647
+
+    return getattr(prop, "default", None)
 
 def attributes_for(cls: type, base_class: type | None, exclude_keywords) -> dict[str, Any]:
     base_attributes = (
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
-        prop.identifier: [convert_type(cls, prop), getattr(prop, "default", None)]
+        prop.identifier: [prop_type(cls, prop), prop_default(prop)]
         for prop in cls.bl_rna.properties
         if prop.identifier not in base_attributes and not [True for keyword in exclude_keywords if keyword in prop.identifier]
     }

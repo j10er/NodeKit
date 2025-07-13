@@ -51,12 +51,19 @@ def setup() -> None:
 
 
 def import_groups() -> None:
-
+    log.info(f"Importing all node groups from {file.get_folder_path()}")
+    log.info("Importing reading json files...")
     data_dicts = file.load_all()
+    log.info(f"Found {len(data_dicts)} node groups to import.")
+
     tree_datas = [NodeTreeData.from_dict(data_dict["tree"]) for data_dict in data_dicts]
+    log.info("Creating node trees...")
     for tree_data in tree_datas:
         tree_data.create_tree_hull()
+    log.info("Adding nodes to node trees...")
     for tree_data in tree_datas:
         tree_data.add_nodes()
+    log.info("Setting socket values")
     for tree_data in tree_datas:
         tree_data.set_socket_attributes()
+    log.info("Import completed successfully.")
