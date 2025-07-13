@@ -2,7 +2,7 @@ import bpy
 from .json_nodes.import_export import export_groups, import_groups
 from .json_nodes.attributes import generate_attributes_dict
 import logging
-
+from inspect import signature
 log = logging.getLogger(__name__)
 
 
@@ -37,8 +37,10 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-        socket = bpy.types.NodeSocketFloat
-        print(issubclass(socket, socket))
+        # Get menu switch of tree Geometry Nodes
+        tree = bpy.data.node_groups.get("Geometry Nodes")
+        node = tree.nodes.get("Reroute")
+        print(node.outputs[1].name)
         return {"FINISHED"}
 
 

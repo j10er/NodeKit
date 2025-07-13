@@ -2,18 +2,35 @@ import bpy
 from typing import Any, Callable
 from .attributes_dict import DEFAULTS
 import logging
+from inspect import signature
 
 log = logging.getLogger(__name__)
-
 
 def collection_get_item_info(item: Any) -> list[str]:
     if not hasattr(item, "name"):
         return []
-    if not hasattr(item, "socket_type"):
-        return [item.name]
+    if hasattr(item, "socket_type"):
+        return [item.socket_type, item.name]
+    if hasattr(item, "data_type"):
+        return [ATTRIBUTE_TYPE_MAPPING[item.data_type], item.name]
 
-    return [item.socket_type, item.name]
+    return [item.name]
 
+ATTRIBUTE_TYPE_MAPPING = {
+    "FLOAT": "FLOAT",
+    "INT": "INT",
+    "FLOAT_VECTOR": "VECTOR",
+    "FLOAT_COLOR": "COLOR",
+    "BYTE_COLOR": "COLOR",
+    "STRING": "STRING",
+    "BOOLEAN": "BOOLEAN",
+    "FLOAT2": "VECTOR",
+    "INT8": "INT",
+    "INT16_2D": "VECTOR",
+    "INT32_2D": "VECTOR",
+    "QUATERNION": "ROTATION",
+    "FLOAT4X4": "MATRIX"
+}
 
 def set_collection(element, name, value):
     log.debug(f"Setting collection {name} on {element.name} with value: {value}")

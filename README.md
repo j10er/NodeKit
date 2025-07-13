@@ -70,13 +70,6 @@ On changing the directory path:
 - set attributes (here: only default_value) on node sockets
 
 
-# Names
-NodeDev | nodedev
-Node Development
-NodeFlow
-NodeOps
-
-
 
 # TODO
 ## Path Management/Workflow

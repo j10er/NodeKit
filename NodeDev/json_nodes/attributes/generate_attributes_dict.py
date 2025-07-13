@@ -34,14 +34,14 @@ def convert_type(cls: type, prop: bpy.types.Property) -> str:
             return prop.type
 
 
-def attributes_for(cls: type, base_class: type | None) -> dict[str, Any]:
+def attributes_for(cls: type, base_class: type | None, exclude_keywords) -> dict[str, Any]:
     base_attributes = (
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
         prop.identifier: [convert_type(cls, prop), getattr(prop, "default", None)]
         for prop in cls.bl_rna.properties
-        if prop.identifier not in base_attributes
+        if prop.identifier not in base_attributes and not [True for keyword in exclude_keywords if keyword in prop.identifier]
     }
 
 
@@ -55,13 +55,14 @@ def attributes_dict_for(
     )
     attributes = params.get(
         "attributes",
-        attributes_for(cls=curr_class, base_class=base_class),
+        attributes_for(cls=curr_class, base_class=base_class, exclude_keywords=params.get("exclude_attribute_keywords", [])),
     )
     if params.get("find_subtypes", False):
         subtypes = {
             cls_name: attributes_dict_for(
                 cls,
                 base_class=curr_class,
+                params=params.get("subtype_params", {}),
             )
             for cls_name, cls in inspect.getmembers(bpy.types, inspect.isclass)
             if issubclass(cls, curr_class) and cls != curr_class

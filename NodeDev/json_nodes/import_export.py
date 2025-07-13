@@ -58,3 +58,5 @@ def import_groups() -> None:
         tree_data.create_tree_hull()
     for tree_data in tree_datas:
         tree_data.add_nodes()
+    for tree_data in tree_datas:
+        tree_data.set_socket_attributes()

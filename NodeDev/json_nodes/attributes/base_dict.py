@@ -24,6 +24,9 @@ classes = {
                     bpy.types.GeometryNode: {
                         "attributes": {},
                         "find_subtypes": True,
+                        "subtype_params": {
+                            "exclude_attribute_keywords": ["active", "index"]
+                        }
                     },
                     bpy.types.FunctionNode: {
                         "attributes": {},

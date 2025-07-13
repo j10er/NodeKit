@@ -121,7 +121,7 @@ class NodeTreeData(Data):
             raise e
         return tree
 
-    def add_nodes(self) -> NodeTree:
+    def add_nodes(self):
         log.debug("=" * 40)
         log.debug(f"{self.name}: Adding {len(self.nodes)} nodes")
         tree = self.tree
@@ -151,9 +151,10 @@ class NodeTreeData(Data):
 
                         to_node = tree.nodes.get(output_data.to_node[i])
                         to_socket = to_node.inputs[output_data.to_socket_index[i]]
-                        log.debug(
-                            f"{self.name}: -- Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
-                        )
+                        log.debug(f"{self.name}: -- {from_node.name}")
+                        # log.debug(
+                        #     f"{self.name}: -- Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
+                        # )
                         tree.links.new(from_socket, to_socket)
 
         log.debug(f"{self.name}: Setting interface item attributes")
@@ -163,6 +164,7 @@ class NodeTreeData(Data):
             )
             item_data.set_attributes()
 
+    def set_socket_attributes(self):
         log.debug(f"{self.name}: - Setting NodeSocket attributes")
         for node_data in self.nodes.values():
             log.debug(
@@ -171,4 +173,3 @@ class NodeTreeData(Data):
             node_data.set_socket_attributes()
         log.debug(f"{self.name}: Done.")
         log.debug("=" * 40)
-        return tree
