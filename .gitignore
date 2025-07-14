@@ -5,6 +5,5 @@
 __pycache__
 blender
 bl_ext
-GeoNodeDevelopment.zip
-sample_nodes
-tests/test_nodes_nodes
+NodeDev.zip
+tests/test_trees/test_trees_json
