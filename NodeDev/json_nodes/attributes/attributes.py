@@ -6,6 +6,7 @@ from inspect import signature
 
 log = logging.getLogger(__name__)
 
+
 def collection_get_item_info(item: Any) -> list[str]:
     if not hasattr(item, "name"):
         return []
@@ -15,6 +16,7 @@ def collection_get_item_info(item: Any) -> list[str]:
         return [ATTRIBUTE_TYPE_MAPPING[item.data_type], item.name]
 
     return [item.name]
+
 
 ATTRIBUTE_TYPE_MAPPING = {
     "FLOAT": "FLOAT",
@@ -29,8 +31,9 @@ ATTRIBUTE_TYPE_MAPPING = {
     "INT16_2D": "VECTOR",
     "INT32_2D": "VECTOR",
     "QUATERNION": "ROTATION",
-    "FLOAT4X4": "MATRIX"
+    "FLOAT4X4": "MATRIX",
 }
+
 
 def set_collection(element, name, value):
     log.debug(f"Setting collection {name} on {element.name} with value: {value}")
@@ -59,6 +62,11 @@ def set_node_tree(element: Any, name: str, value: str) -> None:
 
 none = lambda element, name, value: None
 
+
+def get_pointer(element: Any) -> str:
+    return element["uuid"] if element else None
+
+
 GETTER = {
     "FLOAT": float,
     "INT": int,
@@ -67,9 +75,13 @@ GETTER = {
     "STRING": str,
     "ENUM": str,
     "NODE": lambda node: node.name if node else None,
-    "NODETREE": lambda node_tree: node_tree["uuid"] if node_tree else None,
+    "NODETREE": get_pointer,
+    "OBJECT": get_pointer,
+    "MATERIAL": get_pointer,
+    "IMAGE": get_pointer,
+    "COLLECTION": get_pointer,
     "NONE": lambda x: None,
-    "COLLECTION": lambda items: [collection_get_item_info(item) for item in items],
+    "ITEMS": lambda items: [collection_get_item_info(item) for item in items],
 }
 
 
@@ -83,7 +95,7 @@ SETTER = {
     "NODE": none,
     "NODETREE": set_node_tree,
     "NONE": none,
-    "COLLECTION": set_collection,
+    "ITEMS": set_collection,
 }
 
 

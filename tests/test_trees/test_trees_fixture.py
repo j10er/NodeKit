@@ -27,7 +27,7 @@ def fixture_test_trees():
     json_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "test_trees_json")
     )
-    os.mkdir(json_path)
+    os.makedirs(json_path, exist_ok=True)
     # Export the JSON nodes to test_trees_json folder.
     bpy.context.scene.gnd_props.folder_path = json_path
     print(bpy.context.scene.gnd_props.folder_path)

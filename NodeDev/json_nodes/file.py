@@ -16,12 +16,14 @@ def make_valid_filename(name: str) -> str:
     return name.strip()
 
 
+def get_assets_folder() -> str:
+    return os.path.join(
+        bpy.path.abspath(bpy.context.scene.gnd_props.folder_path), "Assets"
+    )
+
+
 def get_folder_path() -> str:
     return bpy.path.abspath(bpy.context.scene.gnd_props.folder_path)
-
-
-def path_is_valid() -> bool:
-    return os.path.exists(get_folder_path()) and os.path.isdir(get_folder_path())
 
 
 def setup() -> None:

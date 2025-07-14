@@ -1,10 +1,7 @@
 import bpy
 from .json_nodes.import_export import export_groups, import_groups
 from .json_nodes.attributes import generate_attributes_dict
-import logging
-from inspect import signature
-
-log = logging.getLogger(__name__)
+from .json_nodes import assets
 
 
 class NODEDEV_OT_ExportJSON(bpy.types.Operator):
@@ -39,9 +36,7 @@ class NODEDEV_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
         # Get menu switch of tree Geometry Nodes
-        tree = bpy.data.node_groups.get("Geometry Nodes")
-        socket = tree.interface.items_tree[2]
-        print(list(socket.default_value))
+        assets.import_assets()
 
         return {"FINISHED"}
 

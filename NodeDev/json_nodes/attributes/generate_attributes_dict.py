@@ -23,9 +23,18 @@ def prop_type(cls: type, prop: bpy.types.Property) -> str:
             else:
                 all_attribute_types.add("FLOAT")
                 return "FLOAT"
+        case "COLLECTION":
+            all_attribute_types.add("ITEMS")
         case "POINTER":
             type_identifier = prop.fixed_type.identifier.upper()
-            if type_identifier not in ("NODE", "NODETREE"):
+            if type_identifier not in (
+                "NODE",
+                "NODETREE",
+                "OBJECT",
+                "MATERIAL",
+                "IMAGE",
+                "COLLECTION",
+            ):
                 type_identifier = "NONE"
             all_attribute_types.add(type_identifier)
             return type_identifier
@@ -33,12 +42,13 @@ def prop_type(cls: type, prop: bpy.types.Property) -> str:
             all_attribute_types.add(prop.type)
             return prop.type
 
+
 def prop_default(prop: bpy.types.Property) -> Any:
     if prop.type == "FLOAT":
         if prop.identifier == "min_value":
-            return -3.4028234663852886e+38
+            return -3.4028234663852886e38
         elif prop.identifier == "max_value":
-            return -3.4028234663852886e+38
+            return -3.4028234663852886e38
     elif prop.type == "INT":
         if prop.identifier == "min_value":
             return -2147483648
@@ -47,14 +57,18 @@ def prop_default(prop: bpy.types.Property) -> Any:
 
     return getattr(prop, "default", None)
 
-def attributes_for(cls: type, base_class: type | None, exclude_keywords) -> dict[str, Any]:
+
+def attributes_for(
+    cls: type, base_class: type | None, exclude_keywords
+) -> dict[str, Any]:
     base_attributes = (
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
         prop.identifier: [prop_type(cls, prop), prop_default(prop)]
         for prop in cls.bl_rna.properties
-        if prop.identifier not in base_attributes and not [True for keyword in exclude_keywords if keyword in prop.identifier]
+        if prop.identifier not in base_attributes
+        and not [True for keyword in exclude_keywords if keyword in prop.identifier]
     }
 
 
@@ -68,7 +82,11 @@ def attributes_dict_for(
     )
     attributes = params.get(
         "attributes",
-        attributes_for(cls=curr_class, base_class=base_class, exclude_keywords=params.get("exclude_attribute_keywords", [])),
+        attributes_for(
+            cls=curr_class,
+            base_class=base_class,
+            exclude_keywords=params.get("exclude_attribute_keywords", []),
+        ),
     )
     if params.get("find_subtypes", False):
         subtypes = {

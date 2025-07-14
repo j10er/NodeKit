@@ -1,7 +1,7 @@
 import bpy
 from typing import Any
 from pprint import pprint
-from . import file
+from . import file, assets
 from .representations.node_tree import NodeTreeData
 import uuid
 
@@ -13,6 +13,8 @@ log = logging.getLogger(__name__)
 def export_groups() -> None:
     log.info(f"Exporting all node groups to {file.get_folder_path()}")
     setup()
+    assets.export()
+
     for tree in bpy.data.node_groups:
         if tree.bl_idname != "GeometryNodeTree":
             continue
