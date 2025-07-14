@@ -11,6 +11,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Restore Blender installation cache
+        id: blender-cache
+        uses: actions/cache@v4
+        with:
+          path: ./blender
+          key: ${{ runner.os }}-blender-${{ hashFiles('./dev.py') }}
+          restore-keys: |
+            ${{ runner.os }}-blender-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
