@@ -1,6 +1,7 @@
 import os
 from bpy.types import PropertyGroup
 from bpy.props import StringProperty
+from bpy.path import abspath
 
 
 class GNDProperties(PropertyGroup):
@@ -19,11 +20,11 @@ class GNDProperties(PropertyGroup):
     def validate_path(self):
         if not self.folder_path:
             self.directory_error = "Select a directory to store the JSON files"
-        elif not os.path.exists(self.folder_path):
+        elif not os.path.exists(abspath(self.folder_path)):
             self.directory_error = "Path does not exist"
-        elif not os.path.isdir(self.folder_path):
+        elif not os.path.isdir(abspath(self.folder_path)):
             self.directory_error = "Path is not a directory"
-        elif not self.directory_is_valid(self.folder_path):
+        elif not self.directory_is_valid(abspath(self.folder_path)):
             self.directory_error = "The directory contains other content, must only contain JSON files and directories"
         else:
             self.directory_error = ""

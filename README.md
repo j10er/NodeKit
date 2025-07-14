@@ -72,6 +72,8 @@ On changing the directory path:
 
 
 # TODO
+# Node Features
+- MenuSwitch Item Description
 ## Path Management/Workflow
 - determine setup workflow
 - integration with git workflow
@@ -112,8 +114,8 @@ What to do if asset is used in multiple contexts? collection with objects, but o
       - bpy_collection: find type of collection, add 3 items
       - assets/other objets: future
 => attributes_dict wouldn't be backwards compatible
-### Test the behavior of a complex tree
-- needs node tester
+### Test the behavior
+- All basic tests: recieve a point at (0,0,0) as input, test successful if it now is at (0,0,1), otherwise wrong
 ### Manually
 - find key features/node types
 - useful?

@@ -13,11 +13,11 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
     def draw(self, context):
 
         layout = self.layout
-        layout.operator("object.export_json")
-        layout.operator("object.import_json")
-        layout.operator("object.surprise")
-        layout.operator("object.generate_default_values")
+        layout.operator("nodedev.export_json")
+        layout.operator("nodedev.import_json")
+        layout.operator("nodedev.surprise")
+        layout.operator("nodedev.generate_default_values")
         layout.prop(context.scene.gnd_props, "folder_path", text="Nodes Path")
         if context.scene.gnd_props.directory_error:
             box = layout.box()
-            box.label(text=context.scene.gnd_props.directory_error, icon = "ERROR")
+            box.label(text=context.scene.gnd_props.directory_error, icon="ERROR")

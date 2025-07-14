@@ -3,11 +3,12 @@ from .json_nodes.import_export import export_groups, import_groups
 from .json_nodes.attributes import generate_attributes_dict
 import logging
 from inspect import signature
+
 log = logging.getLogger(__name__)
 
 
-class OBJECT_OT_ExportJSON(bpy.types.Operator):
-    bl_idname = "object.export_json"
+class NODEDEV_OT_ExportJSON(bpy.types.Operator):
+    bl_idname = "nodedev.export_json"
     bl_label = "Export to JSON"
 
     @classmethod
@@ -19,8 +20,8 @@ class OBJECT_OT_ExportJSON(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class OBJECT_OT_ImportJSON(bpy.types.Operator):
-    bl_idname = "object.import_json"
+class NODEDEV_OT_ImportJSON(bpy.types.Operator):
+    bl_idname = "nodedev.import_json"
     bl_label = "Import from JSON"
 
     @classmethod
@@ -32,8 +33,8 @@ class OBJECT_OT_ImportJSON(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class OBJECT_OT_Surprise(bpy.types.Operator):
-    bl_idname = "object.surprise"
+class NODEDEV_OT_Surprise(bpy.types.Operator):
+    bl_idname = "nodedev.surprise"
     bl_label = "Surprise"
 
     def execute(self, context):
@@ -45,8 +46,8 @@ class OBJECT_OT_Surprise(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class OBJECT_OT_GenerateDefaultValues(bpy.types.Operator):
-    bl_idname = "object.generate_default_values"
+class NODEDEV_OT_GenerateDefaultValues(bpy.types.Operator):
+    bl_idname = "nodedev.generate_default_values"
     bl_label = "Generate Default Values"
 
     def execute(self, context):
@@ -55,4 +56,4 @@ class OBJECT_OT_GenerateDefaultValues(bpy.types.Operator):
 
 
 def save_handler(scene):
-    bpy.ops.object.export_json()
+    bpy.ops.nodedev.export_json()
