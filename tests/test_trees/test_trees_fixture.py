@@ -23,11 +23,14 @@ def open_test_trees_file():
 @pytest.fixture(scope="module")
 def fixture_test_trees():
     open_test_trees_file()
+
     json_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "test_trees_json")
     )
+    os.mkdir(json_path)
     # Export the JSON nodes to test_trees_json folder.
     bpy.context.scene.gnd_props.folder_path = json_path
+    print(bpy.context.scene.gnd_props.folder_path)
     bpy.ops.nodedev.export_json()
 
     # Import to new file
