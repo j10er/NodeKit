@@ -36,8 +36,9 @@ class NODEDEV_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
         # Get menu switch of tree Geometry Nodes
-        assets.import_assets()
-
+        # assets.import_assets()
+        cls = bpy.types.NodeSocketCollection
+        print(cls.bl_rna.properties["default_value"].fixed_type)
         return {"FINISHED"}
 
 

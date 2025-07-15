@@ -54,6 +54,8 @@ def setup() -> None:
 
 def import_groups() -> None:
     log.info(f"Importing all node groups from {file.get_folder_path()}")
+    log.info("Importing assets...")
+    assets.import_assets()
     log.info("Importing reading json files...")
     data_dicts = file.load_all()
     log.info(f"Found {len(data_dicts)} node groups to import.")

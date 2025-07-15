@@ -93,6 +93,7 @@ On changing the directory path:
 - store uuid of asset in node
 - export asset to separate file with uuid as filename
 What to do if asset is used in multiple contexts? collection with objects, but objects also used on its own
+what to do if assset has geometry nodes
 ### Import
 - Find file with correct uuid
 - append to current scene, extra collection?

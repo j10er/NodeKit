@@ -57,7 +57,8 @@ def get_assets_for_export():
     return assets
 
 
-asset_type_mapping = {
+ASSET_TYPE_MAPPING = {
+    "NodeTree": "node_groups",
     "Object": "objects",
     "Material": "materials",
     "Image": "images",
@@ -67,6 +68,13 @@ asset_type_mapping = {
 
 def import_assets():
     log.debug("Importing assets...")
+    assets_name = "Node-Assets"
+    if assets_name not in bpy.data.collections:
+        assets_collection = bpy.data.collections.new(assets_name)
+        bpy.context.scene.collection.children.link(assets_collection)
+    else:
+        assets_collection = bpy.data.collections[assets_name]
+
     assets_folder = file.get_assets_folder()
     for asset_type in os.listdir(assets_folder):
         for asset_file in os.listdir(os.path.join(assets_folder, asset_type)):
@@ -78,15 +86,15 @@ def import_assets():
                     data_to,
                 ):
                     asset_name = asset_file[:-6]
-                    type_name = asset_type_mapping.get(asset_type, None)
+                    type_name = ASSET_TYPE_MAPPING.get(asset_type, None)
+
                     setattr(data_to, type_name, [asset_name])
                 match asset_type:
                     case "Object":
-                        bpy.context.collection.objects.link(
-                            bpy.data.objects[asset_name]
-                        )
+                        if asset_name not in assets_collection.objects:
+                            assets_collection.objects.link(bpy.data.objects[asset_name])
                     case "Collection":
-                        bpy.data.collections.new(asset_name)
-                        bpy.context.scene.collection.children.link(
-                            bpy.data.collections[asset_name]
-                        )
+                        if asset_name not in assets_collection.children:
+                            assets_collection.children.link(
+                                bpy.data.collections[asset_name]
+                            )

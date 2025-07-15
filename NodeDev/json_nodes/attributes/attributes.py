@@ -1,6 +1,7 @@
 import bpy
 from typing import Any, Callable
 from .attributes_dict import DEFAULTS
+
 import logging
 from inspect import signature
 
@@ -35,7 +36,7 @@ ATTRIBUTE_TYPE_MAPPING = {
 }
 
 
-def set_collection(element, name, value):
+def set_items(element, name, value):
     log.debug(f"Setting collection {name} on {element.name} with value: {value}")
     collection = getattr(element, name)
     collection.clear()
@@ -52,19 +53,21 @@ def set_collection(element, name, value):
                 collection.new(item_info[0], item_info[1])
 
 
-def set_node_tree(element: Any, name: str, value: str) -> None:
-    tree = next((tree for tree in bpy.data.node_groups if tree["uuid"] == value), None)
-    if not tree:
-        log.error(f"Node tree with uuid {value} not found")
-        return
-    setattr(element, name, tree)
-
-
 none = lambda element, name, value: None
 
 
 def get_pointer(element: Any) -> str:
     return element["uuid"] if element else None
+
+
+def set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
+    return lambda element, name, uuid: setattr(
+        element,
+        name,
+        next(
+            o for o in getattr(bpy.data, collection_name) if o.get("uuid", "") == uuid
+        ),
+    )
 
 
 GETTER = {
@@ -93,9 +96,13 @@ SETTER = {
     "ENUM": setattr,
     "LIST": setattr,
     "NODE": none,
-    "NODETREE": set_node_tree,
+    "NODETREE": set_pointer("node_groups"),
+    "OBJECT": set_pointer("objects"),
+    "MATERIAL": set_pointer("materials"),
+    "IMAGE": set_pointer("images"),
+    "COLLECTION": set_pointer("collections"),
     "NONE": none,
-    "ITEMS": set_collection,
+    "ITEMS": set_items,
 }
 
 
@@ -151,7 +158,7 @@ def set_on_element(
                 setter(element, attr_name, value)
             except Exception as e:
                 log.warning(
-                    f"Error when setting attribute '{attr_name}' on {element.name} of type {type(element).__name__}: {e}"
+                    f"Error when setting attribute '{attr_name}' on element '{element.name}' of type {type(element).__name__}: {e}"
                 )
     return element
 
