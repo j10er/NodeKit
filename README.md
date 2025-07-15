@@ -69,7 +69,10 @@ On changing the directory path:
 - set default values of interface items
 - set attributes (here: only default_value) on node sockets
 
-
+## Object Naming
+- How to handle invalid characters for filenames?
+1. Enforce naming in blender by force renaming
+2. Only rename on export, find suitable replacement characters? How to name after import?
 
 # TODO
 # Node Features

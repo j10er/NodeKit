@@ -7,30 +7,19 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export():
+def export_all():
     log.debug("Preparing assets for export...")
-    assets = get_assets_for_export()
-    log.debug(f"Found {len(assets)} assets to export.")
-
-    assets_folder = file.get_assets_folder()
-    os.makedirs(assets_folder, exist_ok=True)
-
+    assets = collect_assets()
     for asset_type in assets:
         for asset in assets[asset_type]:
-            log.debug(f"Exporting asset: {asset.name}")
             if not hasattr(asset, "uuid"):
                 asset["uuid"] = str(uuid.uuid4())
-            folder_path = os.path.join(file.get_assets_folder(), asset_type.__name__)
-            os.makedirs(folder_path, exist_ok=True)
-            asset_path = os.path.join(folder_path, f"{asset.name}.blend")
-            bpy.data.libraries.write(
-                os.path.join(asset_path),
-                set([asset]),
-                fake_user=True,
-            )
+    log.debug(f"Found {len(assets)} assets to export.")
+
+    file.write_assets(assets)
 
 
-def get_assets_for_export():
+def collect_assets():
     assets = {
         bpy.types.Object: set(),
         bpy.types.Material: set(),
@@ -47,7 +36,7 @@ def get_assets_for_export():
                     for asset_type in assets:
                         if isinstance(val, asset_type):
                             assets[asset_type].add(val)
-
+            # Input nodes may have assets as properties
             for asset_type in assets:
                 attribute_name = asset_type.__name__.lower()
                 if hasattr(node, attribute_name):
@@ -57,44 +46,21 @@ def get_assets_for_export():
     return assets
 
 
-ASSET_TYPE_MAPPING = {
-    "NodeTree": "node_groups",
-    "Object": "objects",
-    "Material": "materials",
-    "Image": "images",
-    "Collection": "collections",
-}
-
-
-def import_assets():
+def import_all():
     log.debug("Importing assets...")
-    assets_name = "Node-Assets"
-    if assets_name not in bpy.data.collections:
-        assets_collection = bpy.data.collections.new(assets_name)
+
+    assets = file.read_assets()
+    col_name = "Node-Assets"
+    if col_name not in bpy.data.collections:
+        assets_collection = bpy.data.collections.new(col_name)
         bpy.context.scene.collection.children.link(assets_collection)
     else:
-        assets_collection = bpy.data.collections[assets_name]
-
-    assets_folder = file.get_assets_folder()
-    for asset_type in os.listdir(assets_folder):
-        for asset_file in os.listdir(os.path.join(assets_folder, asset_type)):
-            if asset_file.endswith(".blend"):
-                asset_path = os.path.join(assets_folder, asset_type, asset_file)
-                log.debug(f"Appending asset from {asset_path}")
-                with bpy.data.libraries.load(asset_path, link=False) as (
-                    data_from,
-                    data_to,
-                ):
-                    asset_name = asset_file[:-6]
-                    type_name = ASSET_TYPE_MAPPING.get(asset_type, None)
-
-                    setattr(data_to, type_name, [asset_name])
-                match asset_type:
-                    case "Object":
-                        if asset_name not in assets_collection.objects:
-                            assets_collection.objects.link(bpy.data.objects[asset_name])
-                    case "Collection":
-                        if asset_name not in assets_collection.children:
-                            assets_collection.children.link(
-                                bpy.data.collections[asset_name]
-                            )
+        assets_collection = bpy.data.collections[col_name]
+    for asset in assets:
+        match type(asset).__name__:
+            case "Object":
+                if asset.name not in assets_collection.objects:
+                    assets_collection.objects.link(asset)
+            case "Collection":
+                if asset.name not in assets_collection.children:
+                    assets_collection.children.link(asset)

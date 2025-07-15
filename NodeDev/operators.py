@@ -1,5 +1,5 @@
 import bpy
-from .json_nodes.import_export import export_groups, import_groups
+from .json_nodes.import_export import export_trees, import_groups
 from .json_nodes.attributes import generate_attributes_dict
 from .json_nodes import assets
 
@@ -13,7 +13,7 @@ class NODEDEV_OT_ExportJSON(bpy.types.Operator):
         return not bpy.context.scene.gnd_props.directory_error
 
     def execute(self, context):
-        export_groups()
+        export_trees()
         return {"FINISHED"}
 
 

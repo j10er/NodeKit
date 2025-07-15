@@ -3,17 +3,16 @@ import os
 import shutil
 from typing import Any
 import json
-from pprint import pprint
 import logging
+import re
 
 log = logging.getLogger(__name__)
 
 
-def make_valid_filename(name: str) -> str:
-    invalid_chars = r'<>:"/\|?*.'
-    for char in invalid_chars:
-        name = name.replace(char, "_")
-    return name.strip()
+def make_valid_filename(name: str, uuid_str: str, ext: str) -> str:
+
+    safe = re.sub(r'[<>:"/\\|?*\n\r\t ]', "_", name).strip()
+    return f"{safe}_{uuid_str}{ext}"
 
 
 def get_assets_folder() -> str:
@@ -35,25 +34,29 @@ def setup() -> None:
     os.makedirs(folder_path, exist_ok=True)
 
 
-def save_tree_dict(tree_dict: dict[str, Any]) -> None:
-    directory = os.path.join(
-        get_folder_path(), tree_dict["tree_type"], tree_dict["category"]
-    )
-    os.makedirs(directory, exist_ok=True)
-    filename = f"{make_valid_filename(tree_dict['name'])}.json"
-    filepath = os.path.join(directory, filename)
-    json.dump(
-        tree_dict,
-        open(filepath, "w"),
-        indent=4,
-    )
+def write_trees(tree_dicts: list[dict]) -> None:
+    for tree_dict in tree_dicts:
+
+        directory = os.path.join(
+            get_folder_path(), tree_dict["tree_type"], tree_dict["category"]
+        )
+        os.makedirs(directory, exist_ok=True)
+        filename = make_valid_filename(
+            tree_dict["name"], tree_dict["tree"]["uuid"], ".json"
+        )
+        filepath = os.path.join(directory, filename)
+        json.dump(
+            tree_dict,
+            open(filepath, "w"),
+            indent=4,
+        )
 
 
-def load_all() -> list[dict[str, Any]]:
-    return load_from_folder(get_folder_path())
+def read_trees() -> list[dict[str, Any]]:
+    return read_trees_from_folder(get_folder_path())
 
 
-def load_from_folder(folder_path: str) -> list[dict[str, Any]]:
+def read_trees_from_folder(folder_path: str) -> list[dict[str, Any]]:
     data_dicts = []
     for file in os.listdir(folder_path):
         if file.endswith(".json"):
@@ -61,16 +64,65 @@ def load_from_folder(folder_path: str) -> list[dict[str, Any]]:
                 data_dict = json.load(f)
                 data_dicts.append(data_dict)
         if os.path.isdir(f"{folder_path}/{file}"):
-            subfolder_data = load_from_folder(f"{folder_path}/{file}")
+            subfolder_data = read_trees_from_folder(f"{folder_path}/{file}")
             data_dicts.extend(subfolder_data)
     return data_dicts
 
 
-def write_json(data: dict[str, Any], file_path: str) -> None:
-    with open(file_path, "w") as f:
-        json.dump(data, f, indent=4)
+def write_assets(assets: dict[str, Any]) -> None:
+    assets_folder = get_assets_folder()
+    for asset_type in assets:
+        folder_path = os.path.join(assets_folder, asset_type.__name__)
+        os.makedirs(folder_path, exist_ok=True)
+        for asset in assets[asset_type]:
+            asset_name = asset.name
+            filename = make_valid_filename(asset_name, asset["uuid"], ext=".blend")
+            asset.name = asset["uuid"]
+            asset_path = os.path.join(folder_path, filename)
+            bpy.data.libraries.write(
+                asset_path,
+                set([asset]),
+                fake_user=True,
+            )
+            asset.name = asset_name
 
 
-def read_json(file_path: str) -> dict[str, Any]:
-    with open(file_path, "r") as f:
-        return json.load(f)
+def read_assets() -> list[Any]:
+    uuids = set()
+    assets_folder = get_assets_folder()
+    for asset_type in os.listdir(assets_folder):
+        for filename in os.listdir(os.path.join(assets_folder, asset_type)):
+            if filename.endswith(".blend"):
+                asset_path = os.path.join(assets_folder, asset_type, filename)
+                log.debug(f"Appending asset from {asset_path}")
+
+                uuid = filename.split("_")[-1][:-6]
+                with bpy.data.libraries.load(asset_path, link=False) as (
+                    data_from,
+                    data_to,
+                ):
+                    match asset_type:
+                        case "NodeTree":
+                            data_to.node_groups = [uuid]
+                        case "Object":
+                            data_to.objects = [uuid]
+                        case "Material":
+                            data_to.materials = [uuid]
+                        case "Image":
+                            data_to.images = [uuid]
+                        case "Collection":
+                            data_to.collections = [uuid]
+
+                uuids.add(uuid)
+
+    assets = []
+    for element in (
+        bpy.data.node_groups
+        + bpy.data.objects
+        + bpy.data.materials
+        + bpy.data.images
+        + bpy.data.collections
+    ):
+        if hasattr(element, "uuid") and element["uuid"] in uuids:
+            assets.append(element)
+    return assets

@@ -10,34 +10,27 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export_groups() -> None:
+def export_trees() -> None:
     log.info(f"Exporting all node groups to {file.get_folder_path()}")
     setup()
-    assets.export()
-
+    assets.export_all()
+    tree_dicts = []
     for tree in bpy.data.node_groups:
         if tree.bl_idname != "GeometryNodeTree":
             continue
-        export_tree(tree)
-    log.info(
-        f"Exported {len(bpy.data.node_groups)} node groups to {file.get_folder_path()}."
-    )
-
-
-def export_tree(tree: bpy.types.NodeTree) -> None:
-    tree_data = NodeTreeData.from_tree(tree)
-    tree_dict = tree_data.to_dict()
-    data_dict = {
-        "name": tree_dict["name"],
-        "tree": tree_dict,
-        "blender_version": bpy.app.version_string,
-        "tree_type": tree.bl_idname,
-        "category": "Tests" if tree.name.startswith(".test: ") else "Groups",
-    }
-    log.debug(
-        f"Exporting {data_dict['tree_type']}: {data_dict['name']} with category {data_dict['category']}"
-    )
-    file.save_tree_dict(data_dict)
+        tree_data = NodeTreeData.from_tree(tree)
+        tree_dict = tree_data.to_dict()
+        tree_dicts.append(
+            {
+                "file_type": "Tree",
+                "name": tree_dict["name"],
+                "tree": tree_dict,
+                "blender_version": bpy.app.version_string,
+                "tree_type": tree.bl_idname,
+                "category": "Tests" if tree.name.startswith(".test: ") else "Groups",
+            }
+        )
+    file.write_trees(tree_dicts)
 
 
 def setup() -> None:
@@ -55,9 +48,9 @@ def setup() -> None:
 def import_groups() -> None:
     log.info(f"Importing all node groups from {file.get_folder_path()}")
     log.info("Importing assets...")
-    assets.import_assets()
+    assets.import_all()
     log.info("Importing reading json files...")
-    data_dicts = file.load_all()
+    data_dicts = file.read_trees()
     log.info(f"Found {len(data_dicts)} node groups to import.")
 
     tree_datas = [NodeTreeData.from_dict(data_dict["tree"]) for data_dict in data_dicts]
