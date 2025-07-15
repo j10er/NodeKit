@@ -41,8 +41,6 @@ def fixture_test_trees():
     # Test execution after import
     yield
 
-    # Cleanup after test
-
 
 def test_fixture():
     """Test if the fixture is imported correctly."""

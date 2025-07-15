@@ -49,7 +49,7 @@ def import_groups() -> None:
     log.info(f"Importing all node groups from {file.get_folder_path()}")
     log.info("Importing assets...")
     assets.import_all()
-    log.info("Importing reading json files...")
+    log.info("Importing json files...")
     data_dicts = file.read_trees()
     log.info(f"Found {len(data_dicts)} node groups to import.")
 

@@ -5,6 +5,7 @@ from typing import Any
 import json
 import logging
 import re
+import copy
 
 log = logging.getLogger(__name__)
 
@@ -72,23 +73,35 @@ def read_trees_from_folder(folder_path: str) -> list[dict[str, Any]]:
 def write_assets(assets: dict[str, Any]) -> None:
     assets_folder = get_assets_folder()
     for asset_type in assets:
-        folder_path = os.path.join(assets_folder, asset_type.__name__)
-        os.makedirs(folder_path, exist_ok=True)
+        folder_path = os.path.join(assets_folder, asset_type)
         for asset in assets[asset_type]:
-            asset_name = asset.name
-            filename = make_valid_filename(asset_name, asset["uuid"], ext=".blend")
+            os.makedirs(folder_path, exist_ok=True)
+            asset["name"] = asset.name
+            filename = make_valid_filename(asset["name"], asset["uuid"], ext=".blend")
             asset.name = asset["uuid"]
+
+            log.debug(f"Asset name is {asset['name']} with uuid {asset['uuid']}")
             asset_path = os.path.join(folder_path, filename)
             bpy.data.libraries.write(
                 asset_path,
                 set([asset]),
                 fake_user=True,
             )
-            asset.name = asset_name
+            asset.name = asset["name"]
+
+
+mapping = {
+    "Object": "objects",
+    "Material": "materials",
+    "Image": "images",
+    "Collection": "collections",
+}
 
 
 def read_assets() -> list[Any]:
-    uuids = set()
+
+    uuids = {asset_type: [] for asset_type in mapping}
+    assets = {asset_type: [] for asset_type in mapping}
     assets_folder = get_assets_folder()
     for asset_type in os.listdir(assets_folder):
         for filename in os.listdir(os.path.join(assets_folder, asset_type)):
@@ -101,28 +114,14 @@ def read_assets() -> list[Any]:
                     data_from,
                     data_to,
                 ):
-                    match asset_type:
-                        case "NodeTree":
-                            data_to.node_groups = [uuid]
-                        case "Object":
-                            data_to.objects = [uuid]
-                        case "Material":
-                            data_to.materials = [uuid]
-                        case "Image":
-                            data_to.images = [uuid]
-                        case "Collection":
-                            data_to.collections = [uuid]
+                    setattr(data_to, mapping[asset_type], [uuid])
 
-                uuids.add(uuid)
+                uuids[asset_type].append(uuid)
 
-    assets = []
-    for element in (
-        bpy.data.node_groups
-        + bpy.data.objects
-        + bpy.data.materials
-        + bpy.data.images
-        + bpy.data.collections
-    ):
-        if hasattr(element, "uuid") and element["uuid"] in uuids:
-            assets.append(element)
+    for asset_type in mapping:
+        for uuid, element in getattr(bpy.data, mapping[asset_type]).items():
+            if element.get("uuid", False) and element["uuid"] in uuids[asset_type]:
+                element.name = element["name"]
+                print(f"Adding {element.name} to assets")
+                assets[asset_type].append(element)
     return assets

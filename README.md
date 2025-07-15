@@ -43,7 +43,7 @@ Each exported file contains:
   "category": "Groups"
 }
 ```
-
+jsons haben immer recht, außer ich sage append
 
 # Workflow
 ## First Setup
