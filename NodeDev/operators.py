@@ -1,7 +1,7 @@
 import bpy
 from .json_nodes.import_export import export_trees, import_groups
 from .json_nodes.attributes import generate_attributes_dict
-from .json_nodes import assets
+from .json_nodes import file
 
 
 class NODEDEV_OT_ImportJSON(bpy.types.Operator):
@@ -13,10 +13,12 @@ class NODEDEV_OT_ImportJSON(bpy.types.Operator):
         return not bpy.context.scene.gnd_props.directory_error
 
     def invoke(self, context, event):
+        num_of_json = file.number_of_files(".json")
+        num_of_blend = file.number_of_files(".blend")
         return context.window_manager.invoke_confirm(
             self,
             event=event,
-            title="This will overwrite all node groups and assets in this file that are managed by the add-on. Are you sure?",
+            title=f"Found {num_of_json} node group{'s' if num_of_json > 1 else ''} and {num_of_blend} asset{'s' if num_of_blend>1 else ''}. This will overwrite all node groups and assets in this file that are managed by the add-on. Are you sure?",
         )
 
     def execute(self, context):

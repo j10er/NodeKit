@@ -26,6 +26,16 @@ def get_folder_path() -> str:
     return bpy.path.abspath(bpy.context.scene.gnd_props.folder_path)
 
 
+def number_of_files(ext: str) -> int:
+    counter = 0
+    if not bpy.context.scene.gnd_props.directory_error:
+        for root, dirs, files in os.walk(get_folder_path()):
+            for file in files:
+                if file.endswith(ext):
+                    counter += 1
+    return counter
+
+
 def setup() -> None:
     folder_path = get_folder_path()
     if not get_folder_path():
