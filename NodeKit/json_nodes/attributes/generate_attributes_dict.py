@@ -25,6 +25,7 @@ def prop_type(cls: type, prop: bpy.types.Property) -> str:
                 return "FLOAT"
         case "COLLECTION":
             all_attribute_types.add("ITEMS")
+            return "ITEMS"
         case "POINTER":
             type_identifier = prop.fixed_type.identifier.upper()
             if type_identifier not in (

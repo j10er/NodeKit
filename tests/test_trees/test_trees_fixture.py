@@ -1,7 +1,7 @@
 import pytest
 import bpy
 import os
-
+import shutil
 tree_names = [
     "test_nested_menu",
     "test_nested_menu-menu_switch_1",
@@ -24,19 +24,21 @@ def open_test_trees_file():
 def fixture_test_trees():
     open_test_trees_file()
 
-    json_path = os.path.abspath(
+    folder_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "test_trees_json")
     )
-    os.makedirs(json_path, exist_ok=True)
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+    os.makedirs(folder_path, exist_ok=True)
     # Export the JSON nodes to test_trees_json folder.
-    bpy.context.scene.gnd_props.folder_path = json_path
-    print(bpy.context.scene.gnd_props.folder_path)
-    bpy.ops.nodedev.export_json()
+    bpy.context.scene.node_kit.folder_path = folder_path
+    print(bpy.context.scene.node_kit.folder_path)
+    bpy.ops.nodekit.export_json()
 
     # Import to new file
     bpy.ops.wm.read_homefile(use_empty=True)
-    bpy.context.scene.gnd_props.folder_path = json_path
-    bpy.ops.nodedev.import_json()
+    bpy.context.scene.node_kit.folder_path = folder_path
+    bpy.ops.nodekit.import_json()
 
     # Test execution after import
     yield

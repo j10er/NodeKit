@@ -18,22 +18,26 @@ def make_valid_filename(name: str, uuid_str: str, ext: str) -> str:
 
 def get_assets_folder() -> str:
     return os.path.join(
-        bpy.path.abspath(bpy.context.scene.gnd_props.folder_path), "Assets"
+        bpy.path.abspath(bpy.context.scene.node_kit.folder_path), "Assets"
     )
 
 
 def get_folder_path() -> str:
-    return bpy.path.abspath(bpy.context.scene.gnd_props.folder_path)
+    return bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
 
 
 def number_of_files(ext: str) -> int:
     counter = 0
-    if not bpy.context.scene.gnd_props.directory_error:
+    if not bpy.context.scene.node_kit.directory_error:
         for root, dirs, files in os.walk(get_folder_path()):
             for file in files:
                 if file.endswith(ext):
                     counter += 1
     return counter
+
+
+def folder_is_empty() -> bool:
+    return len(os.listdir(get_folder_path())) == 0
 
 
 def setup() -> None:
@@ -43,7 +47,6 @@ def setup() -> None:
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
     os.makedirs(folder_path, exist_ok=True)
-
 
 def write_trees(tree_dicts: list[dict]) -> None:
     for tree_dict in tree_dicts:
@@ -108,11 +111,14 @@ mapping = {
 }
 
 
-def read_assets() -> list[Any]:
-
+def read_assets() -> dict[str, Any]:
+    assets_folder = get_assets_folder()
+    if not os.path.exists(assets_folder) or not os.path.isdir(assets_folder):
+        log.info(f"No assets found.")
+        return {asset_type: [] for asset_type in mapping}
     uuids = {asset_type: [] for asset_type in mapping}
     assets = {asset_type: [] for asset_type in mapping}
-    assets_folder = get_assets_folder()
+
     for asset_type in os.listdir(assets_folder):
         for filename in os.listdir(os.path.join(assets_folder, asset_type)):
             if filename.endswith(".blend"):

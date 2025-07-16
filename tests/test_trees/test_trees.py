@@ -9,7 +9,11 @@ def test_trees_exist(fixture_test_trees):
             tree_name in bpy.data.node_groups
         ), f"{tree_name} should exist after import"
 
-
+def test_basic_tree(fixture_test_trees):
+    """Test the basic structure of a node tree."""
+    tree = bpy.data.node_groups.get("test_basic_tree")
+    assert "Group Input" in tree.nodes, "Group Input node should exist"
+    assert "Group Output" in tree.nodes, "Group Output node should exist"
 def test_nested_menu(fixture_test_trees):
     """Test the nested menu structure."""
 

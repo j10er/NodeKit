@@ -3,7 +3,7 @@ from bpy.path import abspath
 import bpy
 
 
-class GNDProperties(bpy.types.PropertyGroup):
+class NodeKitProperties(bpy.types.PropertyGroup):
     folder_path: bpy.props.StringProperty(
         name="Folder Path",
         description="Path to a selected folder",

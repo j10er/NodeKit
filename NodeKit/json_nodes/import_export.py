@@ -10,8 +10,8 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export_trees() -> None:
-    log.info(f"Exporting all node groups to {file.get_folder_path()}")
+def export_groups() -> None:
+    log.info(f"Exporting {len(bpy.data.node_groups)} node group{'s' if len(bpy.data.node_groups) != 1 else ''} to {file.get_folder_path()}")
     setup()
     assets.export_all()
     tree_dicts = []
@@ -30,6 +30,7 @@ def export_trees() -> None:
                 "category": "Tests" if tree.name.startswith(".test: ") else "Groups",
             }
         )
+    log.info(f"Writing {len(tree_dicts)} node groups to JSON files.")
     file.write_trees(tree_dicts)
 
 

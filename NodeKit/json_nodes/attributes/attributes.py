@@ -8,7 +8,7 @@ from inspect import signature
 log = logging.getLogger(__name__)
 
 
-def collection_get_item_info(item: Any) -> list[str]:
+def get_item_info(item: Any) -> list[str]:
     if not hasattr(item, "name"):
         return []
     if hasattr(item, "socket_type"):
@@ -84,7 +84,7 @@ GETTER = {
     "IMAGE": get_pointer,
     "COLLECTION": get_pointer,
     "NONE": lambda x: None,
-    "ITEMS": lambda items: [collection_get_item_info(item) for item in items],
+    "ITEMS": lambda items: [get_item_info(item) for item in items],
 }
 
 
@@ -151,7 +151,7 @@ def set_on_element(
 
         value = attributes[attr_name] if attr_name in attributes else default_value
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
-        if value != default_value and (not readonly or attr_type == "COLLECTION"):
+        if value != default_value and (not readonly or attr_type == "ITEMS"):
 
             setter = SETTER[attr_type]
             try:

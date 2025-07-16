@@ -5,8 +5,8 @@ import shutil
 import subprocess
 
 # Should match the addon name and id in blender_manifest.toml
-addon_name = "NodeDev"
-addon_id = "nodedev"
+addon_name = "NodeKit"
+addon_id = "nodekit"
 
 
 def build(fast=False):

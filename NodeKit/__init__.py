@@ -18,18 +18,19 @@ import logging
 
 classes = [
     ui.VIEW3D_PT_SidePanel,
-    operators.NODEDEV_OT_ExportJSON,
-    operators.NODEDEV_OT_ImportJSON,
-    operators.NODEDEV_OT_Surprise,
-    operators.NODEDEV_OT_GenerateDefaultValues,
-    properties.GNDProperties,
+    operators.NODEKIT_OT_ExportJSON,
+    operators.NODEKIT_OT_ImportJSON,
+
+    operators.NODEKIT_OT_Surprise,
+    operators.NODEKIT_OT_GenerateDefaultValues,
+    properties.NodeKitProperties,
 ]
 
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.gnd_props = bpy.props.PointerProperty(type=properties.GNDProperties)
+    bpy.types.Scene.node_kit = bpy.props.PointerProperty(type=properties.NodeKitProperties)
     if operators.save_handler not in bpy.app.handlers.save_post:
         bpy.app.handlers.save_post.append(operators.save_handler)
 
@@ -42,4 +43,4 @@ def register():
 def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-    del bpy.types.Scene.gnd_props
+    del bpy.types.Scene.node_kit

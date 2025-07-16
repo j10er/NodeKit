@@ -15,7 +15,7 @@ def export_all():
         for asset in assets[asset_type]:
             if not hasattr(asset, "uuid"):
                 asset["uuid"] = str(uuid.uuid4())
-    log.debug(f"Found {len(assets)} assets to export.")
+    log.debug(f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export.")
 
     file.write_assets(assets)
 
