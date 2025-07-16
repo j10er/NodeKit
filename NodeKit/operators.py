@@ -60,14 +60,15 @@ class NODEKIT_OT_AppendJSON(bpy.types.Operator):
     ) # type: ignore
 
     def execute(self, context):
-        folder = bpy.path.abspath(self.directory)
+        folder_path = bpy.path.abspath(self.directory)
 
-        directory_error = file.validate_path(folder)
+        directory_error = file.validate_path(folder_path)
         if directory_error:
             self.report({'ERROR'}, directory_error)
             return {'CANCELLED'}
 
-        self.report({'INFO'}, f"Appending node groups from {folder}")
+        self.report({'INFO'}, f"Appending node groups from {folder_path}")
+        import_from(folder_path, append=True)
         return {'FINISHED'}
 
     def invoke(self, context, event):
