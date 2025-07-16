@@ -45,34 +45,28 @@ Each exported file contains:
 ```
 jsons haben immer recht, außer ich sage append
 
-# Workflow
-## First Setup
-### From empty json storage, empty blend:
-- create empty folder, open with
--
-## Path Setup
-On changing the directory path:
-- validate path and folder contents, if anything other than jsons cancel
-- message popup:
-  - if contains jsons:
-    - ask if import or overwrite existing node trees
-  - if is empty:
-    - continue
-  - ask if export is wanted
-## Exporting
-- check if node trees are in the files that arent in the blend
-## Importing
-- Create empty node trees with interfaces
-- add nodes and set their attributes (includes item lists in eg. foreach)
-- connect paired nodes (of zones)
-- connect nodes with links
-- set default values of interface items
-- set attributes (here: only default_value) on node sockets
+# Main Operators:
+- Set Folder permanently and import + overwrite all
+- Append nodes from folder, ask if overwrite or skip
+- Export the selected folder, overwrite all in folder
+  - only allowed if the node groups from the file already have been imported
+- (Single-time export to a folder)
+- Option: Auto-Export on save
 
+
+Workflow:
+- Select previous/empty folder
+- press import
+- Create nodes
+- export
+- git commit
+- git merge
+- import
+- continue working
+-
 ## Object Naming
 - How to handle invalid characters for filenames?
-1. Enforce naming in blender by force renaming
-2. Only rename on export, find suitable replacement characters? How to name after import?
+1. replace, but keep actual name in blend file or JSON
 
 # TODO
 # Node Features
