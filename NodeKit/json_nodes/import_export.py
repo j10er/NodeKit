@@ -10,10 +10,10 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export_groups() -> None:
-    log.info(f"Exporting {len(bpy.data.node_groups)} node group{'s' if len(bpy.data.node_groups) != 1 else ''} to {file.get_folder_path()}")
-    setup()
-    assets.export_all()
+def export_to(folder_path: str) -> None:
+    log.info(f"Exporting {len(bpy.data.node_groups)} node group{'s' if len(bpy.data.node_groups) != 1 else ''} to {folder_path}")
+    setup(folder_path)
+    assets.export_to(folder_path)
     tree_dicts = []
     for tree in bpy.data.node_groups:
         if tree.bl_idname != "GeometryNodeTree":
@@ -31,11 +31,11 @@ def export_groups() -> None:
             }
         )
     log.info(f"Writing {len(tree_dicts)} node groups to JSON files.")
-    file.write_trees(tree_dicts)
+    file.write_trees_to(folder_path, tree_dicts)
 
 
-def setup() -> None:
-    file.setup()
+def setup(folder_path) -> None:
+    file.setup(folder_path)
     for tree in bpy.data.node_groups:
         if not hasattr(tree, "uuid"):
             tree["uuid"] = str(uuid.uuid4())
@@ -46,12 +46,12 @@ def setup() -> None:
                 output["index"] = i
 
 
-def import_groups() -> None:
-    log.info(f"Importing all node groups from {file.get_folder_path()}")
+def import_from(folder_path: str, append:bool=False) -> None:
+    log.info(f"Importing all node groups from {folder_path}")
     log.info("Importing assets...")
-    assets.import_all()
+    assets.import_from(folder_path, append=append)
     log.info("Importing json files...")
-    data_dicts = file.read_trees()
+    data_dicts = file.read_trees_from(folder_path)
     log.info(f"Found {len(data_dicts)} node groups to import.")
 
     tree_datas = [NodeTreeData.from_dict(data_dict["tree"]) for data_dict in data_dicts]

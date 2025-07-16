@@ -1,6 +1,5 @@
 import bpy
 import uuid
-import os
 from . import file
 from .file import mapping
 import logging
@@ -8,7 +7,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def export_all():
+def export_to(folder_path: str) -> None:
     log.debug("Preparing assets for export...")
     assets = collect_assets()
     for asset_type in assets:
@@ -17,7 +16,7 @@ def export_all():
                 asset["uuid"] = str(uuid.uuid4())
     log.debug(f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export.")
 
-    file.write_assets(assets)
+    file.write_assets_to(folder_path, assets)
 
 
 def collect_assets():
@@ -42,9 +41,9 @@ def collect_assets():
     return assets
 
 
-def import_all():
+def import_from(folder_path: str, append: bool = False):
     clear_assets()
-    assets = file.read_assets()
+    assets = file.read_assets_from(folder_path)
     col_name = "Node-Assets"
     if col_name not in bpy.data.collections:
         assets_collection = bpy.data.collections.new(col_name)

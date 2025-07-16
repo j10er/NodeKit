@@ -21,6 +21,7 @@ classes = [
     operators.NODEKIT_OT_ExportJSON,
     operators.NODEKIT_OT_ImportJSON,
 
+    operators.NODEKIT_OT_AppendJSON,
     operators.NODEKIT_OT_Surprise,
     operators.NODEKIT_OT_GenerateDefaultValues,
     properties.NodeKitProperties,

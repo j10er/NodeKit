@@ -1,8 +1,8 @@
 import bpy
-from .json_nodes.import_export import export_groups, import_groups
+from .json_nodes.import_export import export_to, import_from
 from .json_nodes.attributes import generate_attributes_dict
 from .json_nodes import file
-
+import os
 
 class NODEKIT_OT_ImportJSON(bpy.types.Operator):
     bl_idname = "nodekit.import_json"
@@ -13,8 +13,9 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
         return not bpy.context.scene.node_kit.directory_error
 
     def invoke(self, context, event):
-        num_of_json = file.number_of_files(".json")
-        num_of_blend = file.number_of_files(".blend")
+        folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
+        num_of_json = file.number_of_files(folder_path, ".json")
+        num_of_blend = file.number_of_files(folder_path, ".blend")
         return context.window_manager.invoke_confirm(
             self,
             event=event,
@@ -22,7 +23,8 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
         )
 
     def execute(self, context):
-        import_groups()
+        folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
+        import_from(folder_path)
         bpy.context.scene.node_kit.is_imported = True
         return {"FINISHED"}
 
@@ -33,31 +35,49 @@ class NODEKIT_OT_ExportJSON(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
+
         return (
             not bpy.context.scene.node_kit.directory_error
-            and (bpy.context.scene.node_kit.is_imported or file.folder_is_empty())
+            and (bpy.context.scene.node_kit.is_imported or file.folder_is_empty(bpy.path.abspath(bpy.context.scene.node_kit.folder_path)))
         )
 
     def execute(self, context):
-        export_groups()
+        folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
+        export_to(folder_path)
         bpy.context.scene.node_kit.is_imported = True
         return {"FINISHED"}
+
+
+class NODEKIT_OT_AppendJSON(bpy.types.Operator):
+    bl_idname = "nodekit.append_json"
+    bl_label = "Append JSON from"
+    bl_description = "Pick a folder to append its node groups"
+
+    directory: bpy.props.StringProperty(
+        name="Folder",
+        description="Select a folder",
+        subtype='DIR_PATH'
+    ) # type: ignore
+
+    def execute(self, context):
+        folder = bpy.path.abspath(self.directory)
+
+        directory_error = file.validate_path(folder)
+        if directory_error:
+            self.report({'ERROR'}, directory_error)
+            return {'CANCELLED'}
+
+        self.report({'INFO'}, f"Appending node groups from {folder}")
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
 
 class NODEKIT_OT_Surprise(bpy.types.Operator):
     bl_idname = "nodekit.surprise"
     bl_label = "Surprise"
-
-    def invoke(self, context, event=None):
-        wm = context.window_manager
-        return wm.invoke_confirm(self, event=event)
-
-    def execute_post_confirm(self, context):
-        self.report({"INFO"}, "Action executed!")
-        return {"FINISHED"}
-
-    def cancel(self, context):
-        self.report({"WARNING"}, "Operation cancelled.")
 
     def execute(self, context):
 

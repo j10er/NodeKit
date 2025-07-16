@@ -22,6 +22,8 @@ class VIEW3D_PT_SidePanel(bpy.types.Panel):
         layout.operator("nodekit.import_json")
         layout.operator("nodekit.export_json")
         layout.separator()
+        layout.operator("nodekit.append_json", text="Append JSON from")
+        layout.separator()
         if log.isEnabledFor(logging.DEBUG):
             layout.operator("nodekit.surprise")
             layout.operator("nodekit.generate_default_values")
