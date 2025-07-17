@@ -81,7 +81,7 @@ class NODEKIT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-
+        print(__package__.split('.')[-1])
         return {"FINISHED"}
 
 
@@ -92,7 +92,3 @@ class NODEKIT_OT_GenerateDefaultValues(bpy.types.Operator):
     def execute(self, context):
         attributes = generate_attributes_dict.generate_attributes_dict()
         return {"FINISHED"}
-
-
-def save_handler(scene):
-    bpy.ops.nodekit.export_json()
