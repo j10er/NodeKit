@@ -19,10 +19,10 @@ class NodeKitPreferences(bpy.types.AddonPreferences):
         name="Export on Save",
         description="Automatically export node groups to JSON files when saving the Blender file",
         default=False,
-        update=lambda self, context: self.set_save_handler(),
+        update=lambda self, context: self._set_save_handler(),
     )  # type: ignore
 
-    def set_save_handler(self):
+    def _set_save_handler(self):
         if self.export_on_save:
             if save_handler not in bpy.app.handlers.save_post:
                 bpy.app.handlers.save_post.append(save_handler)
@@ -40,7 +40,7 @@ class NodeKitProperties(bpy.types.PropertyGroup):
         name="Folder Path",
         description="Path to a selected folder",
         subtype="DIR_PATH",
-        update=lambda self, context: self.on_path_update(),
+        update=lambda self, context: self._on_path_update(),
     )  # type: ignore
     directory_error: bpy.props.StringProperty(
         name="Path Error",
@@ -53,7 +53,7 @@ class NodeKitProperties(bpy.types.PropertyGroup):
         default=False,
     )  # type: ignore
 
-    def on_path_update(self):
+    def _on_path_update(self):
         self.directory_error = file.validate_path(self.folder_path)
         self.is_imported = False
         if not self.directory_error:

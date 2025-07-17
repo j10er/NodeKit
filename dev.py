@@ -18,7 +18,7 @@ def build(fast=False):
     else:
         version = "4.5.0"
         print(f"Building addon: Using blender version {version} to build")
-        setup_blender("./blender", version)
+        _setup_blender("./blender", version)
         subprocess.run(
             [
                 f"./blender/blender-{version}/blender",
@@ -33,7 +33,7 @@ def build(fast=False):
         )
 
 
-def run_tests(blender_executable):
+def _run_tests(blender_executable):
     subprocess.run(
         [
             blender_executable,
@@ -61,7 +61,7 @@ def run_tests(blender_executable):
     print("Tests passed")
 
 
-def setup_blender(blender_path, version):
+def _setup_blender(blender_path, version):
     major_version = version[:3]
     if not os.path.exists(blender_path):
         os.makedirs(blender_path)
@@ -86,7 +86,7 @@ def setup_blender(blender_path, version):
         os.mkdir(f"{blender_path}/blender-{version}/portable")
 
 
-def install_test_deps(blender_path, version):
+def _install_test_deps(blender_path, version):
     major_version = version[:3]
     python_dir = f"{blender_path}/blender-{version}/{major_version}/python/bin/"
     python_executable = f"{python_dir}/{next(name for name in os.listdir(python_dir) if name.startswith('python3.'))}"
@@ -98,10 +98,10 @@ def test():
     blender_path = "./blender"
     for version in blender_versions:
 
-        setup_blender(blender_path, version)
-        install_test_deps(blender_path, version)
+        _setup_blender(blender_path, version)
+        _install_test_deps(blender_path, version)
         print(f"Running tests for Blender version {version}")
-        run_tests(blender_executable=f"{blender_path}/blender-{version}/blender")
+        _run_tests(blender_executable=f"{blender_path}/blender-{version}/blender")
 
 
 # COMMAND LINE INTERFACE

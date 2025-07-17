@@ -9,7 +9,7 @@ from inspect import signature
 log = logging.getLogger(__name__)
 
 
-def get_item_info(item: Any) -> list[str]:
+def _get_item_info(item: Any) -> list[str]:
     if not hasattr(item, "name"):
         return []
     if hasattr(item, "socket_type"):
@@ -37,7 +37,7 @@ ATTRIBUTE_TYPE_MAPPING = {
 }
 
 
-def set_items(element, name, value):
+def _set_items(element, name, value):
     log.debug(f"Setting collection {name} on {element.name} with value: {value}")
     collection = getattr(element, name)
     collection.clear()
@@ -54,14 +54,14 @@ def set_items(element, name, value):
                 collection.new(item_info[0], item_info[1])
 
 
-none = lambda element, name, value: None
+_none = lambda element, name, value: None
 
 
-def get_pointer(element: Any) -> str:
+def _get_pointer(element: Any) -> str:
     return element[config.JSON_KEY_UUID] if element else None
 
 
-def set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
+def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
     return lambda element, name, uuid: setattr(
         element,
         name,
@@ -81,13 +81,13 @@ GETTER = {
     "STRING": str,
     "ENUM": str,
     "NODE": lambda node: node.name if node else None,
-    "NODETREE": get_pointer,
-    "OBJECT": get_pointer,
-    "MATERIAL": get_pointer,
-    "IMAGE": get_pointer,
-    "COLLECTION": get_pointer,
+    "NODETREE": _get_pointer,
+    "OBJECT": _get_pointer,
+    "MATERIAL": _get_pointer,
+    "IMAGE": _get_pointer,
+    "COLLECTION": _get_pointer,
     "NONE": lambda x: None,
-    "ITEMS": lambda items: [get_item_info(item) for item in items],
+    "ITEMS": lambda items: [_get_item_info(item) for item in items],
 }
 
 
@@ -98,14 +98,14 @@ SETTER = {
     "BOOLEAN": setattr,
     "ENUM": setattr,
     "LIST": setattr,
-    "NODE": none,
-    "NODETREE": set_pointer("node_groups"),
-    "OBJECT": set_pointer("objects"),
-    "MATERIAL": set_pointer("materials"),
-    "IMAGE": set_pointer("images"),
-    "COLLECTION": set_pointer("collections"),
-    "NONE": none,
-    "ITEMS": set_items,
+    "NODE": _none,
+    "NODETREE": _set_pointer("node_groups"),
+    "OBJECT": _set_pointer("objects"),
+    "MATERIAL": _set_pointer("materials"),
+    "IMAGE": _set_pointer("images"),
+    "COLLECTION": _set_pointer("collections"),
+    "NONE": _none,
+    "ITEMS": _set_items,
 }
 
 

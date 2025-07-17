@@ -1,19 +1,54 @@
 import bpy
-from .test_trees_fixture import fixture_test_trees, tree_names
+from .test_trees_fixture import fixture_test_trees, other_tree_names, test_tree_names
 
 
 def test_trees_exist(fixture_test_trees):
     """Test if the trees exist after import."""
-    for tree_name in tree_names:
+    for tree_name in test_tree_names + other_tree_names:
         assert (
             tree_name in bpy.data.node_groups
         ), f"{tree_name} should exist after import"
 
-def test_basic_tree(fixture_test_trees):
-    """Test the basic structure of a node tree."""
-    tree = bpy.data.node_groups.get("test_basic_tree")
-    assert "Group Input" in tree.nodes, "Group Input node should exist"
-    assert "Group Output" in tree.nodes, "Group Output node should exist"
+
+def test_links(fixture_test_trees):
+    tree = bpy.data.node_groups.get("test_links")
+    # Test if Group Input is connected to Set Position
+    group_input = tree.nodes.get("Group Input")
+    group_output = tree.nodes.get("Group Output")
+    set_position = tree.nodes.get("Set Position")
+    assert group_input is not None, "Group Input node should exist"
+    assert group_output is not None, "Group Output node should exist"
+    assert set_position is not None, "Set Position node should exist"
+    assert (
+        group_input.outputs[0].links[0].to_node == set_position
+    ), "Group Input should be linked to Set Position"
+    assert (
+        set_position.outputs[0].links[0].to_node == group_output
+    ), "Set Position should be linked to Group Output"
+
+
+def test_reroute(fixture_test_trees):
+    """Test the reroute node."""
+    tree = bpy.data.node_groups.get("test_reroute")
+    reroute_node = tree.nodes.get("Reroute")
+    assert reroute_node is not None, "Reroute node should exist"
+    assert len(reroute_node.outputs) == 1, "Reroute node should have one output"
+    assert (
+        len(reroute_node.outputs[0].links) > 0
+    ), "Reroute node should have outgoing links"
+
+
+def test_subgroups(fixture_test_trees):
+    """Test the subgroup structure."""
+    tree = bpy.data.node_groups.get("test_subgroups")
+    subtree = bpy.data.node_groups.get("test_subgroups_subgroup")
+    assert "Group" in tree.nodes, "Subgroup node should exist"
+    subgroup_node = tree.nodes.get("Group")
+    assert (
+        subgroup_node.node_tree == subtree
+    ), "Subgroup node should reference the correct subtree"
+
+
 def test_nested_menu(fixture_test_trees):
     """Test the nested menu structure."""
 

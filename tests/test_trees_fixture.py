@@ -2,16 +2,23 @@ import pytest
 import bpy
 import os
 import shutil
-tree_names = [
+
+test_tree_names = [
     "test_nested_menu",
+    "test_foreach_element",
+    "test_links",
+    "test_reroute",
+    "test_subgroups",
+]
+other_tree_names = [
     "test_nested_menu-menu_switch_1",
     "test_nested_menu-menu_switch_2",
     "test_nested_menu-menu_switch_3",
-    "test_foreach_element",
+    "test_subgroups_subgroup",
 ]
 
 
-def open_test_trees_file():
+def _open_test_trees_file():
     """Open the test trees file."""
     filepath = os.path.join(
         os.path.dirname(__file__),
@@ -22,10 +29,10 @@ def open_test_trees_file():
 
 @pytest.fixture(scope="module")
 def fixture_test_trees():
-    open_test_trees_file()
+    _open_test_trees_file()
 
-    folder_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "test_trees_json")
+    folder_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "test_trees_json"
     )
     if os.path.exists(folder_path):
         shutil.rmtree(folder_path)
@@ -46,8 +53,8 @@ def fixture_test_trees():
 
 def test_fixture():
     """Test if the fixture is imported correctly."""
-    open_test_trees_file()
-    for tree_name in tree_names:
+    _open_test_trees_file()
+    for tree_name in other_tree_names:
         assert (
             tree_name in bpy.data.node_groups
         ), f"{tree_name} should be in the node groups"

@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 
 def export_to(folder_path: str) -> None:
     log.debug("Preparing assets for export...")
-    assets = collect_assets()
+    assets = _collect_assets()
     for asset_type in assets:
         for asset in assets[asset_type]:
             if not hasattr(asset, config.JSON_KEY_UUID):
@@ -20,10 +20,10 @@ def export_to(folder_path: str) -> None:
         f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export."
     )
 
-    write_assets_to(folder_path, assets)
+    _write_assets_to(folder_path, assets)
 
 
-def collect_assets():
+def _collect_assets():
     assets = {asset_type: set() for asset_type in config.ASSET_TYPES}
 
     for node_tree in bpy.data.node_groups:
@@ -45,7 +45,7 @@ def collect_assets():
     return assets
 
 
-def write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
+def _write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
     assets_folder = os.path.join(folder_path, config.ASSETS_FOLDER)
     for asset_type in assets:
         folder_path = os.path.join(assets_folder, asset_type)
@@ -75,7 +75,7 @@ def import_from(folder_path: str, append: bool = False) -> str:
         log.info(f"No assets found in {assets_path}, skipping asset import.")
         return ""
 
-    uuids = all_uuids(assets_path)
+    uuids = _all_uuids(assets_path)
 
     # Check for asset conflicts, cancel in append mode, delete all assets in import all mode
     for data_type in config.ASSET_TYPES:
@@ -131,7 +131,7 @@ def import_from(folder_path: str, append: bool = False) -> str:
                 assets_collection.children.link(col)
 
 
-def all_uuids(assets_path: str) -> dict[str, list[str]]:
+def _all_uuids(assets_path: str) -> dict[str, list[str]]:
     uuids = {asset_type: [] for asset_type in config.ASSET_TYPES}
     for asset_type in os.listdir(assets_path):
         for filename in os.listdir(os.path.join(assets_path, asset_type)):

@@ -11,7 +11,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-def setup(folder_path) -> None:
+def _setup(folder_path) -> None:
     file.setup(folder_path)
     for tree in bpy.data.node_groups:
         if not tree.get(config.JSON_KEY_UUID):
@@ -27,7 +27,7 @@ def export_to(folder_path: str) -> None:
     log.info(
         f"Exporting {len(bpy.data.node_groups)} node group{'s' if len(bpy.data.node_groups) != 1 else ''} to {folder_path}"
     )
-    setup(folder_path)
+    _setup(folder_path)
     assets.export_to(folder_path)
     data_dicts: list[config.ExportDict] = []
     for tree in bpy.data.node_groups:
@@ -71,13 +71,13 @@ def import_from(folder_path: str, append: bool) -> str:
         for data_dict in data_dicts
     }
 
-    handle_existing_trees(tree_datas, append)
+    _handle_existing_trees(tree_datas, append)
 
-    create_trees(tree_datas)
+    _create_trees(tree_datas)
     return f"Imported {len(tree_datas)} node group{'s' if len(tree_datas) != 1 else ''} from {folder_path}."
 
 
-def handle_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool) -> str:
+def _handle_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool) -> str:
     for tree in bpy.data.node_groups:
         if append:
             if tree.get(config.JSON_KEY_UUID) in tree_datas:
@@ -91,7 +91,7 @@ def handle_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool) -> 
                 bpy.data.node_groups.remove(tree, do_unlink=True)
 
 
-def create_trees(tree_datas: dict[str, NodeTreeData]) -> None:
+def _create_trees(tree_datas: dict[str, NodeTreeData]) -> None:
     if not tree_datas:
         return "No groups imported, all groups already exist."
     log.info("Creating node trees...")

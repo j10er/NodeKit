@@ -67,13 +67,13 @@ def validate_path(folder_path: str) -> str:
         elif not os.path.isdir(folder_path):
             return "Path is not a directory"
         else:
-            return check_folder_structure(folder_path)
+            return _check_folder_structure(folder_path)
     except Exception as e:
         log.error(f"Error validating path {folder_path}: {e}")
         return "An internal error occurred while validating the path"
 
 
-def check_folder_structure(folder_path: str) -> str:
+def _check_folder_structure(folder_path: str) -> str:
     for tree_type in os.listdir(folder_path):
         if tree_type == config.ASSETS_FOLDER:
             for asset_type in os.listdir(os.path.join(folder_path, tree_type)):
@@ -94,7 +94,7 @@ def check_folder_structure(folder_path: str) -> str:
                 for file in os.listdir(os.path.join(folder_path, tree_type, category)):
                     if not (file.endswith(".json") or file.endswith(".blend")):
                         return f"Unexpected file '{file}' found in '{tree_type}:{category}'"
-                    elif check_json(
+                    elif _check_json(
                         os.path.join(folder_path, tree_type, category, file)
                     ):
                         return f"Invalid JSON structure in file '{file}' in '{tree_type}:{category}'"
@@ -115,18 +115,18 @@ def folder_is_empty(folder_path: str) -> bool:
     return len(os.listdir(folder_path)) == 0
 
 
-def check_json(file_path: str) -> str:
+def _check_json(file_path: str) -> str:
     try:
         with open(file_path, "r") as file:
             json_dict = json.load(file)
-        if not is_typed_dict(json_dict, config.ExportDict):
+        if not _is_typed_dict(json_dict, config.ExportDict):
             return f"Invalid JSON structure in file {file_path}"
     except json.JSONDecodeError as e:
         return f"Invalid JSON in file {file_path}: {e}"
     return ""
 
 
-def is_typed_dict(data: dict, typed_dict_class) -> bool:
+def _is_typed_dict(data: dict, typed_dict_class) -> bool:
     """Validate if a dictionary matches a TypedDict structure"""
     keys = data.keys()
     types = get_type_hints(typed_dict_class)

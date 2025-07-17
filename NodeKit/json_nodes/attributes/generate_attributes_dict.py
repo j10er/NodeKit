@@ -12,7 +12,7 @@ all_prop_types = set()
 all_attribute_types = set()
 
 
-def prop_type(cls: type, prop: bpy.types.Property) -> str:
+def _prop_type(cls: type, prop: bpy.types.Property) -> str:
     all_prop_types.add(prop.type)
 
     match prop.type:
@@ -44,7 +44,7 @@ def prop_type(cls: type, prop: bpy.types.Property) -> str:
             return prop.type
 
 
-def prop_default(prop: bpy.types.Property) -> Any:
+def _prop_default(prop: bpy.types.Property) -> Any:
     if prop.type == "FLOAT":
         if prop.identifier == "min_value":
             return -3.4028234663852886e38
@@ -66,7 +66,7 @@ def attributes_for(
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
-        prop.identifier: [prop_type(cls, prop), prop_default(prop)]
+        prop.identifier: [_prop_type(cls, prop), _prop_default(prop)]
         for prop in cls.bl_rna.properties
         if prop.identifier not in base_attributes
         and not [True for keyword in exclude_keywords if keyword in prop.identifier]
