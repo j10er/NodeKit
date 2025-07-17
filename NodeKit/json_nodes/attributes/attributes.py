@@ -1,6 +1,7 @@
 import bpy
 from typing import Any, Callable
 from .attributes_dict import DEFAULTS
+from ... import config
 
 import logging
 from inspect import signature
@@ -57,7 +58,7 @@ none = lambda element, name, value: None
 
 
 def get_pointer(element: Any) -> str:
-    return element["uuid"] if element else None
+    return element[config.JSON_KEY_UUID] if element else None
 
 
 def set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
@@ -65,7 +66,9 @@ def set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
         element,
         name,
         next(
-            o for o in getattr(bpy.data, collection_name) if o.get("uuid", "") == uuid
+            o
+            for o in getattr(bpy.data, collection_name)
+            if o.get(config.JSON_KEY_UUID, "") == uuid
         ),
     )
 

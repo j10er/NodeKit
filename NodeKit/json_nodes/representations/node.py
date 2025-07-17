@@ -4,6 +4,7 @@ import logging
 from bpy.types import Node, NodeTree, NodeSocket
 from ..attributes import attributes
 from .base_class import Data
+from ... import config
 
 
 log = logging.getLogger(__name__)
@@ -129,14 +130,14 @@ class SocketData(Data):
                 link.from_socket == socket
                 and link.to_node.bl_idname not in EXCLUDED_NODE_TYPES
             ):
-                to_socket_index.append(link.to_socket["index"])
+                to_socket_index.append(link.to_socket[config.JSON_KEY_INDEX])
                 to_node.append(link.to_node.name)
 
         defaults = attributes.defaults_for(socket.bl_idname)
         return cls(
             to_socket_index=to_socket_index,
             to_node=to_node,
-            index=socket["index"],
+            index=socket[config.JSON_KEY_INDEX],
             attributes=attributes.from_element(socket, defaults),
             defaults=defaults,
         )
@@ -149,7 +150,7 @@ class SocketData(Data):
             defaults=defaults,
             to_socket_index=socket_dict.get("to_socket_index", []),
             to_node=socket_dict.get("to_node", []),
-            index=socket_dict["index"],
+            index=socket_dict[config.JSON_KEY_INDEX],
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -161,5 +162,5 @@ class SocketData(Data):
                 else {}
             ),
             **({"to_node": self.to_node} if self.to_node else {}),
-            "index": self.index,
+            config.JSON_KEY_INDEX: self.index,
         }

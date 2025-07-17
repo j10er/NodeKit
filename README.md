@@ -4,7 +4,7 @@
 [![Blender](https://img.shields.io/badge/Blender-4.3%2B-orange.svg)](https://www.blender.org/)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-green.svg)](https://www.python.org/)
 
-A comprehensive Blender addon for developing, testing, and managing Geometry Node Trees. This addon provides tools for exporting node trees to JSON format, importing them back into Blender, and maintaining a robust development workflow for geometry nodes.
+A Blender addon for developing, testing, and managing Geometry Node Trees. This addon provides tools for exporting node trees to JSON format, importing them back into Blender, and maintaining a robust development workflow for geometry nodes.
 
 
 # Notes
@@ -43,27 +43,10 @@ Each exported file contains:
   "category": "Groups"
 }
 ```
-jsons haben immer recht, außer ich sage append
-
-# Main Operators:
-- Set Folder permanently and import + overwrite all
-- Append nodes from folder, ask if overwrite or skip
-- Export the selected folder, overwrite all in folder
-  - only allowed if the node groups from the file already have been imported
-- (Single-time export to a folder)
-- Option: Auto-Export on save
 
 
-Workflow:
-- Select previous/empty folder
-- press import
-- Create nodes
-- export
-- git commit
-- git merge
-- import
-- continue working
--
+
+
 ## Object Naming
 - How to handle invalid characters for filenames?
 1. replace, but keep actual name in blend file or JSON
@@ -72,48 +55,11 @@ Workflow:
 # Node Features
 - MenuSwitch Item Description
 ## Path Management/Workflow
-- determine setup workflow
-- integration with git workflow
-
-## Only sync changed trees
+- test with git
 
 ## Assets
-### Export
-- asset:
-  - Object
-  - Collection
-  - Material
-  - Texture
-
-- determine all assets
-- set a uuid for each used asset
-- store uuid of asset in node
-- export asset to separate file with uuid as filename
-What to do if asset is used in multiple contexts? collection with objects, but objects also used on its own
-what to do if assset has geometry nodes
-### Import
-- Find file with correct uuid
-- append to current scene, extra collection?
-- set asset pointer as attribute
-
+- What to do if asset is used in multiple contexts? collection with objects, but objects also used on its own
+- what to do if assset has geometry nodes
 ## Tests
-### Based on attributes_dict
-- find way to genericallý create each data type
-
-- for each class (except nodetree):
-  - create nodetree
-  - add this item
-  - for each attribute:
-    - set random attribute for this datatype
-      - int/float: trivial
-      - str: random, except filepaths?
-      - vector: store size in attributes_dict?
-      - enum: ??
-      - bpy_collection: find type of collection, add 3 items
-      - assets/other objets: future
-=> attributes_dict wouldn't be backwards compatible
 ### Test the behavior
 - All basic tests: recieve a point at (0,0,0) as input, test successful if it now is at (0,0,1), otherwise wrong
-### Manually
-- find key features/node types
-- useful?

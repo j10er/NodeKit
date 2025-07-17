@@ -2,11 +2,15 @@ import os
 from bpy.path import abspath
 import bpy
 from .json_nodes import file
+from . import config
 import logging
+
 log = logging.getLogger(__name__)
+
 
 def save_handler(scene):
     bpy.ops.nodekit.export_json()
+
 
 class NodeKitPreferences(bpy.types.AddonPreferences):
     bl_idname = __package__
@@ -15,7 +19,7 @@ class NodeKitPreferences(bpy.types.AddonPreferences):
         name="Export on Save",
         description="Automatically export node groups to JSON files when saving the Blender file",
         default=False,
-        update=lambda self, context: self.set_save_handler()
+        update=lambda self, context: self.set_save_handler(),
     )  # type: ignore
 
     def set_save_handler(self):
@@ -48,6 +52,7 @@ class NodeKitProperties(bpy.types.PropertyGroup):
         description="Indicates if the JSON files have been imported",
         default=False,
     )  # type: ignore
+
     def on_path_update(self):
         self.directory_error = file.validate_path(self.folder_path)
         self.is_imported = False

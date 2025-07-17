@@ -2,11 +2,14 @@ import bpy
 from .json_nodes.import_export import export_to, import_from
 from .json_nodes.attributes import generate_attributes_dict
 from .json_nodes import file
+from . import config
 import os
+
 
 class NODEKIT_OT_ImportJSON(bpy.types.Operator):
     bl_idname = "nodekit.import_json"
     bl_label = "Import from JSON"
+    bl_description = "Import node groups and assets from JSON files"
 
     @classmethod
     def poll(cls, context):
@@ -25,7 +28,7 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
     def execute(self, context):
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
         message = import_from(folder_path, append=False)
-        self.report({'INFO'}, message)
+        self.report({"INFO"}, message)
         bpy.context.scene.node_kit.is_imported = True
         return {"FINISHED"}
 
@@ -33,13 +36,16 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
 class NODEKIT_OT_ExportJSON(bpy.types.Operator):
     bl_idname = "nodekit.export_json"
     bl_label = "Export to JSON"
+    bl_description = "Export node groups and assets to JSON files"
 
     @classmethod
     def poll(cls, context):
 
-        return (
-            not bpy.context.scene.node_kit.directory_error
-            and (bpy.context.scene.node_kit.is_imported or file.folder_is_empty(bpy.path.abspath(bpy.context.scene.node_kit.folder_path)))
+        return not bpy.context.scene.node_kit.directory_error and (
+            bpy.context.scene.node_kit.is_imported
+            or file.folder_is_empty(
+                bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
+            )
         )
 
     def execute(self, context):
@@ -55,26 +61,24 @@ class NODEKIT_OT_AppendJSON(bpy.types.Operator):
     bl_description = "Pick a folder to append its node groups"
 
     directory: bpy.props.StringProperty(
-        name="Folder",
-        description="Select a folder",
-        subtype='DIR_PATH'
-    ) # type: ignore
+        name="Folder", description="Select a folder", subtype="DIR_PATH"
+    )  # type: ignore
 
     def execute(self, context):
         folder_path = bpy.path.abspath(self.directory)
 
         directory_error = file.validate_path(folder_path)
         if directory_error:
-            self.report({'ERROR'}, directory_error)
-            return {'CANCELLED'}
+            self.report({"ERROR"}, directory_error)
+            return {"CANCELLED"}
 
         message = import_from(folder_path, append=True)
-        self.report({'INFO'}, message)
-        return {'FINISHED'}
+        self.report({"INFO"}, message)
+        return {"FINISHED"}
 
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
+        return {"RUNNING_MODAL"}
 
 
 class NODEKIT_OT_Surprise(bpy.types.Operator):
@@ -82,7 +86,7 @@ class NODEKIT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-        print(__package__.split('.')[-1])
+        print(__package__.split(".")[-1])
         return {"FINISHED"}
 
 

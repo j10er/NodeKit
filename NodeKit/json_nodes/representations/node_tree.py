@@ -6,6 +6,7 @@ from ..attributes import attributes
 from .base_class import Data
 from .interface_item import InterfaceItemData
 from .node import NodeData, EXCLUDED_NODE_TYPES
+from ... import config
 
 
 log = logging.getLogger(__name__)
@@ -29,20 +30,14 @@ class NodeTreeData(Data):
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
         log.info(
-            f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}..."
+            f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree[config.JSON_KEY_UUID]}..."
         )
-
-        if tree.bl_idname != "GeometryNodeTree":
-            log.error(
-                f"Expected GeometryNodeTree, got {tree.bl_idname} for tree {tree.name}"
-            )
-            return None
 
         defaults = attributes.defaults_for(tree.bl_idname)
         return cls(
             attributes=attributes.from_element(tree, defaults),
             defaults=defaults,
-            uuid=tree["uuid"],
+            uuid=tree[config.JSON_KEY_UUID],
             nodes={
                 node.name: NodeData.from_node(node)
                 for node in tree.nodes
@@ -62,7 +57,7 @@ class NodeTreeData(Data):
         return cls(
             attributes=attributes.from_dict(tree_dict, defaults),
             defaults=defaults,
-            uuid=tree_dict["uuid"],
+            uuid=tree_dict[config.JSON_KEY_UUID],
             nodes={
                 name: NodeData.from_dict(node_dict)
                 for name, node_dict in tree_dict["nodes"].items()
@@ -77,7 +72,7 @@ class NodeTreeData(Data):
         log.debug(f"{self.name}: Converting to dict")
         return {
             **attributes.to_dict(self.attributes, self.defaults),
-            "uuid": self.uuid,
+            config.JSON_KEY_UUID: self.uuid,
             "nodes": {
                 name: node_data.to_dict() for name, node_data in self.nodes.items()
             },
@@ -91,7 +86,7 @@ class NodeTreeData(Data):
             if [
                 tree
                 for tree in bpy.data.node_groups.values()
-                if tree.get("uuid", "") == self.uuid
+                if tree.get(config.JSON_KEY_UUID, "") == self.uuid
             ]:
                 log.info(
                     f"Warning: Resetting existing node tree {self.name} with UUID {self.uuid}"
@@ -105,7 +100,7 @@ class NodeTreeData(Data):
                 log.debug(f"{self.name}: Creating new node tree")
                 tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
             self.tree = tree
-            tree["uuid"] = self.uuid
+            tree[config.JSON_KEY_UUID] = self.uuid
             attributes.set_on_element(tree, self.attributes, self.defaults)
             for item_data in self.interface_items:
                 log.debug(f"{self.name}: Creating interface item {item_data.name}")
