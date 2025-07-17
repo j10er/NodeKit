@@ -24,7 +24,8 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
 
     def execute(self, context):
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
-        import_from(folder_path)
+        message = import_from(folder_path, append=False)
+        self.report({'INFO'}, message)
         bpy.context.scene.node_kit.is_imported = True
         return {"FINISHED"}
 
@@ -67,8 +68,8 @@ class NODEKIT_OT_AppendJSON(bpy.types.Operator):
             self.report({'ERROR'}, directory_error)
             return {'CANCELLED'}
 
-        self.report({'INFO'}, f"Appending node groups from {folder_path}")
-        import_from(folder_path, append=True)
+        message = import_from(folder_path, append=True)
+        self.report({'INFO'}, message)
         return {'FINISHED'}
 
     def invoke(self, context, event):

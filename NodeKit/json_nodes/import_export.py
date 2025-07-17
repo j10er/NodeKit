@@ -47,12 +47,14 @@ def export_to(folder_path: str) -> None:
 
 
 
-def import_from(folder_path: str, append:bool=False) -> str:
+def import_from(folder_path: str, append:bool) -> str:
     log.info(f"Importing all node groups from {folder_path}")
 
     log.info("Importing assets...")
-    assets.import_from(folder_path, append=append)
-
+    error = assets.import_from(folder_path, append=append)
+    if error:
+        log.info(error)
+        return error
     log.info("Reading json files...")
     data_dicts = file.read_trees_from(folder_path)
     log.info(f"Found {len(data_dicts)} node groups to import.")

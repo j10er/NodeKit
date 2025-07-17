@@ -52,64 +52,7 @@ def read_trees_from(folder_path: str) -> list[dict[str, Any]]:
     return data_dicts
 
 
-def write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
-    assets_folder = os.path.join(folder_path, "Assets")
-    for asset_type in assets:
-        folder_path = os.path.join(assets_folder, asset_type)
-        for asset in assets[asset_type]:
-            os.makedirs(folder_path, exist_ok=True)
-            asset["name"] = asset.name
-            filename = make_valid_filename(asset["name"], asset["uuid"], ext=".blend")
-            asset.name = asset["uuid"]
 
-            log.debug(f"Asset name is {asset['name']} with uuid {asset['uuid']}")
-            asset_path = os.path.join(folder_path, filename)
-            bpy.data.libraries.write(
-                asset_path,
-                set([asset]),
-                fake_user=True,
-            )
-            asset.name = asset["name"]
-
-
-mapping = {
-    "Object": "objects",
-    "Material": "materials",
-    "Image": "images",
-    "Collection": "collections",
-}
-
-
-def read_assets_from(folder_path: str) -> dict[str, Any]:
-    assets_path = os.path.join(folder_path, "Assets")
-    if not os.path.exists(assets_path) or not os.path.isdir(assets_path):
-        log.info(f"No assets found.")
-        return {asset_type: [] for asset_type in mapping}
-    uuids = {asset_type: [] for asset_type in mapping}
-    assets = {asset_type: [] for asset_type in mapping}
-
-    for asset_type in os.listdir(assets_path):
-        for filename in os.listdir(os.path.join(assets_path, asset_type)):
-            if filename.endswith(".blend"):
-                asset_path = os.path.join(assets_path, asset_type, filename)
-                log.debug(f"Appending asset from {asset_path}")
-
-                uuid = filename.split("_")[-1][:-6]
-                with bpy.data.libraries.load(asset_path, link=False) as (
-                    data_from,
-                    data_to,
-                ):
-                    setattr(data_to, mapping[asset_type], [uuid])
-
-                uuids[asset_type].append(uuid)
-
-    for asset_type in mapping:
-        for uuid, element in getattr(bpy.data, mapping[asset_type]).items():
-            if element.get("uuid", False) and element["uuid"] in uuids[asset_type]:
-                element.name = element["name"]
-                print(f"Adding {element.name} to assets")
-                assets[asset_type].append(element)
-    return assets
 
 
 def validate_path(folder_path: str) -> str:

@@ -1,11 +1,19 @@
 import bpy
+import os
 import uuid
-from . import file
-from .file import mapping
 import logging
+from typing import Any
+from . import file
 
 log = logging.getLogger(__name__)
 
+
+DATA_BLOCK_MAPPING = {
+    "Object": "objects",
+    "Material": "materials",
+    "Image": "images",
+    "Collection": "collections",
+}
 
 def export_to(folder_path: str) -> None:
     log.debug("Preparing assets for export...")
@@ -16,11 +24,11 @@ def export_to(folder_path: str) -> None:
                 asset["uuid"] = str(uuid.uuid4())
     log.debug(f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export.")
 
-    file.write_assets_to(folder_path, assets)
+    write_assets_to(folder_path, assets)
 
 
 def collect_assets():
-    assets = {asset_type: set() for asset_type in mapping}
+    assets = {asset_type: set() for asset_type in DATA_BLOCK_MAPPING}
 
     for node_tree in bpy.data.node_groups:
         for node in node_tree.nodes:
@@ -40,32 +48,90 @@ def collect_assets():
                         assets[asset_type].add(asset)
     return assets
 
+def write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
+    assets_folder = os.path.join(folder_path, "Assets")
+    for asset_type in assets:
+        folder_path = os.path.join(assets_folder, asset_type)
+        for asset in assets[asset_type]:
+            os.makedirs(folder_path, exist_ok=True)
+            asset["name"] = asset.name
+            filename = file.make_valid_filename(asset["name"], asset["uuid"], ext=".blend")
+            asset.name = asset["uuid"]
 
-def import_from(folder_path: str, append: bool = False):
-    clear_assets()
-    assets = file.read_assets_from(folder_path)
-    col_name = "Node-Assets"
-    if col_name not in bpy.data.collections:
-        assets_collection = bpy.data.collections.new(col_name)
-        bpy.context.scene.collection.children.link(assets_collection)
-    else:
-        assets_collection = bpy.data.collections[col_name]
-
-    for obj in assets["Object"]:
-        if obj.name not in assets_collection.objects:
-            assets_collection.objects.link(obj)
-
-    for col in assets["Collection"]:
-        if col.name not in assets_collection.children:
-            assets_collection.children.link(col)
+            log.debug(f"Asset name is {asset['name']} with uuid {asset['uuid']}")
+            asset_path = os.path.join(folder_path, filename)
+            bpy.data.libraries.write(
+                asset_path,
+                set([asset]),
+                fake_user=True,
+            )
+            asset.name = asset["name"]
 
 
-def clear_assets():
+def import_from(folder_path: str, append: bool = False) -> str:
+    assets_path = os.path.join(folder_path, "Assets")
+    if not os.path.exists(assets_path) or not os.path.isdir(assets_path):
+        log.info(f"No assets found in {assets_path}, skipping asset import.")
+        return ""
 
-    for data_col_name in mapping.values():
-        for data_block in getattr(bpy.data, data_col_name):
-            if data_block.get("uuid", False):
-                log.debug(
-                    f"Removing data block {data_block.name} with uuid {data_block['uuid']}"
-                )
-                getattr(bpy.data, data_col_name).remove(data_block, do_unlink=True)
+    uuids = all_uuids(assets_path)
+
+    # Check for asset conflicts, cancel in append mode, delete all assets in import all mode
+    for data_type in DATA_BLOCK_MAPPING:
+            for data_block in getattr(bpy.data, DATA_BLOCK_MAPPING[data_type]):
+                if append:
+                    if data_block.get("uuid", False) in uuids[data_type]:
+                        return f"Asset {data_block.name} with uuid {data_block['uuid']} already exists, cannot append. Remove it in the current file or delete it from the assets folder."
+                else:
+                    if data_block.get("uuid", False):
+                        log.debug(f"Removing asset {data_block.name} with uuid {data_block['uuid']}")
+                        getattr(bpy.data, DATA_BLOCK_MAPPING[data_type]).remove(data_block, do_unlink=True)
+
+
+    # Import the assets
+    assets = {asset_type: [] for asset_type in DATA_BLOCK_MAPPING}
+
+    for asset_type in os.listdir(assets_path):
+        for filename in os.listdir(os.path.join(assets_path, asset_type)):
+            if filename.endswith(".blend"):
+                asset_path = os.path.join(assets_path, asset_type, filename)
+                log.debug(f"Appending asset from {asset_path}")
+
+                uuid = filename.split("_")[-1][:-6]
+                with bpy.data.libraries.load(asset_path, link=False) as (
+                    data_from,
+                    data_to,
+                ):
+                    setattr(data_to, DATA_BLOCK_MAPPING[asset_type], [uuid])
+                asset = getattr(bpy.data, DATA_BLOCK_MAPPING[asset_type])[uuid]
+                asset.name = asset["name"]
+                assets[asset_type].append(asset)
+
+    # Link collections and objects to the scene
+
+    if assets["Object"] or assets["Collection"]:
+        col_name = "Node-Assets"
+        log.info(f"Linking assets to collection {col_name}")
+        if col_name not in bpy.data.collections:
+            assets_collection = bpy.data.collections.new(col_name)
+            bpy.context.scene.collection.children.link(assets_collection)
+        else:
+            assets_collection = bpy.data.collections[col_name]
+
+        for obj in assets["Object"]:
+            if obj.name not in assets_collection.objects:
+                assets_collection.objects.link(obj)
+
+        for col in assets["Collection"]:
+            if col.name not in assets_collection.children:
+                assets_collection.children.link(col)
+
+
+def all_uuids(assets_path:str) -> dict[str, list[str]]:
+    uuids = {asset_type: [] for asset_type in DATA_BLOCK_MAPPING}
+    for asset_type in os.listdir(assets_path):
+        for filename in os.listdir(os.path.join(assets_path, asset_type)):
+            if filename.endswith(".blend"):
+                uuid = filename.split("_")[-1][:-6]
+                uuids[asset_type].append(uuid)
+    return uuids
