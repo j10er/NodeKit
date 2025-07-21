@@ -18,9 +18,8 @@ NodeKit is a Blender addon designed for developing, testing, and managing Geomet
 
 > ⚠️ **Development Status**: This add-on is under active development and may contain bugs in the importer and exporter. Use with caution in production projects.
 
-## Requirements
-
-- **Blender**: 4.3.0 or higher
+### Settings
+- Export on Save: Whether node groups should be exported automatically to the specified location whenever the blend file is saved
 
 ## Installation
 

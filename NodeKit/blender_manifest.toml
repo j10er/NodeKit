@@ -1,9 +1,9 @@
-schema_version = "1.0.0"
+schema_version = "0.1.0"
 
 # Example of manifest file for a Blender extension
 # Change the values according to your extension
 id = "NodeKit"
-version = "1.0.0"
+version = "0.1.0"
 name = "NodeKit"
 tagline = "Tools for building better Blender node trees"
 maintainer = "Josua Zehner"
@@ -15,7 +15,7 @@ type = "add-on"
 
 # Optional list defined by Blender and server, see:
 # https://docs.blender.org/manual/en/dev/advanced/extensions/tags.html
-#tags = ["Animation", "Sequencer"]
+tags = ["Development", "Geometry Nodes", "Import-Export", "Node"]
 
 blender_version_min = "4.3.0"
 

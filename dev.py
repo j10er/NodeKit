@@ -4,9 +4,8 @@ import os
 import shutil
 import subprocess
 
-# Should match the addon name and id in blender_manifest.toml
+# Should match the addon name in blender_manifest.toml
 addon_name = "NodeKit"
-addon_id = "nodekit"
 
 
 def build():
@@ -37,7 +36,7 @@ def build():
         lines = file.readlines()
     with open(config_path, "w") as file:
         for line in lines:
-            if line.strip() != debug_line:
+            if line.strip() != debug_line.strip():
                 file.write(line)
 
 
