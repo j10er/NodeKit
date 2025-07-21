@@ -2,6 +2,7 @@
 
 [![Blender](https://img.shields.io/badge/Blender-4.3%2B-orange)](https://www.blender.org/)
 [![License](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](LICENSE)
+[![Tests](https://github.com/j10er/NodeKit/workflows/test/badge.svg)](https://github.com/j10er/NodeKit/actions/workflows/test.yml)
 [![Release](https://img.shields.io/github/v/release/j10er/NodeKit?include_prereleases)](https://github.com/j10er/NodeKit/releases)
 
 > Tools for building better Blender node trees
