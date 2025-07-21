@@ -58,6 +58,5 @@ jobs:
           name: ${{ inputs.release_name || inputs.tag_name }}
           files: NodeKit.zip
           prerelease: ${{ inputs.prerelease }}
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
