@@ -46,6 +46,3 @@ INVALID_FILENAME_CHARS = r'[<>:"/\\|?*\n\r\t ]'
 FILENAME_REPLACEMENT_CHAR = "_"
 
 DEBUG = True
-
-
-

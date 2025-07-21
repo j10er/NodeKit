@@ -14,7 +14,7 @@ def build():
     config_path = f"{source_dir}/config.py"
     debug_line = "DEBUG = False"
     with open(config_path, "a") as file:
-        file.write(f"\n{debug_line}")
+        file.write(f"{debug_line}")
     build_version = "4.5.0"
     print(f"Building addon: Using blender version {build_version} to build")
 
