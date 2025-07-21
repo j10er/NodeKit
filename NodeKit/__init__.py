@@ -12,8 +12,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import bpy
-from . import operators
-from . import ui, properties
+from . import operators, ui, properties, config
 import logging
 
 classes = [
@@ -21,26 +20,25 @@ classes = [
     properties.NodeKitPreferences,
     operators.NODEKIT_OT_ExportJSON,
     operators.NODEKIT_OT_ImportJSON,
-
     operators.NODEKIT_OT_AppendJSON,
     operators.NODEKIT_OT_Surprise,
     operators.NODEKIT_OT_GenerateDefaultValues,
-
     ui.NODEKIT_PT_MainPanel,
-    ui.NODEKIT_PT_DebugPanel,
 ]
 
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.node_kit = bpy.props.PointerProperty(type=properties.NodeKitProperties)
+    bpy.types.Scene.node_kit = bpy.props.PointerProperty(
+        type=properties.NodeKitProperties
+    )
     if bpy.context.preferences.addons[__package__].preferences.export_on_save:
         if properties.save_handler not in bpy.app.handlers.save_post:
             bpy.app.handlers.save_post.append(properties.save_handler)
 
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.DEBUG if config.DEBUG else logging.INFO,
         format="[%(levelname)s] %(message)s",
     )
 

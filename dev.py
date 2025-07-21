@@ -9,28 +9,36 @@ addon_name = "NodeKit"
 addon_id = "nodekit"
 
 
-def build(fast=False):
+def build():
     source_dir = f"./{addon_name}"
     filename = addon_name
-    if fast:
-        print(f"Building addon: Zipping folder {source_dir} to {filename}.zip")
-        shutil.make_archive(addon_name, "zip", addon_name)
-    else:
-        version = "4.5.0"
-        print(f"Building addon: Using blender version {version} to build")
-        _setup_blender("./blender", version)
-        subprocess.run(
-            [
-                f"./blender/blender-{version}/blender",
-                "--command",
-                "extension",
-                "build",
-                "--source-dir",
-                source_dir,
-                "--output-filepath",
-                f"{filename}.zip",
-            ]
-        )
+    config_path = f"{source_dir}/config.py"
+    debug_line = "DEBUG = False"
+    with open(config_path, "a") as file:
+        file.write(f"\n{debug_line}")
+    build_version = "4.5.0"
+    print(f"Building addon: Using blender version {build_version} to build")
+
+    _setup_blender("./blender", build_version)
+    subprocess.run(
+        [
+            f"./blender/blender-{build_version}/blender",
+            "--command",
+            "extension",
+            "build",
+            "--source-dir",
+            source_dir,
+            "--output-filepath",
+            f"{filename}.zip",
+        ]
+    )
+
+    with open(config_path, "r") as file:
+        lines = file.readlines()
+    with open(config_path, "w") as file:
+        for line in lines:
+            if line.strip() != debug_line:
+                file.write(line)
 
 
 def _run_tests(blender_executable):
@@ -116,11 +124,6 @@ parser.add_argument(
   """,
 )
 parser.add_argument(
-    "--fast",
-    action=argparse.BooleanOptionalAction,
-    help="Do not use the blender addon builder and instead just zip the folder",
-)
-parser.add_argument(
     "--skip-rebuild",
     action=argparse.BooleanOptionalAction,
     help="Do not rebuild the addon when running the tests, only viable when there are no changes in the addon code",
@@ -128,10 +131,10 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.command == "build":
-    build(args.fast)
+    build()
 elif args.command == "test":
     if not args.skip_rebuild:
-        build(args.fast)
+        build()
     test()
 else:
     parser.print_help()

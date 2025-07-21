@@ -8,7 +8,7 @@
 
 ## About
 
-NodeKit is a Blender addon designed for developing, testing, and managing Geometry Node Trees with version control in mind. The addon provides comprehensive tools for exporting node trees to JSON format and importing them back into Blender, making it seamless to use with version control systems like Git.
+NodeKit is a Blender addon designed for developing, testing, and managing Geometry Node Trees with version control in mind. The addon lets you export node trees to JSON format and import them back into Blender, allowing to easily share them.
 
 **Key Features:**
 - Export/Import Geometry Node Trees as JSON
@@ -21,7 +21,6 @@ NodeKit is a Blender addon designed for developing, testing, and managing Geomet
 ## Requirements
 
 - **Blender**: 4.3.0 or higher
-- **Python**: 3.11+ (included with Blender)
 
 ## Installation
 
