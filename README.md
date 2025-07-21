@@ -1,6 +1,6 @@
 # NodeKit
 
-[![Release](https://img.shields.io/github/v/release/your-username/NodeKit)](https://github.com/your-username/NodeKit/releases)
+[![Release](https://img.shields.io/github/v/release/j10er/NodeKit)](https://github.com/j10er/NodeKit/releases)
 [![Blender](https://img.shields.io/badge/Blender-4.3%2B-orange)](https://www.blender.org/)
 [![License](https://img.shields.io/badge/License-GPL%202.0-blue.svg)](LICENSE)
 
@@ -26,7 +26,7 @@ NodeKit is a Blender addon designed for developing, testing, and managing Geomet
 ## Installation
 
 ### Method 1: Download from Releases
-1. Download the latest `NodeKit.zip` from the [Releases page](https://github.com/your-username/NodeKit/releases)
+1. Download the latest `NodeKit.zip` from the [Releases page](https://github.com/j10er/NodeKit/releases)
 2. In Blender, go to **Edit** → **Preferences** → **Add-ons**
 3. Click **Install** and select the downloaded `NodeKit.zip` file
 4. Enable the "NodeKit" addon in the list
