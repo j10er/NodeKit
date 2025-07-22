@@ -9,6 +9,7 @@ test_tree_names = [
     "test_links",
     "test_reroute",
     "test_subgroups",
+    "test_input_node_float",
 ]
 other_tree_names = [
     "test_nested_menu-menu_switch_1",
