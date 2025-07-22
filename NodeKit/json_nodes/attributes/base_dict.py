@@ -32,6 +32,14 @@ classes = {
                         "attributes": {},
                         "find_subtypes": True,
                     },
+                    bpy.types.ShaderNode: {
+                        "attributes": {},
+                        "find_subtypes": True,
+                    },
+                    bpy.types.CompositorNode: {
+                        "attributes": {},
+                        "find_subtypes": True,
+                    },
                 },
             }
         },
