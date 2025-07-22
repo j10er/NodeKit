@@ -92,3 +92,22 @@ def test_foreach_element(fixture_test_trees):
     assert (
         foreach_output.generation_items[1].name == "Geometry.001"
     ), "Generation should have 'Geometry.001' item"
+
+
+def test_node_frame(fixture_test_trees):
+    """Test the node frame."""
+    tree = bpy.data.node_groups.get("test_nodeframe")
+    inner_frame = tree.nodes.get("Frame")
+    outer_frame = tree.nodes.get("Frame.001")
+    group_input = tree.nodes.get("Group Input")
+    assert inner_frame is not None, "Node Frame should exist"
+    assert outer_frame is not None, "Outer Frame should exist"
+    assert group_input is not None, "Group Input should exist"
+    assert (
+        inner_frame.parent == outer_frame
+    ), "Node Frame should be a child of Outer Frame"
+    assert (
+        inner_frame.label == "Inner Frame"
+    ), "Node Frame should have the correct label"
+    assert group_input.parent == inner_frame, "Group Input should be inside Node Frame"
+    assert inner_frame.shrink == True, "Node Frame should have shrink enabled"

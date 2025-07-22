@@ -71,15 +71,21 @@ def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
     )
 
 
-def _set_node(element, name, value):
+def _set_node(element, attr_name, value):
+
     tree = element.id_data
     if value not in tree.nodes:
         log.warning(
-            f"Node {value} not found in tree {tree.name} when setting attribute {name} on {element.name}"
+            f"Node {value} not found in tree {tree.name} when setting attribute {attr_name} on {element.name}"
         )
         return
     node = tree.nodes.get(value)
-    setattr(element, name, node)
+    if attr_name == "paired_output":
+        # This should be a zone node (like ForEachGeometryElementInput), so we need to set the paired output
+        log.debug(f"Pairing zone node {element.name} with output {node.name}")
+        element.pair_with_output(node)
+    else:
+        setattr(element, attr_name, node)
 
 
 GETTER = {
@@ -164,7 +170,9 @@ def set_on_element(
 
         value = attributes[attr_name] if attr_name in attributes else default_value
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
-        if value != default_value and (not readonly or attr_type == "ITEMS"):
+        if value != default_value and (
+            not readonly or attr_type == "ITEMS" or attr_name == "paired_output"
+        ):
             log.debug(
                 f"Setting attribute '{attr_name}' of type '{attr_type}' on element '{element.name}'"
             )

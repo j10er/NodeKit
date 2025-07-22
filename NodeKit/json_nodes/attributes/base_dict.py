@@ -16,7 +16,7 @@ classes = {
             "warning_propagation": ["STRING", "ALL"],
             "width": ["FLOAT", 140],
             "bl_idname": ["STRING", ""],
-            "parent": ["NODE", ""],
+            "parent": ["NODE", None],
         },
         "subtypes": {
             bpy.types.NodeInternal: {
