@@ -94,6 +94,16 @@ class NodeData(Data):
                 socket_data.attributes,
                 socket_data.defaults,
             )
+        for socket_data in self.outputs:
+            log.debug(
+                f"Setting attributes on output socket {self.node.outputs[socket_data.index].name}"
+            )
+
+            attributes.set_on_element(
+                self.node.outputs[socket_data.index],
+                socket_data.attributes,
+                socket_data.defaults,
+            )
 
 
 class SocketData(Data):
