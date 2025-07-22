@@ -77,12 +77,12 @@ class NodeData(Data):
         }
 
     def to_node(self, tree: NodeTree) -> Node:
-        self.node = tree.nodes.new(
-            type=self.bl_idname,
-        )
-        attributes.set_on_element(self.node, self.attributes, self.defaults)
-
+        self.node = tree.nodes.new(type=self.bl_idname)
+        self.node.name = self.name
         return self.node
+
+    def set_attributes(self) -> None:
+        attributes.set_on_element(self.node, self.attributes, self.defaults)
 
     def set_socket_attributes(self) -> None:
         for socket_data in self.inputs:

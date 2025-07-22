@@ -126,13 +126,7 @@ class NodeTreeData(Data):
             node = node_data.to_node(tree)
         log.debug(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
-            if hasattr(node_data, "paired_output"):
-                log.debug(
-                    f"{self.name}: - Pairing zone node '{node_data.name}' to output '{node_data.paired_output}'"
-                )
-                tree.nodes[node_data.name].pair_with_output(
-                    tree.nodes[node_data.paired_output]
-                )
+            node_data.set_attributes()
 
         log.debug(f"{self.name}: Connecting nodes with links")
         for node_data in self.nodes.values():

@@ -71,6 +71,17 @@ def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
     )
 
 
+def _set_node(element, name, value):
+    tree = element.id_data
+    if value not in tree.nodes:
+        log.warning(
+            f"Node {value} not found in tree {tree.name} when setting attribute {name} on {element.name}"
+        )
+        return
+    node = tree.nodes.get(value)
+    setattr(element, name, node)
+
+
 GETTER = {
     "FLOAT": float,
     "INT": int,
@@ -96,7 +107,7 @@ SETTER = {
     "BOOLEAN": setattr,
     "ENUM": setattr,
     "LIST": setattr,
-    "NODE": _none,
+    "NODE": _set_node,
     "NODETREE": _set_pointer("node_groups"),
     "OBJECT": _set_pointer("objects"),
     "MATERIAL": _set_pointer("materials"),
