@@ -43,17 +43,13 @@ NodeKit is a Blender addon designed for developing, testing, and managing Geomet
 2. **Export your first node tree**: Select an empty folder and export your geometry nodes to it
 3. **Version control**: Add your project folder to Git or your preferred VCS
 
-### Basic Workflow
+### Notes
 
-```
-Create Node Tree → Export to JSON → Commit to Git → Share/Collaborate → Import JSON → Continue Development
-```
-
-### Important Notes
-
-- **Import Warning**: Using "Import from JSON" will delete all other node groups in the current scene
-- **Safe Addition**: Use the "Append" function to add node groups without affecting existing ones
-- **Project Structure**: Always work with a dedicated project folder for each set of related node trees
+- Store local .blend files separate from the git repository - all relevant information to reconstruct the node tree is included in the JSON folder
+- Currently, linked objects are not separated; localize all objects before exporting
+- Using "Import from JSON" will delete all other node groups in the current scene
+- Use the "Append" function to add node groups without affecting existing ones
+-
 
 ## Export Structure
 

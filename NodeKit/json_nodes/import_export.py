@@ -14,8 +14,8 @@ log = logging.getLogger(__name__)
 def _setup(folder_path) -> None:
     file.setup(folder_path)
     for tree in bpy.data.node_groups:
-        if not tree.get(config.JSON_KEY_UUID):
-            tree[config.JSON_KEY_UUID] = str(uuid.uuid4())
+        if not tree.get("uuid"):
+            tree["uuid"] = str(uuid.uuid4())
         for node in tree.nodes:
             for i, input in enumerate(node.inputs):
                 input[config.JSON_KEY_INDEX] = i
@@ -65,7 +65,7 @@ def import_from(folder_path: str, append: bool) -> str:
     data_dicts = file.read_trees_from(folder_path)
     log.info(f"Found {len(data_dicts)} node groups to import.")
     tree_datas = {
-        data_dict[config.JSON_KEY_TREE][config.JSON_KEY_UUID]: NodeTreeData.from_dict(
+        data_dict[config.JSON_KEY_TREE]["uuid"]: NodeTreeData.from_dict(
             data_dict[config.JSON_KEY_TREE]
         )
         for data_dict in data_dicts
@@ -80,13 +80,13 @@ def import_from(folder_path: str, append: bool) -> str:
 def _handle_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool) -> str:
     for tree in bpy.data.node_groups:
         if append:
-            if tree.get(config.JSON_KEY_UUID) in tree_datas:
+            if tree.get("uuid") in tree_datas:
                 log.info(f"Tree {tree.name} already exists, skipping.")
-                tree_datas.pop(tree.get(config.JSON_KEY_UUID))
+                tree_datas.pop(tree.get("uuid"))
         else:
             if (
                 tree.bl_idname == config.SUPPORTED_TREE_TYPES
-                and tree.get(config.JSON_KEY_UUID) not in tree_datas
+                and tree.get("uuid") not in tree_datas
             ):
                 bpy.data.node_groups.remove(tree, do_unlink=True)
 

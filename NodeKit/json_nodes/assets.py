@@ -14,8 +14,8 @@ def export_to(folder_path: str) -> None:
     assets = _collect_assets()
     for asset_type in assets:
         for asset in assets[asset_type]:
-            if not hasattr(asset, config.JSON_KEY_UUID):
-                asset[config.JSON_KEY_UUID] = str(uuid.uuid4())
+            if not hasattr(asset, "uuid"):
+                asset["uuid"] = str(uuid.uuid4())
     log.debug(
         f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export."
     )
@@ -50,16 +50,15 @@ def _write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
     for asset_type in assets:
         folder_path = os.path.join(assets_folder, asset_type)
         for asset in assets[asset_type]:
+            log.debug(f"Exporting asset {asset.name} of type {asset_type}")
             os.makedirs(folder_path, exist_ok=True)
             asset["name"] = asset.name
             filename = file.make_valid_filename(
-                asset["name"], asset[config.JSON_KEY_UUID], ext=".blend"
+                asset["name"], asset["uuid"], ext=".blend"
             )
-            asset.name = asset[config.JSON_KEY_UUID]
+            asset.name = asset["uuid"]
 
-            log.debug(
-                f"Asset name is {asset['name']} with uuid {asset[config.JSON_KEY_UUID]}"
-            )
+            log.debug(f"Asset name is {asset['name']} with uuid {asset['uuid']}")
             asset_path = os.path.join(folder_path, filename)
             bpy.data.libraries.write(
                 asset_path,
@@ -81,12 +80,12 @@ def import_from(folder_path: str, append: bool = False) -> str:
     for data_type in config.ASSET_TYPES:
         for data_block in getattr(bpy.data, config.ASSET_TYPES[data_type]):
             if append:
-                if data_block.get(config.JSON_KEY_UUID, False) in uuids[data_type]:
-                    return f"Asset {data_block.name} with uuid {data_block[config.JSON_KEY_UUID]} already exists, cannot append. Remove it in the current file or delete it from the assets folder."
+                if data_block.get("uuid", False) in uuids[data_type]:
+                    return f"Asset {data_block.name} with uuid {data_block['uuid']} already exists, cannot append. Remove it in the current file or delete it from the assets folder."
             else:
-                if data_block.get(config.JSON_KEY_UUID, False):
+                if data_block.get("uuid", False):
                     log.debug(
-                        f"Removing asset {data_block.name} with uuid {data_block[config.JSON_KEY_UUID]}"
+                        f"Removing asset {data_block.name} with uuid {data_block['uuid']}"
                     )
                     getattr(bpy.data, config.ASSET_TYPES[data_type]).remove(
                         data_block, do_unlink=True

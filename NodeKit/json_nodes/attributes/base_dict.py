@@ -26,7 +26,7 @@ classes = {
                         "find_subtypes": True,
                         "subtype_params": {
                             "exclude_attribute_keywords": ["active", "index"]
-                        }
+                        },
                     },
                     bpy.types.FunctionNode: {
                         "attributes": {},
@@ -82,7 +82,6 @@ classes = {
     },
     bpy.types.NodeSocket: {
         "attributes": {
-            "name": ["STRING", ""],
             "bl_idname": ["STRING", ""],
         },
         "subtypes": {

@@ -28,7 +28,7 @@ TEST_PREFIX = ".test: "
 
 # Folder and collection names
 ASSETS_FOLDER = "Assets"
-ASSETS_COLLECTION_NAME = "Node-Assets"
+ASSETS_COLLECTION_NAME = "Assets"
 
 # JSON structure keys
 JSON_KEY_FILE_TYPE = "file_type"

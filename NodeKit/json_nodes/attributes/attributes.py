@@ -58,7 +58,7 @@ _none = lambda element, name, value: None
 
 
 def _get_pointer(element: Any) -> str:
-    return element[config.JSON_KEY_UUID] if element else None
+    return element["uuid"] if element else None
 
 
 def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
@@ -66,9 +66,7 @@ def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
         element,
         name,
         next(
-            o
-            for o in getattr(bpy.data, collection_name)
-            if o.get(config.JSON_KEY_UUID, "") == uuid
+            o for o in getattr(bpy.data, collection_name) if o.get("uuid", "") == uuid
         ),
     )
 
@@ -146,6 +144,7 @@ def set_on_element(
     defaults: dict[str, tuple[str, Any]],
 ) -> Any:
     for attr_name, (attr_type, default_value) in defaults.items():
+
         if not hasattr(element, attr_name):
             log.warning(
                 f"{element} of type {type(element)} has no attribute '{attr_name}'"
@@ -155,7 +154,9 @@ def set_on_element(
         value = attributes[attr_name] if attr_name in attributes else default_value
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
         if value != default_value and (not readonly or attr_type == "ITEMS"):
-
+            log.debug(
+                f"Setting attribute '{attr_name}' of type '{attr_type}' on element '{element.name}'"
+            )
             setter = SETTER[attr_type]
             try:
                 setter(element, attr_name, value)
