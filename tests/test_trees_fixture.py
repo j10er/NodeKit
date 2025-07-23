@@ -4,13 +4,14 @@ import os
 import shutil
 
 test_tree_names = [
-    "test_nested_menu",
     "test_foreach_element",
+    "test_input_node_float",
+    "test_interface_sockets",
     "test_links",
+    "test_nested_menu",
+    "test_nodeframe",
     "test_reroute",
     "test_subgroups",
-    "test_input_node_float",
-    "test_nodeframe",
 ]
 other_tree_names = [
     "test_nested_menu-menu_switch_1",

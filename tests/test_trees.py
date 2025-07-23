@@ -111,3 +111,16 @@ def test_node_frame(fixture_test_trees):
     ), "Node Frame should have the correct label"
     assert group_input.parent == inner_frame, "Group Input should be inside Node Frame"
     assert inner_frame.shrink == True, "Node Frame should have shrink enabled"
+
+
+def test_interface_sockets(fixture_test_trees):
+    """Test the interface sockets."""
+    tree = bpy.data.node_groups.get("test_interface_sockets")
+    input_socket = tree.interface.items_tree.get("Input Socket")
+    assert input_socket.subtype == "DISTANCE", "Input Socket should be of type DISTANCE"
+    assert (
+        input_socket.default_value == 1.0
+    ), "Input Socket should have a default value of 1.0"
+    assert (
+        input_socket.min_value == 0.0
+    ), "Input Socket should have a minimum value of 0.0"
