@@ -66,7 +66,12 @@ def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
         element,
         name,
         next(
-            o for o in getattr(bpy.data, collection_name) if o.get("uuid", "") == uuid
+            (
+                o
+                for o in getattr(bpy.data, collection_name)
+                if o.get("uuid", "") == uuid
+            ),
+            None,
         ),
     )
 
@@ -155,6 +160,11 @@ def to_dict(
     }
 
 
+IGNORE_SET_ATTRIBUTES = ["bl_idname"]
+IGNORE_READONLY_ATTRIBUTES = ["paired_output"]
+IGNORE_REDONLY_ATTRIBUTE_TYPES = ["ITEMS"]
+
+
 def set_on_element(
     element: Any,
     attributes: dict[str, Any],
@@ -170,8 +180,14 @@ def set_on_element(
 
         value = attributes[attr_name] if attr_name in attributes else default_value
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
-        if value != default_value and (
-            not readonly or attr_type == "ITEMS" or attr_name == "paired_output"
+        if (
+            value != default_value
+            and (
+                not readonly
+                or attr_type in IGNORE_REDONLY_ATTRIBUTE_TYPES
+                or attr_name in IGNORE_READONLY_ATTRIBUTES
+            )
+            and attr_name not in IGNORE_SET_ATTRIBUTES
         ):
             log.debug(
                 f"Setting attribute '{attr_name}' of type '{attr_type}' on element '{element.name}'"

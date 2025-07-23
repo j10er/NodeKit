@@ -22,6 +22,12 @@ class NodeKitPreferences(bpy.types.AddonPreferences):
         update=lambda self, context: self._set_save_handler(),
     )  # type: ignore
 
+    include_assets: bpy.props.BoolProperty(
+        name="Include Assets",
+        description="Include assets in the export",
+        default=True,
+    )  # type: ignore
+
     def _set_save_handler(self):
         if self.export_on_save:
             if save_handler not in bpy.app.handlers.save_post:
@@ -33,6 +39,7 @@ class NodeKitPreferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
         layout.prop(self, "export_on_save", text="Export on Save")
+        layout.prop(self, "include_assets", text="Include Assets")
 
 
 class NodeKitProperties(bpy.types.PropertyGroup):

@@ -11,6 +11,8 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
     bl_label = "Import from JSON"
     bl_description = "Import node groups and assets from JSON files"
 
+    _generator = None
+
     @classmethod
     def poll(cls, context):
         return not bpy.context.scene.node_kit.directory_error
@@ -26,17 +28,38 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
         )
 
     def execute(self, context):
+        print("Executing import operator")
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
-        message = import_from(folder_path, append=False)
-        self.report({"INFO"}, message)
+        self._generator = import_from(
+            folder_path,
+            append=False,
+            include_assets=bpy.context.preferences.addons[
+                __package__
+            ].preferences.include_assets,
+        )
+        context.window_manager.modal_handler_add(self)
+        return {"RUNNING_MODAL"}
+
+    def modal(self, context, event):
+        try:
+            next(self._generator)
+        except StopIteration as e:
+            self.report({"INFO"}, f"Done: {e.value}")
+            self.finish(context)
+            return {"FINISHED"}
+
+        return {"PASS_THROUGH"}
+
+    def finish(self, context):
         bpy.context.scene.node_kit.is_imported = True
-        return {"FINISHED"}
 
 
 class NODEKIT_OT_ExportJSON(bpy.types.Operator):
     bl_idname = "nodekit.export_json"
     bl_label = "Export to JSON"
     bl_description = "Export node groups and assets to JSON files"
+
+    _generator = None
 
     @classmethod
     def poll(cls, context):
@@ -49,10 +72,29 @@ class NODEKIT_OT_ExportJSON(bpy.types.Operator):
         )
 
     def execute(self, context):
+        print("Executing export operator")
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
-        export_to(folder_path)
+        self._generator = export_to(
+            folder_path=folder_path,
+            include_assets=bpy.context.preferences.addons[
+                __package__
+            ].preferences.include_assets,
+        )
+        context.window_manager.modal_handler_add(self)
+        return {"RUNNING_MODAL"}
+
+    def modal(self, context, event):
+        try:
+            next(self._generator)
+        except StopIteration as e:
+            self.report({"INFO"}, f"Done: {e.value}")
+            self.finish(context)
+            return {"FINISHED"}
+
+        return {"PASS_THROUGH"}
+
+    def finish(self, context):
         bpy.context.scene.node_kit.is_imported = True
-        return {"FINISHED"}
 
 
 class NODEKIT_OT_AppendJSON(bpy.types.Operator):
