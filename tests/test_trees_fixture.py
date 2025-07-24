@@ -5,6 +5,7 @@ import shutil
 
 test_tree_names = [
     "test_foreach_element",
+    "test_index_switch",
     "test_input_node_float",
     "test_interface_sockets",
     "test_links",

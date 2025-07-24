@@ -124,3 +124,14 @@ def test_interface_sockets(fixture_test_trees):
     assert (
         input_socket.min_value == 0.0
     ), "Input Socket should have a minimum value of 0.0"
+
+
+def test_index_switch(fixture_test_trees):
+    """Test the index switch."""
+    tree = bpy.data.node_groups.get("test_index_switch")
+    index_switch = tree.nodes.get("Index Switch")
+    assert index_switch is not None, "Index Switch node should exist"
+    assert index_switch.data_type == "FLOAT", "Index Switch should have data type FLOAT"
+    assert (
+        len(index_switch.index_switch_items) == 3
+    ), "Index Switch should have three options"
