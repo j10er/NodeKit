@@ -145,3 +145,15 @@ def test_compare_node(fixture_test_trees):
     assert (
         compare_node.operation == "LESS_THAN"
     ), "Compare node should use LESS_THAN operation"
+
+
+def test_multi_input_order(fixture_test_trees):
+    """Test the multi-input order."""
+    tree = bpy.data.node_groups.get("test_multi_input_order")
+    join_geometry = tree.nodes.get("Join Geometry")
+    assert join_geometry is not None, "Join Geometry node should exist"
+    socket = join_geometry.inputs.get("Geometry")
+    correct_from_node = tree.nodes.get("Correct From Node")
+    assert (
+        socket.links[2].from_node == correct_from_node
+    ), "Join Geometry should link to Correct From Node"

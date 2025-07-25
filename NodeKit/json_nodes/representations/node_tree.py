@@ -89,7 +89,7 @@ class NodeTreeData(Data):
                 if tree.get("uuid", "") == self.uuid
             ]:
                 log.info(
-                    f"Warning: Resetting existing node tree {self.name} with UUID {self.uuid}"
+                    f"Resetting existing node tree '{self.name}' with UUID {self.uuid}"
                 )
                 tree = bpy.data.node_groups[self.name]
                 for node in tree.nodes:
@@ -122,7 +122,7 @@ class NodeTreeData(Data):
         tree = self.tree
 
         for node_data in self.nodes.values():
-            log.debug(f"{self.name}: - Creating node {node_data.name}")
+            log.debug(f"{self.name}:{node_data.name}: Creating node")
             node = node_data.to_node(tree)
         log.debug(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
@@ -130,19 +130,19 @@ class NodeTreeData(Data):
 
         log.debug(f"{self.name}: Connecting nodes with links")
         for node_data in self.nodes.values():
-            log.debug(f"{self.name}: - Adding links for node {node_data.name}")
-            for output_data in node_data.outputs:
-                if output_data.to_node and output_data.to_socket_index:
-                    from_node = tree.nodes.get(node_data.name)
-                    from_socket = from_node.outputs[output_data.index]
+            for input_data in node_data.inputs:
+                if input_data.from_node and input_data.from_socket_index:
 
-                    for i in range(len(output_data.to_node)):
+                    to_node = tree.nodes.get(node_data.name)
+                    # links.new adds links to the top, so we reverse the order
+                    for i in reversed(range(len(input_data.from_node))):
+                        to_socket = to_node.inputs[input_data.index]
 
-                        to_node = tree.nodes.get(output_data.to_node[i])
-                        to_socket = to_node.inputs[output_data.to_socket_index[i]]
-                        log.debug(f"{self.name}: -- {from_node.name}")
+                        from_node = tree.nodes.get(input_data.from_node[i])
+                        from_socket = from_node.outputs[input_data.from_socket_index[i]]
+
                         log.debug(
-                            f"{self.name}: -- Linking {from_node.name}.{from_socket.name} to {to_node.name}.{to_socket.name}"
+                            f"{self.name}:{from_node.name}: Linking socket {from_socket.name} to {node_data.name}:{to_socket.name}"
                         )
                         tree.links.new(from_socket, to_socket)
 

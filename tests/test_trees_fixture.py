@@ -14,6 +14,7 @@ test_tree_names = [
     "test_nodeframe",
     "test_reroute",
     "test_subgroups",
+    "test_multi_input_order",
 ]
 other_tree_names = [
     "test_nested_menu-menu_switch_1",

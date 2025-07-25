@@ -62,13 +62,13 @@ class NodeData(Data):
             socket_data.to_dict()
             for socket_data in self.inputs
             if "default_value" in socket_data.to_dict()
-            or "to_socket_index" in socket_data.to_dict()
+            or "from_socket_index" in socket_data.to_dict()
         ]
         outputs = [
             socket_data.to_dict()
             for socket_data in self.outputs
             if "default_value" in socket_data.to_dict()
-            or "to_socket_index" in socket_data.to_dict()
+            or "from_socket_index" in socket_data.to_dict()
         ]
         return {
             **attributes.to_dict(self.attributes, self.defaults),
@@ -86,24 +86,25 @@ class NodeData(Data):
 
     def set_socket_attributes(self) -> None:
         for socket_data in self.inputs:
-            log.debug(
-                f"Setting attributes on input socket {self.node.inputs[socket_data.index].name}"
-            )
-            attributes.set_on_element(
-                self.node.inputs[socket_data.index],
-                socket_data.attributes,
-                socket_data.defaults,
-            )
+            if len(socket_data.attributes) > 0:
+                log.debug(
+                    f"Setting attributes on input socket {self.node.inputs[socket_data.index].name}"
+                )
+                attributes.set_on_element(
+                    self.node.inputs[socket_data.index],
+                    socket_data.attributes,
+                    socket_data.defaults,
+                )
         for socket_data in self.outputs:
-            log.debug(
-                f"Setting attributes on output socket {self.node.outputs[socket_data.index].name}"
-            )
-
-            attributes.set_on_element(
-                self.node.outputs[socket_data.index],
-                socket_data.attributes,
-                socket_data.defaults,
-            )
+            if len(socket_data.attributes) > 0:
+                log.debug(
+                    f"Setting attributes on output socket {self.node.outputs[socket_data.index].name}"
+                )
+                attributes.set_on_element(
+                    self.node.outputs[socket_data.index],
+                    socket_data.attributes,
+                    socket_data.defaults,
+                )
 
 
 class SocketData(Data):
@@ -113,30 +114,30 @@ class SocketData(Data):
         attributes: dict[str, Any],
         defaults: dict[str, Any],
         index: int,
-        to_socket_index: list[int],
-        to_node: list[str],
+        from_socket_index: list[int],
+        from_node: list[str],
     ) -> None:
         super().__init__(attributes, defaults)
-        self.to_socket_index = to_socket_index
-        self.to_node = to_node
+        self.from_socket_index = from_socket_index
+        self.from_node = from_node
         self.index = index
 
     @classmethod
     def from_socket(cls, socket: NodeSocket) -> "SocketData":
-        to_socket_index = []
-        to_node = []
+        from_socket_index = []
+        from_node = []
         for link in socket.links:
             if (
-                link.from_socket == socket
-                and link.to_node.bl_idname not in EXCLUDED_NODE_TYPES
+                link.to_socket == socket
+                and link.from_node.bl_idname not in EXCLUDED_NODE_TYPES
             ):
-                to_socket_index.append(link.to_socket[config.JSON_KEY_INDEX])
-                to_node.append(link.to_node.name)
+                from_socket_index.append(link.from_socket[config.JSON_KEY_INDEX])
+                from_node.append(link.from_node.name)
 
         defaults = attributes.defaults_for(socket.bl_idname)
         return cls(
-            to_socket_index=to_socket_index,
-            to_node=to_node,
+            from_socket_index=from_socket_index,
+            from_node=from_node,
             index=socket[config.JSON_KEY_INDEX],
             attributes=attributes.from_element(socket, defaults),
             defaults=defaults,
@@ -148,8 +149,8 @@ class SocketData(Data):
         return cls(
             attributes=attributes.from_dict(socket_dict, defaults),
             defaults=defaults,
-            to_socket_index=socket_dict.get("to_socket_index", []),
-            to_node=socket_dict.get("to_node", []),
+            from_socket_index=socket_dict.get("from_socket_index", []),
+            from_node=socket_dict.get("from_node", []),
             index=socket_dict[config.JSON_KEY_INDEX],
         )
 
@@ -157,10 +158,10 @@ class SocketData(Data):
         return {
             **attributes.to_dict(self.attributes, self.defaults),
             **(
-                {"to_socket_index": self.to_socket_index}
-                if self.to_socket_index
+                {"from_socket_index": self.from_socket_index}
+                if self.from_socket_index
                 else {}
             ),
-            **({"to_node": self.to_node} if self.to_node else {}),
+            **({"from_node": self.from_node} if self.from_node else {}),
             config.JSON_KEY_INDEX: self.index,
         }

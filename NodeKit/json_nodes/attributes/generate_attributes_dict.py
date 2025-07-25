@@ -68,7 +68,7 @@ def _prop_default(cls_name: str, prop: bpy.types.Property) -> Any:
     return getattr(prop, "default", None)
 
 
-def attributes_for(
+def _attributes_for(
     cls: type, base_class: type | None, exclude_keywords
 ) -> dict[str, Any]:
     base_attributes = (
@@ -82,7 +82,7 @@ def attributes_for(
     }
 
 
-def attributes_dict_for(
+def _attributes_dict_for(
     curr_class: type,
     params: dict[str, Any] = {},
     base_class: type | None = None,
@@ -92,7 +92,7 @@ def attributes_dict_for(
     )
     attributes = params.get(
         "attributes",
-        attributes_for(
+        _attributes_for(
             cls=curr_class,
             base_class=base_class,
             exclude_keywords=params.get("exclude_attribute_keywords", []),
@@ -100,7 +100,7 @@ def attributes_dict_for(
     )
     if params.get("find_subtypes", False):
         subtypes = {
-            cls_name: attributes_dict_for(
+            cls_name: _attributes_dict_for(
                 cls,
                 base_class=curr_class,
                 params=params.get("subtype_params", {}),
@@ -110,7 +110,7 @@ def attributes_dict_for(
         }
     else:
         subtypes = {
-            cls.__name__: attributes_dict_for(cls, params=p, base_class=curr_class)
+            cls.__name__: _attributes_dict_for(cls, params=p, base_class=curr_class)
             for cls, p in params.get("subtypes", {}).items()
         }
 
@@ -123,7 +123,7 @@ def generate_attributes_dict() -> dict[str, Any]:
         "Element": [
             {},
             {
-                cls.__name__: attributes_dict_for(curr_class=cls, params=params)
+                cls.__name__: _attributes_dict_for(curr_class=cls, params=params)
                 for cls, params in classes.items()
             },
         ]

@@ -189,9 +189,9 @@ def set_on_element(
             )
             and attr_name not in IGNORE_SET_ATTRIBUTES
         ):
-            log.debug(
-                f"Setting attribute '{attr_name}' of type '{attr_type}' on element '{element.name}'"
-            )
+            # log.debug(
+            #     f"Setting attribute '{attr_name}' of type '{attr_type}' on element '{element.name}'"
+            # )
             setter = SETTER[attr_type]
             try:
                 setter(element, attr_name, value)
