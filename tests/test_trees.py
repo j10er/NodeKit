@@ -135,3 +135,13 @@ def test_index_switch(fixture_test_trees):
     assert (
         len(index_switch.index_switch_items) == 3
     ), "Index Switch should have three options"
+
+
+def test_compare_node(fixture_test_trees):
+    """Test the compare node."""
+    tree = bpy.data.node_groups.get("test_compare_node")
+    compare_node = tree.nodes.get("Compare")
+    assert compare_node is not None, "Compare node should exist"
+    assert (
+        compare_node.operation == "LESS_THAN"
+    ), "Compare node should use LESS_THAN operation"

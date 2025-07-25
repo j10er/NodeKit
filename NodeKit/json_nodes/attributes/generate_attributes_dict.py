@@ -44,18 +44,27 @@ def _prop_type(cls: type, prop: bpy.types.Property) -> str:
             return prop.type
 
 
-def _prop_default(prop: bpy.types.Property) -> Any:
-    if prop.type == "FLOAT":
-        if prop.identifier == "min_value":
-            return -3.4028234663852886e38
-        elif prop.identifier == "max_value":
-            return -3.4028234663852886e38
-    elif prop.type == "INT":
-        if prop.identifier == "min_value":
-            return -2147483648
-        elif prop.identifier == "max_value":
-            return 2147483647
-
+def _prop_default(cls_name: str, prop: bpy.types.Property) -> Any:
+    DEFAULT_VALUE_MAPPINGS = {
+        "NodeTreeInterfaceSocketFloat": {
+            "min_value": -3.4028234663852886e38,
+            "max_value": 3.4028234663852886e38,
+        },
+        "NodeTreeInterfaceSocketInt": {
+            "min_value": -2147483648,
+            "max_value": 2147483647,
+        },
+        "FunctionNodeCompare": {
+            "operation": "GREATER_THAN",
+        },
+    }
+    if cls_name in DEFAULT_VALUE_MAPPINGS:
+        if [
+            True
+            for key in DEFAULT_VALUE_MAPPINGS[cls_name]
+            if prop.identifier.startswith(key)
+        ]:
+            return DEFAULT_VALUE_MAPPINGS[cls_name][prop.identifier]
     return getattr(prop, "default", None)
 
 
@@ -66,7 +75,7 @@ def attributes_for(
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
-        prop.identifier: [_prop_type(cls, prop), _prop_default(prop)]
+        prop.identifier: [_prop_type(cls, prop), _prop_default(cls.__name__, prop)]
         for prop in cls.bl_rna.properties
         if prop.identifier not in base_attributes
         and not [True for keyword in exclude_keywords if keyword in prop.identifier]

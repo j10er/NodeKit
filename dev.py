@@ -13,6 +13,7 @@ addon_name = "NodeKit"
 
 
 def build():
+
     source_dir = f"./{addon_name}"
     filename = addon_name
     config_path = f"{source_dir}/config.py"

@@ -58,6 +58,7 @@ class NODEKIT_OT_ExportJSON(bpy.types.Operator):
             or file.folder_is_empty(
                 bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
             )
+            or True
         )
 
     def execute(self, context):
