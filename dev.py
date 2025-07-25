@@ -3,6 +3,10 @@ import argparse
 import os
 import shutil
 import subprocess
+import logging
+
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 
 # Should match the addon name in blender_manifest.toml
 addon_name = "NodeKit"
@@ -16,7 +20,7 @@ def build():
     with open(config_path, "a") as file:
         file.write(f"{debug_line}")
     build_version = "4.5.0"
-    print(f"Building addon: Using blender version {build_version} to build")
+    log.info(f"Building addon: Using blender version {build_version} to build")
 
     _setup_blender("./blender", build_version)
     subprocess.run(
@@ -41,6 +45,7 @@ def build():
 
 
 def _run_tests(blender_executable):
+    # Install addon
     subprocess.run(
         [
             blender_executable,
@@ -53,6 +58,7 @@ def _run_tests(blender_executable):
             f"{addon_name}.zip",
         ]
     )
+    # Run tests
     result = subprocess.run(
         [
             blender_executable,
@@ -65,7 +71,7 @@ def _run_tests(blender_executable):
     )
     if result.returncode != 0:
         raise Exception("Tests failed")
-    print("Tests passed")
+    log.info("Tests passed")
 
 
 def _setup_blender(blender_path, version):
@@ -73,7 +79,7 @@ def _setup_blender(blender_path, version):
     if not os.path.exists(blender_path):
         os.makedirs(blender_path)
     if not os.path.exists(f"{blender_path}/blender-{version}"):
-        print(f"Downloading Blender {version}.")
+        log.info(f"Downloading Blender {version}.")
 
         subprocess.run(
             [
@@ -88,7 +94,9 @@ def _setup_blender(blender_path, version):
         os.remove(f"blender-{version}-linux-x64.tar.xz")
         os.mkdir(f"{blender_path}/blender-{version}/portable")
     else:
-        print(f"Blender {version} already downloaded. Resetting existing installation.")
+        log.info(
+            f"Blender {version} already downloaded. Resetting existing installation."
+        )
         shutil.rmtree(f"{blender_path}/blender-{version}/portable")
         os.mkdir(f"{blender_path}/blender-{version}/portable")
 
@@ -107,7 +115,7 @@ def test():
 
         _setup_blender(blender_path, version)
         _install_test_deps(blender_path, version)
-        print(f"Running tests for Blender version {version}")
+        log.info(f"Running tests for Blender version {version}")
         _run_tests(blender_executable=f"{blender_path}/blender-{version}/blender")
 
 
@@ -136,4 +144,4 @@ elif args.command == "test":
         build()
     test()
 else:
-    parser.print_help()
+    parser.log.info_help()
