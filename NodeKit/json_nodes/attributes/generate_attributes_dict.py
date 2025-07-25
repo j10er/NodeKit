@@ -57,6 +57,9 @@ def _prop_default(cls_name: str, prop: bpy.types.Property) -> Any:
         "FunctionNodeCompare": {
             "operation": "GREATER_THAN",
         },
+        "GeometryNodeMeshBoolean": {
+            "operation": "DIFFERENCE",
+        },
     }
     if cls_name in DEFAULT_VALUE_MAPPINGS:
         if [
