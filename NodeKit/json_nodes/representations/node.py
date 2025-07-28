@@ -106,6 +106,24 @@ class NodeData(Data):
                     socket_data.defaults,
                 )
 
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, self.__class__):
+            log.error(
+                f"Cannot compare {self.__class__.__name__} with {value.__class__.__name__}"
+            )
+            return False
+        if not super().__eq__(value):
+            log.error(f"Node attributes are not equal: {self.name} != {value.name}")
+        if not self.inputs == value.inputs:
+            log.error(f"Node inputs of nodes {self.name}, {value.name} are not equal")
+        if not self.outputs == value.outputs:
+            log.error(f"Node outputs of nodes {self.name}, {value.name} are not equal")
+        return (
+            super().__eq__(value)
+            and self.inputs == value.inputs
+            and self.outputs == value.outputs
+        )
+
 
 class SocketData(Data):
 
@@ -165,3 +183,24 @@ class SocketData(Data):
             **({"from_node": self.from_node} if self.from_node else {}),
             config.JSON_KEY_INDEX: self.index,
         }
+
+    def __eq__(self, value: object) -> bool:
+        if not super().__eq__(value):
+            log.debug(f"SocketData attributes are not equal for : {self.index}")
+        if not self.index == value.index:
+            log.debug(f"SocketData index is not equal: {self.index} != {value.index}")
+        if not self.from_socket_index == value.from_socket_index:
+            log.debug(
+                f"SocketData from_socket_index is not equal: {self.from_socket_index} != {value.from_socket_index}"
+            )
+        if not self.from_node == value.from_node:
+            log.debug(
+                f"SocketData from_node is not equal: {self.from_node} != {value.from_node}"
+            )
+
+        return (
+            super().__eq__(value)
+            and self.index == value.index
+            and self.from_socket_index == value.from_socket_index
+            and self.from_node == value.from_node
+        )

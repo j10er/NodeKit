@@ -30,6 +30,9 @@ class InterfaceItemData(Data):
             case "PANEL":
                 return InterfacePanelData.from_panel_dict(item_dict)
 
+    def __eq__(self, value):
+        return super().__eq__(value)
+
 
 class InterfaceSocketData(InterfaceItemData):
 
@@ -94,6 +97,16 @@ class InterfaceSocketData(InterfaceItemData):
             attributes=self.attributes,
             defaults=self.defaults,
         )
+
+    def __eq__(self, value: object) -> bool:
+        equal = (
+            super().__eq__(value)
+            and self.parent_index == value.parent_index
+            and self.bl_idname == value.bl_idname
+        )
+        if not equal:
+            log.debug(f"InterfaceSocketData __eq__ failed: {self.name} != {value.name}")
+        return equal
 
 
 class InterfacePanelData(InterfaceItemData):

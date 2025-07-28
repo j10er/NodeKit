@@ -1,7 +1,7 @@
 import bpy
 from .json_nodes.import_export import export_to, import_from
 from .json_nodes.attributes import generate_attributes_dict
-from .json_nodes import file
+from .json_nodes import file, compare
 from . import config
 import os
 
@@ -117,4 +117,13 @@ class NODEKIT_OT_GenerateDefaultValues(bpy.types.Operator):
 
     def execute(self, context):
         attributes = generate_attributes_dict.generate_attributes_dict()
+        return {"FINISHED"}
+
+
+class NODEKIT_OT_TestConversion(bpy.types.Operator):
+    bl_idname = "nodekit.test_conversion"
+    bl_label = "Test Conversion"
+
+    def execute(self, context):
+        compare.test_conversion()
         return {"FINISHED"}

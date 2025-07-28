@@ -23,6 +23,7 @@ classes = [
     operators.NODEKIT_OT_AppendJSON,
     operators.NODEKIT_OT_Surprise,
     operators.NODEKIT_OT_GenerateDefaultValues,
+    operators.NODEKIT_OT_TestConversion,
     ui.NODEKIT_PT_MainPanel,
 ]
 

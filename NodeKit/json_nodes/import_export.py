@@ -82,7 +82,7 @@ def import_from(folder_path: str, append: bool, include_assets: bool):
         for data_dict in data_dicts
     }
 
-    _handle_existing_trees(tree_datas, append)
+    _setup_existing_trees(tree_datas, append)
 
     if not tree_datas:
         return "No groups imported, all groups already exist."
@@ -92,7 +92,7 @@ def import_from(folder_path: str, append: bool, include_assets: bool):
     return f"Imported {len(tree_datas)} node group{'s' if len(tree_datas) != 1 else ''} from {folder_path}."
 
 
-def _handle_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool):
+def _setup_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool):
     for tree in bpy.data.node_groups:
         if append:
             if tree.get("uuid") in tree_datas:
