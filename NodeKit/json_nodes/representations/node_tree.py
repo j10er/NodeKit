@@ -40,7 +40,7 @@ class NodeTreeData(Data):
             uuid=tree["uuid"],
             nodes={
                 node.name: NodeData.from_node(node)
-                for node in tree.nodes
+                for node in sorted(tree.nodes, key=lambda node: node.location[0])
                 if node.bl_idname not in EXCLUDED_NODE_TYPES
             },
             interface_items=[
