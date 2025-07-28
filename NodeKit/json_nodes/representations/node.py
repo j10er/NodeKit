@@ -13,6 +13,7 @@ EXCLUDED_NODE_TYPES = ["GeometryNodeViewer"]
 
 
 class NodeData(Data):
+    base_class_name = "Node"
 
     def __init__(
         self,
@@ -28,7 +29,7 @@ class NodeData(Data):
     @classmethod
     def from_node(cls, node: Node) -> "NodeData":
         defaults = attributes.defaults_for(
-            base_class="Node", subtype_class=node.bl_idname
+            base_class_name=cls.base_class_name, class_name=node.bl_idname
         )
         return cls(
             attributes=attributes.from_element(node, defaults),
@@ -48,7 +49,7 @@ class NodeData(Data):
     @classmethod
     def from_dict(cls, node_dict: dict[str, Any]) -> "NodeData":
         defaults = attributes.defaults_for(
-            base_class="Node", subtype_class=node_dict["bl_idname"]
+            base_class_name=cls.base_class_name, class_name=node_dict["bl_idname"]
         )
         return cls(
             attributes=attributes.from_dict(node_dict, defaults),
@@ -126,6 +127,7 @@ class NodeData(Data):
 
 
 class SocketData(Data):
+    base_class_name = "NodeSocket"
 
     def __init__(
         self,
@@ -152,7 +154,9 @@ class SocketData(Data):
                 from_socket_index.append(link.from_socket[config.JSON_KEY_INDEX])
                 from_node.append(link.from_node.name)
 
-        defaults = attributes.defaults_for(socket.bl_idname)
+        defaults = attributes.defaults_for(
+            base_class_name=cls.base_class_name, class_name=socket.bl_idname
+        )
         return cls(
             from_socket_index=from_socket_index,
             from_node=from_node,
@@ -163,7 +167,9 @@ class SocketData(Data):
 
     @classmethod
     def from_dict(cls, socket_dict: dict[str, Any]) -> "SocketData":
-        defaults = attributes.defaults_for(socket_dict["bl_idname"])
+        defaults = attributes.defaults_for(
+            base_class_name=cls.base_class_name, class_name=socket_dict["bl_idname"]
+        )
         return cls(
             attributes=attributes.from_dict(socket_dict, defaults),
             defaults=defaults,

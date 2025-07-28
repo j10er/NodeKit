@@ -2,7 +2,7 @@ import bpy
 from typing import Any, Callable
 from .attributes_dict import DEFAULTS
 from ... import config
-
+from collections import deque
 import logging
 from inspect import signature
 
@@ -37,6 +37,10 @@ ATTRIBUTE_TYPE_MAPPING = {
 }
 
 
+def _get_pointer(element: Any) -> str:
+    return element["uuid"] if element else None
+
+
 def _set_items(element, name, value):
     log.debug(f"Setting collection {name} on {element.name} with value: {value}")
     collection = getattr(element, name)
@@ -54,11 +58,7 @@ def _set_items(element, name, value):
                 collection.new(item_info[0], item_info[1])
 
 
-_none = lambda element, name, value: None
-
-
-def _get_pointer(element: Any) -> str:
-    return element["uuid"] if element else None
+_set_skip = lambda element, name, value: None
 
 
 def _set_pointer(collection_name: str) -> Callable[[Any, str, str], None]:
@@ -124,7 +124,7 @@ SETTER = {
     "MATERIAL": _set_pointer("materials"),
     "IMAGE": _set_pointer("images"),
     "COLLECTION": _set_pointer("collections"),
-    "NONE": _none,
+    "NONE": _set_skip,
     "ITEMS": _set_items,
 }
 
@@ -189,9 +189,6 @@ def set_on_element(
             )
             and attr_name not in IGNORE_SET_ATTRIBUTES
         ):
-            # log.debug(
-            #     f"Setting attribute '{attr_name}' of type '{attr_type}' on element '{element.name}'"
-            # )
             setter = SETTER[attr_type]
             try:
                 setter(element, attr_name, value)
@@ -204,40 +201,47 @@ def set_on_element(
 
 def find_class_path(
     target_name: str,
-    subtype: Any = DEFAULTS["Element"],
-    path: list[str] | None = None,
+    subtype: Any,
+    path: list[str] = [],
 ) -> list[str]:
-    if path is None:
-        path = []
 
-    for name, subtype_data in subtype[1].items() if len(subtype) > 1 else []:
-        if name == target_name:
-            return path + [name]
-        result = find_class_path(target_name, subtype_data, path + [name])
+    subtype_dict = subtype.get("subtypes", {})
+    if target_name in subtype_dict:
+        return path + [target_name]
+
+    # Prioritize classes that contain the target name
+    for name in subtype_dict:
+        if target_name.startswith(name):
+            return find_class_path(target_name, subtype_dict[name], path + [name])
+
+    # Otherwise, search recursively
+    for name in subtype_dict:
+        result = find_class_path(target_name, subtype_dict[name], path + [name])
         if result:
             return result
+
     return []
 
 
 def defaults_for(
-    subtype_class: str, base_class: str = "Element"
+    base_class_name: str, class_name: str = ""
 ) -> dict[str, tuple[str, Any]]:
-    class_path = find_class_path(subtype_class)
-    if not class_path:
-        class_path = find_class_path(base_class)
-    if not class_path:
-        print(f"Error: No class path found for {subtype_class} or {base_class}")
-        return {}
-    current_subtype = DEFAULTS["Element"]
+
+    if class_name == "":
+        class_path = []
+    else:
+        class_path = find_class_path(
+            target_name=class_name, subtype=DEFAULTS[base_class_name]
+        )
+
+        if not class_path:
+            log.error(f"Error: No class path found for {class_name}")
+            return {}
+
     defaults = {}
-
-    defaults.update(current_subtype[0])
-
+    subtype_dict = DEFAULTS[base_class_name]
+    defaults.update(subtype_dict.get("attributes", {}))
     for subtype_name in class_path:
-        if len(current_subtype) < 2 or subtype_name not in current_subtype[1]:
-            print(f"Error: Subtype '{subtype_name}' not found in current path")
-            break
-        current_subtype = current_subtype[1][subtype_name]
-        if len(current_subtype) > 0:
-            defaults.update(current_subtype[0])
+        subtype_dict = subtype_dict["subtypes"].get(subtype_name, {})
+        defaults.update(subtype_dict.get("attributes", {}))
     return defaults

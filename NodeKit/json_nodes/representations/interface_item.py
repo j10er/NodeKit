@@ -36,6 +36,8 @@ class InterfaceItemData(Data):
 
 class InterfaceSocketData(InterfaceItemData):
 
+    base_class_name = "NodeTreeInterfaceSocket"
+
     def __init__(
         self,
         attributes: dict[str, Any],
@@ -50,7 +52,9 @@ class InterfaceSocketData(InterfaceItemData):
     @classmethod
     def from_socket(cls, socket: NodeTreeInterfaceSocket) -> "InterfaceSocketData":
         bl_idname = socket.__class__.__name__
-        defaults = attributes.defaults_for(bl_idname)
+        defaults = attributes.defaults_for(
+            base_class_name=cls.base_class_name, class_name=bl_idname
+        )
         return cls(
             attributes=attributes.from_element(
                 socket,
@@ -63,7 +67,9 @@ class InterfaceSocketData(InterfaceItemData):
 
     @classmethod
     def from_socket_dict(cls, socket_dict: dict[str, Any]) -> "InterfaceSocketData":
-        defaults = attributes.defaults_for(socket_dict["bl_idname"])
+        defaults = attributes.defaults_for(
+            base_class_name=cls.base_class_name, class_name=socket_dict["bl_idname"]
+        )
         return cls(
             attributes=attributes.from_dict(socket_dict, defaults),
             defaults=defaults,
@@ -110,6 +116,7 @@ class InterfaceSocketData(InterfaceItemData):
 
 
 class InterfacePanelData(InterfaceItemData):
+    base_class_name = "NodeTreeInterfacePanel"
 
     def __init__(
         self,
@@ -122,7 +129,7 @@ class InterfacePanelData(InterfaceItemData):
 
     @classmethod
     def from_panel(cls, panel: NodeTreeInterfacePanel) -> "InterfacePanelData":
-        defaults = attributes.defaults_for("NodeTreeInterfacePanel")
+        defaults = attributes.defaults_for(base_class_name=cls.base_class_name)
         return cls(
             attributes=attributes.from_element(
                 panel,
@@ -134,7 +141,7 @@ class InterfacePanelData(InterfaceItemData):
 
     @classmethod
     def from_panel_dict(cls, panel_dict: dict[str, Any]) -> "InterfacePanelData":
-        defaults = attributes.defaults_for("NodeTreeInterfacePanel")
+        defaults = attributes.defaults_for(base_class_name=cls.base_class_name)
         return cls(
             attributes=attributes.from_dict(panel_dict, defaults),
             defaults=defaults,

@@ -107,7 +107,9 @@ class NODEKIT_OT_Surprise(bpy.types.Operator):
     bl_label = "Surprise"
 
     def execute(self, context):
-        print(__package__.split(".")[-1])
+        import cProfile
+
+        cProfile.run("bpy.ops.nodekit.export_json()")
         return {"FINISHED"}
 
 

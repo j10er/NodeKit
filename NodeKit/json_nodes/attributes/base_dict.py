@@ -1,6 +1,6 @@
 import bpy
 
-classes = {
+CLASSES = {
     bpy.types.Node: {
         "attributes": {
             "color": [
@@ -20,30 +20,56 @@ classes = {
         },
         "subtypes": {
             bpy.types.NodeInternal: {
-                "attributes": {},
+                "attributes": {
+                    "color": [
+                        "LIST",
+                        [0.6079999804496765, 0.6079999804496765, 0.6079999804496765],
+                    ],
+                    "height": ["FLOAT", 100],
+                    "label": ["STRING", ""],
+                    "location": ["LIST", [0, 0]],
+                    "mute": ["BOOLEAN", False],
+                    "name": ["STRING", ""],
+                    "use_custom_color": ["BOOLEAN", False],
+                    "warning_propagation": ["STRING", "ALL"],
+                    "width": ["FLOAT", 140],
+                    "bl_idname": ["STRING", ""],
+                    "parent": ["NODE", None],
+                },
                 "subtypes": {
-                    bpy.types.GeometryNode: {
+                    bpy.types.CompositorNode: {
                         "attributes": {},
                         "find_subtypes": True,
-                        "subtype_params": {"exclude_attribute_keywords": ["active"]},
                     },
                     bpy.types.FunctionNode: {
                         "attributes": {},
                         "find_subtypes": True,
                     },
-                    bpy.types.ShaderNode: {
+                    bpy.types.GeometryNode: {
                         "attributes": {},
                         "find_subtypes": True,
-                    },
-                    bpy.types.CompositorNode: {
-                        "attributes": {},
-                        "find_subtypes": True,
+                        "subtype_params": {"exclude_attribute_keywords": ["active"]},
                     },
                     bpy.types.NodeFrame: {
                         "attributes": {
                             "label_size": ["INT", 12],
                             "shrink": ["BOOLEAN", True],
                         }
+                    },
+                    bpy.types.NodeGroupInput: {
+                        "attributes": {},
+                    },
+                    bpy.types.NodeGroupOutput: {
+                        "attributes": {},
+                    },
+                    bpy.types.NodeReroute: {"attributes": {}},
+                    bpy.types.ShaderNode: {
+                        "attributes": {},
+                        "find_subtypes": True,
+                    },
+                    bpy.types.TextureNode: {
+                        "attributes": {},
+                        "find_subtypes": True,
                     },
                 },
             },
@@ -66,32 +92,29 @@ classes = {
             }
         },
     },
-    bpy.types.NodeTreeInterfaceItem: {
+    bpy.types.NodeTreeInterfacePanel: {
+        "attributes": {
+            "default_closed": ["BOOLEAN", False],
+            "item_type": ["STRING", "SOCKET"],
+            "name": ["STRING", ""],
+            "description": ["STRING", ""],
+        }
+    },
+    bpy.types.NodeTreeInterfaceSocket: {
         "attributes": {
             "item_type": ["STRING", "SOCKET"],
             "name": ["STRING", ""],
             "description": ["STRING", ""],
+            "attribute_domain": ["STRING", "POINT"],
+            "default_attribute_name": ["STRING", ""],
+            "description": ["STRING", ""],
+            "force_non_field": ["BOOLEAN", False],
+            "hide_in_modifier": ["BOOLEAN", False],
+            "hide_value": ["BOOLEAN", False],
+            "socket_type": ["STRING", "DEFAULT"],
+            "in_out": ["STRING", "INPUT"],
         },
-        "subtypes": {
-            bpy.types.NodeTreeInterfacePanel: {
-                "attributes": {
-                    "default_closed": ["BOOLEAN", False],
-                }
-            },
-            bpy.types.NodeTreeInterfaceSocket: {
-                "attributes": {
-                    "attribute_domain": ["STRING", "POINT"],
-                    "default_attribute_name": ["STRING", ""],
-                    "description": ["STRING", ""],
-                    "force_non_field": ["BOOLEAN", False],
-                    "hide_in_modifier": ["BOOLEAN", False],
-                    "hide_value": ["BOOLEAN", False],
-                    "socket_type": ["STRING", "DEFAULT"],
-                    "in_out": ["STRING", "INPUT"],
-                },
-                "find_subtypes": True,
-            },
-        },
+        "find_subtypes": True,
     },
     bpy.types.NodeSocket: {
         "attributes": {
@@ -100,7 +123,7 @@ classes = {
         "subtypes": {
             bpy.types.NodeSocketStandard: {
                 "find_subtypes": True,
-            }
+            },
         },
     },
 }

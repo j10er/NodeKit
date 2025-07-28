@@ -40,7 +40,6 @@ def export_to(folder_path: str, include_assets: bool):
         if tree.bl_idname not in config.SUPPORTED_TREE_TYPES:
             continue
 
-        log.info(f"Processing node group: {tree.name}")
         tree_data = NodeTreeData.from_tree(tree)
         tree_dict = tree_data.to_dict()
 

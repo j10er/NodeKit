@@ -1,7 +1,7 @@
 import bpy
 from typing import Any
 from pprint import pprint
-from .base_dict import classes
+from .base_dict import CLASSES
 import os
 import logging
 import inspect
@@ -117,19 +117,18 @@ def _attributes_dict_for(
             for cls, p in params.get("subtypes", {}).items()
         }
 
-    return [attributes, subtypes] if subtypes else [attributes]
+    return (
+        {"attributes": attributes, "subtypes": subtypes}
+        if subtypes
+        else {"attributes": attributes}
+    )
 
 
 def generate_attributes_dict() -> dict[str, Any]:
     log.info("Generating attributes dictionary...")
     attributes = {
-        "Element": [
-            {},
-            {
-                cls.__name__: _attributes_dict_for(curr_class=cls, params=params)
-                for cls, params in classes.items()
-            },
-        ]
+        cls.__name__: _attributes_dict_for(curr_class=cls, params=params)
+        for cls, params in CLASSES.items()
     }
 
     file_path = os.path.join(os.path.dirname(__file__), "attributes_dict.py")

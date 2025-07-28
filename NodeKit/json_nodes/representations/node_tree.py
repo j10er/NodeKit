@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 
 
 class NodeTreeData(Data):
+    base_class_name = "NodeTree"
 
     def __init__(
         self,
@@ -29,11 +30,10 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
-        log.info(
-            f"Creating NodeTreeData from tree: {tree.name} with UUID: {tree['uuid']}..."
-        )
 
-        defaults = attributes.defaults_for(tree.bl_idname)
+        defaults = attributes.defaults_for(
+            base_class_name=cls.base_class_name, class_name=tree.bl_idname
+        )
         return cls(
             attributes=attributes.from_element(tree, defaults),
             defaults=defaults,
@@ -53,7 +53,9 @@ class NodeTreeData(Data):
     @classmethod
     def from_dict(cls, tree_dict: dict[str, Any]) -> "NodeTreeData":
         log.debug(f"{tree_dict['name']}: Creating NodeTreeData from dict...")
-        defaults = attributes.defaults_for(tree_dict["bl_idname"])
+        defaults = attributes.defaults_for(
+            base_class_name=cls.base_class_name, class_name=tree_dict["bl_idname"]
+        )
         return cls(
             attributes=attributes.from_dict(tree_dict, defaults),
             defaults=defaults,
@@ -81,6 +83,17 @@ class NodeTreeData(Data):
             ],
         }
 
+    def _reset_tree(self):
+        log.info(f"Resetting existing node tree '{self.name}' with UUID {self.uuid}")
+
+        for node in self.tree.nodes:
+            self.tree.nodes.remove(node)
+        self.tree.interface.clear()
+        self.tree.bl_icon = "NODETREE"
+        self.tree.bl_label = ""
+        self.tree.color_tag = "NONE"
+        self.tree.description = ""
+
     def create_tree_hull(self) -> NodeTree:
         try:
             if [
@@ -88,37 +101,29 @@ class NodeTreeData(Data):
                 for tree in bpy.data.node_groups.values()
                 if tree.get("uuid", "") == self.uuid
             ]:
-                log.info(
-                    f"Resetting existing node tree '{self.name}' with UUID {self.uuid}"
-                )
-                tree = bpy.data.node_groups[self.name]
-                for node in tree.nodes:
-                    tree.nodes.remove(node)
-                tree.interface.clear()
-                tree.bl_icon = "NODETREE"
-                tree.bl_label = ""
-                tree.color_tag = "NONE"
-                tree.description = ""
-
+                self.tree = bpy.data.node_groups[self.name]
+                self._reset_tree()
             else:
                 log.debug(f"{self.name}: Creating new node tree")
-                tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
-            self.tree = tree
-            tree["uuid"] = self.uuid
-            attributes.set_on_element(tree, self.attributes, self.defaults)
+                self.tree = bpy.data.node_groups.new(
+                    name=self.name, type=self.bl_idname
+                )
+            self.tree = self.tree
+            self.tree["uuid"] = self.uuid
+            attributes.set_on_element(self.tree, self.attributes, self.defaults)
             for item_data in self.interface_items:
                 log.debug(f"{self.name}: Creating interface item {item_data.name}")
-                item = item_data.to_item(tree.interface)
+                item = item_data.to_item(self.tree.interface)
             log.debug(
-                f"{self.name}: Created {len(tree.interface.items_tree)} interface items"
+                f"{self.name}: Created {len(self.tree.interface.items_tree)} interface items"
             )
         except Exception as e:
-            if tree:
-                return tree
-                bpy.data.node_groups.remove(tree, do_unlink=True)
+            if self.tree:
+                return self.tree
+                bpy.data.node_groups.remove(self.tree, do_unlink=True)
             log.error(f"{self.name}: Error creating tree hull: {e}")
             raise e
-        return tree
+        return self.tree
 
     def add_nodes(self):
         log.debug("=" * 40)
