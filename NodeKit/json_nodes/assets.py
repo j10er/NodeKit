@@ -14,7 +14,7 @@ def export_to(folder_path: str) -> None:
     assets = _collect_assets()
     for asset_type in assets:
         for asset in assets[asset_type]:
-            if not hasattr(asset, "uuid"):
+            if not asset.get("uuid"):
                 asset["uuid"] = str(uuid.uuid4())
     log.debug(
         f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export."
