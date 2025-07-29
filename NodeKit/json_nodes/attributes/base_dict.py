@@ -14,39 +14,29 @@ CLASSES = {
             "name": ["STRING", ""],
             "use_custom_color": ["BOOLEAN", False],
             "warning_propagation": ["STRING", "ALL"],
-            "width": ["FLOAT", 140],
             "bl_idname": ["STRING", ""],
             "parent": ["NODE", None],
         },
         "subtypes": {
             bpy.types.NodeInternal: {
-                "attributes": {
-                    "color": [
-                        "LIST",
-                        [0.6079999804496765, 0.6079999804496765, 0.6079999804496765],
-                    ],
-                    "height": ["FLOAT", 100],
-                    "label": ["STRING", ""],
-                    "location": ["LIST", [0, 0]],
-                    "mute": ["BOOLEAN", False],
-                    "name": ["STRING", ""],
-                    "use_custom_color": ["BOOLEAN", False],
-                    "warning_propagation": ["STRING", "ALL"],
-                    "width": ["FLOAT", 140],
-                    "bl_idname": ["STRING", ""],
-                    "parent": ["NODE", None],
-                },
+                "attributes": {},
                 "subtypes": {
                     bpy.types.CompositorNode: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                         "find_subtypes": True,
                     },
                     bpy.types.FunctionNode: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                         "find_subtypes": True,
                     },
                     bpy.types.GeometryNode: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                         "find_subtypes": True,
                         "subtype_params": {"exclude_attribute_keywords": ["active"]},
                     },
@@ -54,21 +44,30 @@ CLASSES = {
                         "attributes": {
                             "label_size": ["INT", 12],
                             "shrink": ["BOOLEAN", True],
+                            "width": ["FLOAT", -1],
                         }
                     },
                     bpy.types.NodeGroupInput: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                     },
                     bpy.types.NodeGroupOutput: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                     },
                     bpy.types.NodeReroute: {"attributes": {}},
                     bpy.types.ShaderNode: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                         "find_subtypes": True,
                     },
                     bpy.types.TextureNode: {
-                        "attributes": {},
+                        "attributes": {
+                            "width": ["FLOAT", 140],
+                        },
                         "find_subtypes": True,
                     },
                 },
@@ -82,6 +81,7 @@ CLASSES = {
             "default_group_node_width": ["INT", 140],
             "description": ["STRING", ""],
             "bl_idname": ["STRING", ""],
+            "view_center": ["LIST", [0.0, 0.0]],
         },
         "subtypes": {
             bpy.types.GeometryNodeTree: {
