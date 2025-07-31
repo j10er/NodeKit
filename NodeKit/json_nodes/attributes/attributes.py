@@ -229,10 +229,10 @@ def types_for(base_class_name: str, class_name: str = "") -> dict[str, tuple[str
             log.error(f"Error: No class path found for {class_name}")
             return {}
 
-    defaults = {}
+    attribute_types = {}
     subtype_dict = ATTRIBUTES[base_class_name]
-    defaults.update(subtype_dict.get("attributes", {}))
+    attribute_types.update(subtype_dict.get("attributes", {}))
     for subtype_name in class_path:
         subtype_dict = subtype_dict["subtypes"].get(subtype_name, {})
-        defaults.update(subtype_dict.get("attributes", {}))
-    return defaults
+        attribute_types.update(subtype_dict.get("attributes", {}))
+    return attribute_types

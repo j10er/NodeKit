@@ -6,13 +6,13 @@ CLASSES = {
             "color": "LIST",
             "height": "FLOAT",
             "label": "STRING",
-            "location": "LIST",
+            "parent": "NODE",
+            "location_absolute": "LIST",
             "mute": "BOOLEAN",
             "name": "STRING",
             "use_custom_color": "BOOLEAN",
             "warning_propagation": "STRING",
             "bl_idname": "STRING",
-            "parent": "NODE",
         },
         "subtypes": {
             bpy.types.NodeInternal: {

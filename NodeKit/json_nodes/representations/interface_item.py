@@ -137,6 +137,7 @@ class InterfacePanelData(InterfaceItemData):
                 panel,
                 attribute_types,
             ),
+            attribute_types=attribute_types,
             items=[InterfaceItemData.from_item(item) for item in panel.interface_items],
         )
 

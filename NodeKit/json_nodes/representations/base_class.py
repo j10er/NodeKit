@@ -33,5 +33,5 @@ class Data:
                 )
         return (
             self.attributes == value.attributes
-            and self.attribute_types == value.defaults
+            and self.attribute_types == value.attribute_types
         )
