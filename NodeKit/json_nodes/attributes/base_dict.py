@@ -78,7 +78,6 @@ CLASSES = {
             "default_group_node_width": "INT",
             "description": "STRING",
             "bl_idname": "STRING",
-            "view_center": "LIST",
         },
         "subtypes": {
             bpy.types.GeometryNodeTree: {

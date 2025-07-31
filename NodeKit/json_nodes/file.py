@@ -48,12 +48,12 @@ def write_trees_to(folder_path: str, data_dicts: dict[str, dict[str, Any]]) -> N
                 folder_path, data_dict["tree_type"], data_dict["category"]
             )
             os.makedirs(directory, exist_ok=True)
-        filepath = os.path.join(directory, _filename_for(data_dict))
-        json.dump(
-            data_dict,
-            open(filepath, "w"),
-            indent=4,
-        )
+            filepath = os.path.join(directory, _filename_for(data_dict))
+            json.dump(
+                data_dict,
+                open(filepath, "w"),
+                indent=4,
+            )
 
     # Clean up empty folders
     for root, dirs, files in os.walk(folder_path, topdown=False):
