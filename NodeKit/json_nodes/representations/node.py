@@ -18,22 +18,22 @@ class NodeData(Data):
     def __init__(
         self,
         attributes: dict[str, Any],
-        defaults: dict[str, Any],
+        attribute_types: dict[str, Any],
         inputs: list["SocketData"],
         outputs: list["SocketData"],
     ) -> None:
-        super().__init__(attributes, defaults)
+        super().__init__(attributes, attribute_types)
         self.inputs = inputs
         self.outputs = outputs
 
     @classmethod
     def from_node(cls, node: Node) -> "NodeData":
-        defaults = attributes.defaults_for(
+        attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=node.bl_idname
         )
         return cls(
-            attributes=attributes.from_element(node, defaults),
-            defaults=defaults,
+            attributes=attributes.from_element(node, attribute_types),
+            attribute_types=attribute_types,
             inputs=[
                 SocketData.from_socket(input)
                 for input in node.inputs
@@ -48,12 +48,12 @@ class NodeData(Data):
 
     @classmethod
     def from_dict(cls, node_dict: dict[str, Any]) -> "NodeData":
-        defaults = attributes.defaults_for(
+        attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=node_dict["bl_idname"]
         )
         return cls(
-            attributes=attributes.from_dict(node_dict, defaults),
-            defaults=defaults,
+            attributes=attributes.from_dict(node_dict, attribute_types),
+            attribute_types=attribute_types,
             inputs=[SocketData.from_dict(s) for s in node_dict.get("inputs", [])],
             outputs=[SocketData.from_dict(s) for s in node_dict.get("outputs", [])],
         )
@@ -72,7 +72,7 @@ class NodeData(Data):
             or "from_socket_index" in socket_data.to_dict()
         ]
         return {
-            **attributes.to_dict(self.attributes, self.defaults),
+            **self.attributes,
             **({"inputs": inputs} if inputs else {}),
             **({"outputs": outputs} if outputs else {}),
         }
@@ -83,7 +83,7 @@ class NodeData(Data):
         return self.node
 
     def set_attributes(self) -> None:
-        attributes.set_on_element(self.node, self.attributes, self.defaults)
+        attributes.set_on_element(self.node, self.attributes, self.attribute_types)
 
     def set_socket_attributes(self) -> None:
         for socket_data in self.inputs:
@@ -94,7 +94,7 @@ class NodeData(Data):
                 attributes.set_on_element(
                     self.node.inputs[socket_data.index],
                     socket_data.attributes,
-                    socket_data.defaults,
+                    socket_data.attribute_types,
                 )
         for socket_data in self.outputs:
             if len(socket_data.attributes) > 0:
@@ -104,7 +104,7 @@ class NodeData(Data):
                 attributes.set_on_element(
                     self.node.outputs[socket_data.index],
                     socket_data.attributes,
-                    socket_data.defaults,
+                    socket_data.attribute_types,
                 )
 
     def __eq__(self, value: object) -> bool:
@@ -132,12 +132,12 @@ class SocketData(Data):
     def __init__(
         self,
         attributes: dict[str, Any],
-        defaults: dict[str, Any],
+        attribute_types: dict[str, Any],
         index: int,
         from_socket_index: list[int],
         from_node: list[str],
     ) -> None:
-        super().__init__(attributes, defaults)
+        super().__init__(attributes, attribute_types)
         self.from_socket_index = from_socket_index
         self.from_node = from_node
         self.index = index
@@ -154,25 +154,25 @@ class SocketData(Data):
                 from_socket_index.append(link.from_socket[config.JSON_KEY_INDEX])
                 from_node.append(link.from_node.name)
 
-        defaults = attributes.defaults_for(
+        attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=socket.bl_idname
         )
         return cls(
             from_socket_index=from_socket_index,
             from_node=from_node,
             index=socket[config.JSON_KEY_INDEX],
-            attributes=attributes.from_element(socket, defaults),
-            defaults=defaults,
+            attributes=attributes.from_element(socket, attribute_types),
+            attribute_types=attribute_types,
         )
 
     @classmethod
     def from_dict(cls, socket_dict: dict[str, Any]) -> "SocketData":
-        defaults = attributes.defaults_for(
+        attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=socket_dict["bl_idname"]
         )
         return cls(
-            attributes=attributes.from_dict(socket_dict, defaults),
-            defaults=defaults,
+            attributes=attributes.from_dict(socket_dict, attribute_types),
+            attribute_types=attribute_types,
             from_socket_index=socket_dict.get("from_socket_index", []),
             from_node=socket_dict.get("from_node", []),
             index=socket_dict[config.JSON_KEY_INDEX],
@@ -180,7 +180,7 @@ class SocketData(Data):
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            **attributes.to_dict(self.attributes, self.defaults),
+            **self.attributes,
             **(
                 {"from_socket_index": self.from_socket_index}
                 if self.from_socket_index

@@ -9,8 +9,10 @@ log = logging.getLogger(__name__)
 
 class InterfaceItemData(Data):
 
-    def __init__(self, attributes: dict[str, Any], defaults: dict[str, Any]) -> None:
-        super().__init__(attributes, defaults)
+    def __init__(
+        self, attributes: dict[str, Any], attribute_types: dict[str, Any]
+    ) -> None:
+        super().__init__(attributes, attribute_types)
 
     @classmethod
     def from_item(
@@ -41,45 +43,45 @@ class InterfaceSocketData(InterfaceItemData):
     def __init__(
         self,
         attributes: dict[str, Any],
-        defaults: dict[str, Any],
+        attribute_types: dict[str, Any],
         parent_index: int,
         bl_idname: str,
     ) -> None:
-        super().__init__(attributes, defaults)
+        super().__init__(attributes, attribute_types)
         self.parent_index = parent_index
         self.bl_idname = bl_idname
 
     @classmethod
     def from_socket(cls, socket: NodeTreeInterfaceSocket) -> "InterfaceSocketData":
         bl_idname = socket.__class__.__name__
-        defaults = attributes.defaults_for(
+        attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=bl_idname
         )
         return cls(
             attributes=attributes.from_element(
                 socket,
-                defaults,
+                attribute_types,
             ),
-            defaults=defaults,
+            attribute_types=attribute_types,
             parent_index=socket.parent.index,
             bl_idname=bl_idname,
         )
 
     @classmethod
     def from_socket_dict(cls, socket_dict: dict[str, Any]) -> "InterfaceSocketData":
-        defaults = attributes.defaults_for(
+        attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=socket_dict["bl_idname"]
         )
         return cls(
-            attributes=attributes.from_dict(socket_dict, defaults),
-            defaults=defaults,
+            attributes=attributes.from_dict(socket_dict, attribute_types),
+            attribute_types=attribute_types,
             parent_index=socket_dict.get("parent_index", -1),
             bl_idname=socket_dict["bl_idname"],
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            **attributes.to_dict(self.attributes, self.defaults),
+            **self.attributes,
             **({"parent_index": self.parent_index} if self.parent_index != -1 else {}),
             "bl_idname": self.bl_idname,
         }
@@ -101,7 +103,7 @@ class InterfaceSocketData(InterfaceItemData):
         return attributes.set_on_element(
             element=self.socket,
             attributes=self.attributes,
-            defaults=self.defaults,
+            attribute_types=self.attribute_types,
         )
 
     def __eq__(self, value: object) -> bool:
@@ -121,30 +123,29 @@ class InterfacePanelData(InterfaceItemData):
     def __init__(
         self,
         attributes: dict[str, Any],
-        defaults: dict[str, Any],
+        attribute_types: dict[str, Any],
         items: list[InterfaceItemData],
     ) -> None:
-        super().__init__(attributes, defaults)
+        super().__init__(attributes, attribute_types)
         self.items = items
 
     @classmethod
     def from_panel(cls, panel: NodeTreeInterfacePanel) -> "InterfacePanelData":
-        defaults = attributes.defaults_for(base_class_name=cls.base_class_name)
+        attribute_types = attributes.types_for(base_class_name=cls.base_class_name)
         return cls(
             attributes=attributes.from_element(
                 panel,
-                defaults,
+                attribute_types,
             ),
-            defaults=defaults,
             items=[InterfaceItemData.from_item(item) for item in panel.interface_items],
         )
 
     @classmethod
     def from_panel_dict(cls, panel_dict: dict[str, Any]) -> "InterfacePanelData":
-        defaults = attributes.defaults_for(base_class_name=cls.base_class_name)
+        attribute_types = attributes.types_for(base_class_name=cls.base_class_name)
         return cls(
-            attributes=attributes.from_dict(panel_dict, defaults),
-            defaults=defaults,
+            attributes=attributes.from_dict(panel_dict, attribute_types),
+            attribute_types=attribute_types,
             items=[
                 InterfaceItemData.from_dict(item)
                 for item in panel_dict.get("items", [])
@@ -153,7 +154,7 @@ class InterfacePanelData(InterfaceItemData):
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            **attributes.to_dict(self.attributes, self.defaults),
+            **self.attributes,
             **(
                 {"items": [item.to_dict() for item in self.items]} if self.items else {}
             ),
@@ -164,7 +165,7 @@ class InterfacePanelData(InterfaceItemData):
         attributes.set_on_element(
             element=panel,
             attributes=self.attributes,
-            defaults=self.defaults,
+            attribute_types=self.attribute_types,
         )
         for item in self.items:
             item.to_item(interface)
