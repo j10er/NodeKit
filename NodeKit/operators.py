@@ -31,9 +31,7 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
         result = import_from(
             folder_path,
             append=False,
-            include_assets=bpy.context.preferences.addons[
-                __package__
-            ].preferences.include_assets,
+            include_assets=False,
         )
 
         if result.startswith("Error"):
@@ -48,7 +46,7 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
 class NODEKIT_OT_ExportJSON(bpy.types.Operator):
     bl_idname = "nodekit.export_json"
     bl_label = "Export to JSON"
-    bl_description = "Export node groups and assets to JSON files"
+    bl_description = "Export node groups to JSON files"
 
     @classmethod
     def poll(cls, context):
@@ -66,13 +64,37 @@ class NODEKIT_OT_ExportJSON(bpy.types.Operator):
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
         result = export_to(
             folder_path=folder_path,
-            include_assets=bpy.context.preferences.addons[
-                __package__
-            ].preferences.include_assets,
+            include_assets=False,
         )
 
         self.report({"INFO"}, result)
         bpy.context.scene.node_kit.is_imported = True
+        return {"FINISHED"}
+
+
+class NODEKIT_OT_ExportUpdateAssets(bpy.types.Operator):
+    bl_idname = "nodekit.export_update_assets"
+    bl_label = "Export to JSON (Update assets)"
+    bl_description = "Export assets to JSON files"
+
+    @classmethod
+    def poll(cls, context):
+        return not bpy.context.scene.node_kit.directory_error and (
+            bpy.context.scene.node_kit.is_imported
+            or file.folder_is_empty(
+                bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
+            )
+            or True
+        )
+
+    def execute(self, context):
+        folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
+        result = export_to(
+            folder_path=folder_path,
+            include_assets=True,
+        )
+
+        self.report({"INFO"}, result)
         return {"FINISHED"}
 
 

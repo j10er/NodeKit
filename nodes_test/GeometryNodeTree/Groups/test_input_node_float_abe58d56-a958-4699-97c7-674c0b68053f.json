@@ -1,0 +1,244 @@
+{
+    "name": "test_input_node_float",
+    "tree": {
+        "bl_idname": "GeometryNodeTree",
+        "color_tag": "NONE",
+        "default_group_node_width": 140,
+        "description": "",
+        "name": "test_input_node_float",
+        "view_center": [
+            91.17633056640625,
+            -30.180999755859375
+        ],
+        "is_modifier": true,
+        "is_tool": false,
+        "uuid": "abe58d56-a958-4699-97c7-674c0b68053f",
+        "nodes": {
+            "Value": {
+                "bl_idname": "ShaderNodeValue",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    -427.1146240234375,
+                    105.20520782470703
+                ],
+                "mute": false,
+                "name": "Value",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "outputs": [
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 1.0,
+                        "index": 0
+                    }
+                ]
+            },
+            "Group Input": {
+                "bl_idname": "NodeGroupInput",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    -340.0,
+                    0.0
+                ],
+                "mute": false,
+                "name": "Group Input",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0
+            },
+            "Combine XYZ": {
+                "bl_idname": "ShaderNodeCombineXYZ",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    -219.33189392089844,
+                    228.07400512695312
+                ],
+                "mute": false,
+                "name": "Combine XYZ",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "inputs": [
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 0.0,
+                        "index": 0
+                    },
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 0.0,
+                        "index": 1
+                    },
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 0.0,
+                        "from_socket_index": [
+                            0
+                        ],
+                        "from_node": [
+                            "Value"
+                        ],
+                        "index": 2
+                    }
+                ],
+                "outputs": [
+                    {
+                        "bl_idname": "NodeSocketVector",
+                        "default_value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "index": 0
+                    }
+                ]
+            },
+            "Set Position": {
+                "bl_idname": "GeometryNodeSetPosition",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    8.139066696166992,
+                    98.96509552001953
+                ],
+                "mute": false,
+                "name": "Set Position",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "inputs": [
+                    {
+                        "bl_idname": "NodeSocketGeometry",
+                        "from_socket_index": [
+                            0
+                        ],
+                        "from_node": [
+                            "Group Input"
+                        ],
+                        "index": 0
+                    },
+                    {
+                        "bl_idname": "NodeSocketBool",
+                        "default_value": true,
+                        "index": 1
+                    },
+                    {
+                        "bl_idname": "NodeSocketVector",
+                        "default_value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "index": 2
+                    },
+                    {
+                        "bl_idname": "NodeSocketVectorTranslation",
+                        "default_value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "from_socket_index": [
+                            0
+                        ],
+                        "from_node": [
+                            "Combine XYZ"
+                        ],
+                        "index": 3
+                    }
+                ]
+            },
+            "Group Output": {
+                "bl_idname": "NodeGroupOutput",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    200.0,
+                    0.0
+                ],
+                "mute": false,
+                "name": "Group Output",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "inputs": [
+                    {
+                        "bl_idname": "NodeSocketGeometry",
+                        "from_socket_index": [
+                            0
+                        ],
+                        "from_node": [
+                            "Set Position"
+                        ],
+                        "index": 0
+                    }
+                ]
+            }
+        },
+        "interface_items": [
+            {
+                "attribute_domain": "POINT",
+                "default_attribute_name": "",
+                "description": "",
+                "force_non_field": false,
+                "hide_in_modifier": false,
+                "hide_value": false,
+                "in_out": "OUTPUT",
+                "item_type": "SOCKET",
+                "name": "Geometry",
+                "socket_type": "NodeSocketGeometry",
+                "bl_idname": "NodeTreeInterfaceSocketGeometry"
+            },
+            {
+                "attribute_domain": "POINT",
+                "default_attribute_name": "",
+                "description": "",
+                "force_non_field": false,
+                "hide_in_modifier": false,
+                "hide_value": false,
+                "in_out": "INPUT",
+                "item_type": "SOCKET",
+                "name": "Geometry",
+                "socket_type": "NodeSocketGeometry",
+                "bl_idname": "NodeTreeInterfaceSocketGeometry"
+            }
+        ]
+    },
+    "blender_version": "4.5.0",
+    "tree_type": "GeometryNodeTree",
+    "category": "Groups"
+}

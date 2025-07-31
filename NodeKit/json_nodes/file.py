@@ -26,34 +26,54 @@ def setup(folder_path: str) -> None:
     os.makedirs(folder_path, exist_ok=True)
 
 
-def write_trees_to(folder_path: str, tree_dicts: list[dict]) -> None:
-    for tree_dict in tree_dicts:
+def _filename_for(data_dict: dict[str, Any]) -> str:
+    return make_valid_filename(data_dict["name"], data_dict["tree"]["uuid"], ".json")
 
-        directory = os.path.join(
-            folder_path, tree_dict["tree_type"], tree_dict["category"]
-        )
-        os.makedirs(directory, exist_ok=True)
-        filename = make_valid_filename(
-            tree_dict["name"], tree_dict["tree"]["uuid"], ".json"
-        )
-        filepath = os.path.join(directory, filename)
+
+def write_trees_to(folder_path: str, data_dicts: dict[str, dict[str, Any]]) -> None:
+
+    previous_data_dicts = read_trees_from(folder_path)
+
+    # Delete JSON files that are not in the current export
+    for uuid, old_dict in previous_data_dicts.items():
+        if uuid not in data_dicts:
+            log.info(f"Removing old file: {old_dict['name']}")
+
+            filepath = os.path.join(folder_path, _filename_for(old_dict))
+            os.remove(filepath)
+
+    for uuid, data_dict in data_dicts.items():
+        if data_dict != previous_data_dicts.get(uuid, {}):
+            directory = os.path.join(
+                folder_path, data_dict["tree_type"], data_dict["category"]
+            )
+            os.makedirs(directory, exist_ok=True)
+        filepath = os.path.join(directory, _filename_for(data_dict))
         json.dump(
-            tree_dict,
+            data_dict,
             open(filepath, "w"),
             indent=4,
         )
 
+    # Clean up empty folders
+    for root, dirs, files in os.walk(folder_path, topdown=False):
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            if not os.listdir(dir_path):
+                log.info(f"Removing empty folder: {dir_path}")
+                os.rmdir(dir_path)
 
-def read_trees_from(folder_path: str) -> list[dict[str, Any]]:
-    data_dicts = []
+
+def read_trees_from(folder_path: str) -> dict[str, dict[str, Any]]:
+    data_dicts = {}
     for file in os.listdir(folder_path):
         if file.endswith(".json"):
             with open(f"{folder_path}/{file}", "r") as f:
                 data_dict = json.load(f)
-                data_dicts.append(data_dict)
+                data_dicts[data_dict["tree"]["uuid"]] = data_dict
         if os.path.isdir(f"{folder_path}/{file}"):
             subfolder_data = read_trees_from(f"{folder_path}/{file}")
-            data_dicts.extend(subfolder_data)
+            data_dicts.update(subfolder_data)
     return data_dicts
 
 

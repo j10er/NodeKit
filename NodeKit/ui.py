@@ -22,6 +22,7 @@ class NODEKIT_PT_MainPanel(bpy.types.Panel):
             box.label(text=context.scene.node_kit.directory_error, icon="ERROR")
         layout.operator("nodekit.import_json")
         layout.operator("nodekit.export_json")
+        layout.operator("nodekit.export_update_assets")
         layout.separator()
         layout.operator("nodekit.append_json", text="Append JSON from")
 

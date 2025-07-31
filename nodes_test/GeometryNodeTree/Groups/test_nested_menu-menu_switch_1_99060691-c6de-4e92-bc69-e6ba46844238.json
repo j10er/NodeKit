@@ -1,0 +1,211 @@
+{
+    "name": "test_nested_menu-menu_switch_1",
+    "tree": {
+        "bl_idname": "GeometryNodeTree",
+        "color_tag": "NONE",
+        "default_group_node_width": 140,
+        "description": "",
+        "name": "test_nested_menu-menu_switch_1",
+        "view_center": [
+            201.44546508789062,
+            -46.85956573486328
+        ],
+        "is_modifier": false,
+        "is_tool": false,
+        "uuid": "99060691-c6de-4e92-bc69-e6ba46844238",
+        "nodes": {
+            "Group Input": {
+                "bl_idname": "NodeGroupInput",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    -427.640380859375,
+                    0.0
+                ],
+                "mute": false,
+                "name": "Group Input",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "outputs": [
+                    {
+                        "bl_idname": "NodeSocketMenu",
+                        "default_value": "Option 1",
+                        "index": 0
+                    },
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 3.0,
+                        "index": 1
+                    }
+                ]
+            },
+            "Menu Switch": {
+                "bl_idname": "GeometryNodeMenuSwitch",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    -6.693482398986816,
+                    101.90409088134766
+                ],
+                "mute": false,
+                "name": "Menu Switch",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "data_type": "FLOAT",
+                "enum_definition": "Menu Switch",
+                "enum_items": [
+                    [
+                        "Option 1"
+                    ],
+                    [
+                        "Option 2"
+                    ],
+                    [
+                        "Option 3"
+                    ]
+                ],
+                "inputs": [
+                    {
+                        "bl_idname": "NodeSocketMenu",
+                        "default_value": "Option 1",
+                        "from_socket_index": [
+                            0
+                        ],
+                        "from_node": [
+                            "Group Input"
+                        ],
+                        "index": 0
+                    },
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 0.0,
+                        "index": 1
+                    },
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 1.0,
+                        "index": 2
+                    },
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 3.0,
+                        "from_socket_index": [
+                            1
+                        ],
+                        "from_node": [
+                            "Group Input"
+                        ],
+                        "index": 3
+                    }
+                ],
+                "outputs": [
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 0.0,
+                        "index": 0
+                    }
+                ]
+            },
+            "Group Output": {
+                "bl_idname": "NodeGroupOutput",
+                "color": [
+                    0.6079999804496765,
+                    0.6079999804496765,
+                    0.6079999804496765
+                ],
+                "height": 100.0,
+                "label": "",
+                "location_absolute": [
+                    398.0287780761719,
+                    44.199851989746094
+                ],
+                "mute": false,
+                "name": "Group Output",
+                "parent": null,
+                "use_custom_color": false,
+                "warning_propagation": "ALL",
+                "width": 140.0,
+                "inputs": [
+                    {
+                        "bl_idname": "NodeSocketFloat",
+                        "default_value": 0.0,
+                        "from_socket_index": [
+                            0
+                        ],
+                        "from_node": [
+                            "Menu Switch"
+                        ],
+                        "index": 0
+                    }
+                ]
+            }
+        },
+        "interface_items": [
+            {
+                "attribute_domain": "POINT",
+                "default_attribute_name": "",
+                "description": "",
+                "force_non_field": false,
+                "hide_in_modifier": false,
+                "hide_value": false,
+                "in_out": "OUTPUT",
+                "item_type": "SOCKET",
+                "name": "Output",
+                "socket_type": "NodeSocketFloat",
+                "default_value": 0.0,
+                "max_value": 3.4028234663852886e+38,
+                "min_value": -3.4028234663852886e+38,
+                "subtype": "NONE",
+                "bl_idname": "NodeTreeInterfaceSocketFloat"
+            },
+            {
+                "attribute_domain": "POINT",
+                "default_attribute_name": "",
+                "description": "",
+                "force_non_field": false,
+                "hide_in_modifier": false,
+                "hide_value": false,
+                "in_out": "INPUT",
+                "item_type": "SOCKET",
+                "name": "Menu",
+                "socket_type": "NodeSocketMenu",
+                "default_value": "Option 1",
+                "bl_idname": "NodeTreeInterfaceSocketMenu"
+            },
+            {
+                "attribute_domain": "POINT",
+                "default_attribute_name": "",
+                "description": "",
+                "force_non_field": false,
+                "hide_in_modifier": false,
+                "hide_value": false,
+                "in_out": "INPUT",
+                "item_type": "SOCKET",
+                "name": "Option 3",
+                "socket_type": "NodeSocketFloat",
+                "default_value": 3.0,
+                "max_value": 3.4028234663852886e+38,
+                "min_value": -3.4028234663852886e+38,
+                "subtype": "NONE",
+                "bl_idname": "NodeTreeInterfaceSocketFloat"
+            }
+        ]
+    },
+    "blender_version": "4.5.0",
+    "tree_type": "GeometryNodeTree",
+    "category": "Groups"
+}
