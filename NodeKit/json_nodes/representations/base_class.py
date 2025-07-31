@@ -6,13 +6,13 @@ log = logging.getLogger(__name__)
 
 class Data:
     attributes: dict[str, Any] = {}
-    defaults: dict[str, tuple[str, Any]] = {}
+    attribute_types: dict[str, tuple[str, Any]] = {}
 
     def __init__(
-        self, attributes: dict[str, Any], defaults: dict[str, tuple[str, Any]]
+        self, attributes: dict[str, Any], attribute_types: dict[str, tuple[str, Any]]
     ) -> None:
         self.attributes = attributes
-        self.defaults = defaults
+        self.attribute_types = attribute_types
 
     def __getattr__(self, name: str) -> Any:
         if name in self.attributes:
@@ -31,4 +31,7 @@ class Data:
                 log.error(
                     f"Attribute '{attribute_name}' does not match: {self.attributes[attribute_name]} != {value.attributes[attribute_name]}"
                 )
-        return self.attributes == value.attributes and self.defaults == value.defaults
+        return (
+            self.attributes == value.attributes
+            and self.attribute_types == value.attribute_types
+        )

@@ -1,6 +1,6 @@
 import bpy
 from typing import Any, Callable
-from .attributes_dict import DEFAULTS
+from .attributes_dict import ATTRIBUTES
 from ... import config
 from collections import deque
 import logging
@@ -129,73 +129,66 @@ SETTER = {
 }
 
 
-def from_element(element: Any, defaults: dict[str, tuple[str, Any]]) -> dict[str, Any]:
-    attribute_dict = {}
-    for attr_name, (attr_type, default_value) in defaults.items():
+def from_element(element: Any, attribute_types: dict[str, str]) -> dict[str, Any]:
+    attributes = {}
+    for attr_name, attr_type in attribute_types.items():
         if not hasattr(element, attr_name):
+            log.warning(
+                f"Error when trying to get attribute value: {element} of type {type(element)} has no attribute '{attr_name}'"
+            )
             continue
         value = GETTER[attr_type](getattr(element, attr_name))
 
-        attribute_dict[attr_name] = value
-    return attribute_dict
+        attributes[attr_name] = value
+    return attributes
+
+
+IGNORE_ATTRIBUTES_NAMES = ["bl_idname"]
+IGNORE_READONLY_ATTRIBUTE_NAMES = ["paired_output"]
+IGNORE_READONLY_ATTRIBUTE_TYPES = ["ITEMS"]
 
 
 def from_dict(
-    element_dict: dict[str, Any], defaults: dict[str, tuple[str, Any]]
+    element_dict: dict[str, Any], attribute_types: dict[str, str]
 ) -> dict[str, Any]:
     return {
-        name: element_dict.get(name, default_value)
-        for name, (attr_type, default_value) in defaults.items()
+        attr_name: value
+        for attr_name, value in element_dict.items()
+        if attr_name in attribute_types
     }
-
-
-def to_dict(
-    attributes: dict[str, Any], defaults: dict[str, tuple[str, Any]]
-) -> dict[str, Any]:
-    for name in list(attributes.keys()):
-        if name not in defaults:
-            log.warning(f"Attribute '{name}' not found in defaults")
-    return {
-        name: value for name, value in attributes.items() if defaults[name][1] != value
-    }
-
-
-IGNORE_SET_ATTRIBUTES = ["bl_idname"]
-IGNORE_READONLY_ATTRIBUTES = ["paired_output"]
-IGNORE_REDONLY_ATTRIBUTE_TYPES = ["ITEMS"]
 
 
 def set_on_element(
     element: Any,
-    attributes: dict[str, Any],
-    defaults: dict[str, tuple[str, Any]],
+    attributes: dict[str, str],
+    attribute_types: dict[str, str],
 ) -> Any:
-    for attr_name, (attr_type, default_value) in defaults.items():
+    for attr_name, attr_type in attribute_types.items():
 
         if not hasattr(element, attr_name):
             log.warning(
-                f"{element} of type {type(element)} has no attribute '{attr_name}'"
+                f"Error when trying to set attribute value: {element} of type {type(element)} has no attribute '{attr_name}'"
             )
             continue
 
-        value = attributes[attr_name] if attr_name in attributes else default_value
+        value = attributes[attr_name]
         readonly = element.__class__.bl_rna.properties[attr_name].is_readonly
+
         if (
-            value != default_value
-            and (
-                not readonly
-                or attr_type in IGNORE_REDONLY_ATTRIBUTE_TYPES
-                or attr_name in IGNORE_READONLY_ATTRIBUTES
-            )
-            and attr_name not in IGNORE_SET_ATTRIBUTES
-        ):
-            setter = SETTER[attr_type]
-            try:
-                setter(element, attr_name, value)
-            except Exception as e:
-                log.warning(
-                    f"Error when setting attribute '{attr_name}' on element '{element.name}' of type {type(element).__name__}: {e}"
-                )
+            not readonly
+            or attr_type in IGNORE_READONLY_ATTRIBUTE_TYPES
+            or attr_name in IGNORE_READONLY_ATTRIBUTE_NAMES
+        ) and attr_name not in IGNORE_ATTRIBUTES_NAMES:
+            # Only set the attribute if it is different from the current value
+            current_value = GETTER[attr_type](getattr(element, attr_name))
+            if value != current_value:
+                setter = SETTER[attr_type]
+                try:
+                    setter(element, attr_name, value)
+                except Exception as e:
+                    log.warning(
+                        f"Error when setting attribute '{attr_name}' on element '{element.name}' of type {type(element).__name__}: {e}"
+                    )
     return element
 
 
@@ -223,25 +216,23 @@ def find_class_path(
     return []
 
 
-def defaults_for(
-    base_class_name: str, class_name: str = ""
-) -> dict[str, tuple[str, Any]]:
+def types_for(base_class_name: str, class_name: str = "") -> dict[str, tuple[str, Any]]:
 
     if class_name == "":
         class_path = []
     else:
         class_path = find_class_path(
-            target_name=class_name, subtype=DEFAULTS[base_class_name]
+            target_name=class_name, subtype=ATTRIBUTES[base_class_name]
         )
 
         if not class_path:
             log.error(f"Error: No class path found for {class_name}")
             return {}
 
-    defaults = {}
-    subtype_dict = DEFAULTS[base_class_name]
-    defaults.update(subtype_dict.get("attributes", {}))
+    attribute_types = {}
+    subtype_dict = ATTRIBUTES[base_class_name]
+    attribute_types.update(subtype_dict.get("attributes", {}))
     for subtype_name in class_path:
         subtype_dict = subtype_dict["subtypes"].get(subtype_name, {})
-        defaults.update(subtype_dict.get("attributes", {}))
-    return defaults
+        attribute_types.update(subtype_dict.get("attributes", {}))
+    return attribute_types

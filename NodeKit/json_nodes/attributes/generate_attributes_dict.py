@@ -44,33 +44,6 @@ def _prop_type(cls: type, prop: bpy.types.Property) -> str:
             return prop.type
 
 
-def _prop_default(cls_name: str, prop: bpy.types.Property) -> Any:
-    DEFAULT_VALUE_MAPPINGS = {
-        "NodeTreeInterfaceSocketFloat": {
-            "min_value": -3.4028234663852886e38,
-            "max_value": 3.4028234663852886e38,
-        },
-        "NodeTreeInterfaceSocketInt": {
-            "min_value": -2147483648,
-            "max_value": 2147483647,
-        },
-        "FunctionNodeCompare": {
-            "operation": "GREATER_THAN",
-        },
-        "GeometryNodeMeshBoolean": {
-            "operation": "DIFFERENCE",
-        },
-    }
-    if cls_name in DEFAULT_VALUE_MAPPINGS:
-        if [
-            True
-            for key in DEFAULT_VALUE_MAPPINGS[cls_name]
-            if prop.identifier.startswith(key)
-        ]:
-            return DEFAULT_VALUE_MAPPINGS[cls_name][prop.identifier]
-    return getattr(prop, "default", None)
-
-
 def _attributes_for(
     cls: type, base_class: type | None, exclude_keywords
 ) -> dict[str, Any]:
@@ -78,7 +51,7 @@ def _attributes_for(
         [prop.identifier for prop in base_class.bl_rna.properties] if base_class else []
     )
     return {
-        prop.identifier: [_prop_type(cls, prop), _prop_default(cls.__name__, prop)]
+        prop.identifier: _prop_type(cls, prop)
         for prop in cls.bl_rna.properties
         if prop.identifier not in base_attributes
         and not [True for keyword in exclude_keywords if keyword in prop.identifier]
@@ -134,7 +107,7 @@ def generate_attributes_dict() -> dict[str, Any]:
     file_path = os.path.join(os.path.dirname(__file__), "attributes_dict.py")
     log.info(f"Saving attributes dictionary in {file_path}")
     with open(file_path, "w") as file:
-        file.write("DEFAULTS = ")
+        file.write("ATTRIBUTES = ")
         pprint(attributes, stream=file)
         file.write("\nALL_ATTRIBUTE_TYPES = ")
         pprint(sorted(all_attribute_types), stream=file)
