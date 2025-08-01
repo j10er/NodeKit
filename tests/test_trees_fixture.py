@@ -1,7 +1,8 @@
-import pytest
-import bpy
 import os
 import shutil
+
+import bpy
+import pytest
 
 test_tree_names = [
     "test_compare_node",

@@ -1,10 +1,11 @@
-import bpy
-from typing import Any, Callable
-from .attributes_dict import ATTRIBUTES
-from ... import config
-from collections import deque
 import logging
 from inspect import signature
+from typing import Any, Callable
+
+import bpy
+
+from ... import config
+from .attributes_dict import ATTRIBUTES
 
 log = logging.getLogger(__name__)
 
@@ -216,7 +217,7 @@ def find_class_path(
     return []
 
 
-def types_for(base_class_name: str, class_name: str = "") -> dict[str, tuple[str, Any]]:
+def types_for(base_class_name: str, class_name: str = "") -> dict[str, str]:
 
     if class_name == "":
         class_path = []

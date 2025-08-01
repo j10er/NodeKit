@@ -1,6 +1,7 @@
-import pytest
-import bpy
 import bmesh
+import bpy
+import pytest
+
 from .test_trees_fixture import fixture_test_trees, test_tree_names
 
 

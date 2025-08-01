@@ -1,29 +1,29 @@
-import bpy
-import os
-import uuid
 import logging
+import uuid
+from pathlib import Path
 from typing import Any
+
+import bpy
+
 from . import file
 from .. import config
 
 log = logging.getLogger(__name__)
 
 
-def export_to(folder_path: str) -> None:
+def export_to(folder_path: Path) -> None:
     log.debug("Preparing assets for export...")
-    assets = _collect_assets()
-    for asset_type in assets:
-        for asset in assets[asset_type]:
-            if not asset.get("uuid"):
-                asset["uuid"] = str(uuid.uuid4())
+    assets = collect_assets()
+
     log.debug(
         f"Found {sum([len(asset_list) for asset_list in assets.values()])} assets to export."
     )
 
     _write_assets_to(folder_path, assets)
+    return assets
 
 
-def _collect_assets():
+def collect_assets():
     assets = {asset_type: set() for asset_type in config.ASSET_TYPES}
 
     for node_tree in bpy.data.node_groups:
@@ -42,16 +42,20 @@ def _collect_assets():
                     asset = getattr(node, attribute_name)
                     if isinstance(asset, getattr(bpy.types, asset_type)):
                         assets[asset_type].add(asset)
+    for asset_type in assets:
+        for asset in assets[asset_type]:
+            if not asset.get("uuid"):
+                asset["uuid"] = str(uuid.uuid4())
     return assets
 
 
-def _write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
-    assets_folder = os.path.join(folder_path, config.ASSETS_FOLDER)
+def _write_assets_to(folder_path: Path, assets: dict[str, set[Any]]) -> None:
+    assets_folder = folder_path / config.ASSETS_FOLDER
     for asset_type in assets:
-        folder_path = os.path.join(assets_folder, asset_type)
+        asset_type_folder = assets_folder / asset_type
         for asset in assets[asset_type]:
             log.debug(f"Exporting asset {asset.name} of type {asset_type}")
-            os.makedirs(folder_path, exist_ok=True)
+            asset_type_folder.mkdir(parents=True, exist_ok=True)
             asset["name"] = asset.name
             filename = file.make_valid_filename(
                 asset["name"], asset["uuid"], ext=".blend"
@@ -59,18 +63,18 @@ def _write_assets_to(folder_path: str, assets: dict[str, Any]) -> None:
             asset.name = asset["uuid"]
 
             log.debug(f"Asset name is {asset['name']} with uuid {asset['uuid']}")
-            asset_path = os.path.join(folder_path, filename)
+            asset_path = asset_type_folder / filename
             bpy.data.libraries.write(
-                asset_path,
+                str(asset_path),
                 set([asset]),
                 fake_user=True,
             )
             asset.name = asset["name"]
 
 
-def import_from(folder_path: str, append: bool = False) -> str:
-    assets_path = os.path.join(folder_path, config.ASSETS_FOLDER)
-    if not os.path.exists(assets_path) or not os.path.isdir(assets_path):
+def import_from(folder_path: Path, append: bool = False) -> str:
+    assets_path = folder_path / config.ASSETS_FOLDER
+    if not assets_path.exists() or not assets_path.is_dir():
         log.info(f"No assets found in {assets_path}, skipping asset import.")
         return ""
 
@@ -94,14 +98,16 @@ def import_from(folder_path: str, append: bool = False) -> str:
     # Import the assets
     assets = {asset_type: [] for asset_type in config.ASSET_TYPES}
 
-    for asset_type in os.listdir(assets_path):
-        for filename in os.listdir(os.path.join(assets_path, asset_type)):
-            if filename.endswith(".blend"):
-                asset_path = os.path.join(assets_path, asset_type, filename)
-                log.debug(f"Appending asset from {asset_path}")
+    for asset_type_dir in assets_path.iterdir():
+        if not asset_type_dir.is_dir():
+            continue
+        asset_type = asset_type_dir.name
+        for asset_file in asset_type_dir.iterdir():
+            if asset_file.is_file() and asset_file.name.endswith(".blend"):
+                log.debug(f"Appending asset from {asset_file}")
 
-                uuid = filename.split("_")[-1][:-6]
-                with bpy.data.libraries.load(asset_path, link=False) as (
+                uuid = asset_file.name.split("_")[-1][:-6]
+                with bpy.data.libraries.load(str(asset_file), link=False) as (
                     data_from,
                     data_to,
                 ):
@@ -130,11 +136,14 @@ def import_from(folder_path: str, append: bool = False) -> str:
                 assets_collection.children.link(col)
 
 
-def _all_uuids(assets_path: str) -> dict[str, list[str]]:
+def _all_uuids(assets_path: Path) -> dict[str, list[str]]:
     uuids = {asset_type: [] for asset_type in config.ASSET_TYPES}
-    for asset_type in os.listdir(assets_path):
-        for filename in os.listdir(os.path.join(assets_path, asset_type)):
-            if filename.endswith(".blend"):
-                uuid = filename.split("_")[-1][:-6]
+    for asset_type_dir in assets_path.iterdir():
+        if not asset_type_dir.is_dir():
+            continue
+        asset_type = asset_type_dir.name
+        for asset_file in asset_type_dir.iterdir():
+            if asset_file.is_file() and asset_file.name.endswith(".blend"):
+                uuid = asset_file.name.split("_")[-1][:-6]
                 uuids[asset_type].append(uuid)
     return uuids

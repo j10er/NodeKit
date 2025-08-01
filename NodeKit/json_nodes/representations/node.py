@@ -1,11 +1,12 @@
-import bpy
-from typing import Any
 import logging
-from bpy.types import Node, NodeTree, NodeSocket
+from typing import Any
+
+import bpy
+from bpy.types import Node, NodeSocket, NodeTree
+
+from ... import config
 from ..attributes import attributes
 from .base_class import Data
-from ... import config
-
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ class NodeData(Data):
     def __init__(
         self,
         attributes: dict[str, Any],
-        attribute_types: dict[str, Any],
+        attribute_types: dict[str, str],
         inputs: list["SocketData"],
         outputs: list["SocketData"],
     ) -> None:
@@ -31,6 +32,7 @@ class NodeData(Data):
         attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=node.bl_idname
         )
+
         return cls(
             attributes=attributes.from_element(node, attribute_types),
             attribute_types=attribute_types,
@@ -88,9 +90,9 @@ class NodeData(Data):
     def set_socket_attributes(self) -> None:
         for socket_data in self.inputs:
             if len(socket_data.attributes) > 0:
-                log.debug(
-                    f"Setting attributes on input socket {self.node.inputs[socket_data.index].name}"
-                )
+                # log.debug(
+                #     f"Setting attributes on input socket {self.node.inputs[socket_data.index].name}"
+                # )
                 attributes.set_on_element(
                     self.node.inputs[socket_data.index],
                     socket_data.attributes,
@@ -98,9 +100,9 @@ class NodeData(Data):
                 )
         for socket_data in self.outputs:
             if len(socket_data.attributes) > 0:
-                log.debug(
-                    f"Setting attributes on output socket {self.node.outputs[socket_data.index].name}"
-                )
+                # log.debug(
+                #     f"Setting attributes on output socket {self.node.outputs[socket_data.index].name}"
+                # )
                 attributes.set_on_element(
                     self.node.outputs[socket_data.index],
                     socket_data.attributes,
@@ -132,7 +134,7 @@ class SocketData(Data):
     def __init__(
         self,
         attributes: dict[str, Any],
-        attribute_types: dict[str, Any],
+        attribute_types: dict[str, str],
         index: int,
         from_socket_index: list[int],
         from_node: list[str],

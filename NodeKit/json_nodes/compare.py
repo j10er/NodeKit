@@ -1,7 +1,9 @@
-import bpy
-from .representations.node_tree import NodeTreeData
-from .. import config
 import logging
+
+import bpy
+
+from .. import config
+from .representations.node_tree import NodeTreeData
 
 log = logging.getLogger(__name__)
 

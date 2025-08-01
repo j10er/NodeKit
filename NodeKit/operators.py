@@ -1,9 +1,9 @@
 import bpy
-from .json_nodes.import_export import export_to, import_from
-from .json_nodes.attributes import generate_attributes_dict
-from .json_nodes import file, compare
+
 from . import config
-import os
+from .json_nodes import compare, file
+from .json_nodes.attributes import generate_attributes_dict
+from .json_nodes.import_export import export_to, import_from
 
 
 class NODEKIT_OT_ImportJSON(bpy.types.Operator):
@@ -31,7 +31,7 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
         result = import_from(
             folder_path,
             append=False,
-            include_assets=False,
+            include_assets=True,
         )
 
         if result.startswith("Error"):
@@ -63,7 +63,7 @@ class NODEKIT_OT_ExportJSON(bpy.types.Operator):
         print("Executing export operator")
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
         result = export_to(
-            folder_path=folder_path,
+            folder_path_str=folder_path,
             include_assets=False,
         )
 
@@ -90,7 +90,7 @@ class NODEKIT_OT_ExportUpdateAssets(bpy.types.Operator):
     def execute(self, context):
         folder_path = bpy.path.abspath(bpy.context.scene.node_kit.folder_path)
         result = export_to(
-            folder_path=folder_path,
+            folder_path_str=folder_path,
             include_assets=True,
         )
 
@@ -115,7 +115,7 @@ class NODEKIT_OT_AppendJSON(bpy.types.Operator):
             self.report({"ERROR"}, directory_error)
             return {"CANCELLED"}
 
-        message = import_from(folder_path, append=True)
+        message = import_from(folder_path_str=folder_path, append=True)
         self.report({"INFO"}, message)
         return {"FINISHED"}
 

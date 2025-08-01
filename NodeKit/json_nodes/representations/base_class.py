@@ -1,15 +1,15 @@
-from typing import Any
 import logging
+from typing import Any
 
 log = logging.getLogger(__name__)
 
 
 class Data:
     attributes: dict[str, Any] = {}
-    attribute_types: dict[str, tuple[str, Any]] = {}
+    attribute_types: dict[str, str] = {}
 
     def __init__(
-        self, attributes: dict[str, Any], attribute_types: dict[str, tuple[str, Any]]
+        self, attributes: dict[str, Any], attribute_types: dict[str, str]
     ) -> None:
         self.attributes = attributes
         self.attribute_types = attribute_types

@@ -1,12 +1,12 @@
-import bpy
-import os
-import shutil
-from typing import Any, get_type_hints
 import json
 import logging
 import re
-import copy
+from pathlib import Path
+from typing import Any, get_type_hints
+
+import bpy
 from bpy.path import abspath
+
 from .. import config
 
 log = logging.getLogger(__name__)
@@ -14,130 +14,137 @@ log = logging.getLogger(__name__)
 
 def make_valid_filename(name: str, uuid_str: str, ext: str) -> str:
 
-    safe = re.sub(
+    safe_name = re.sub(
         config.INVALID_FILENAME_CHARS, config.FILENAME_REPLACEMENT_CHAR, name
     ).strip()
-    return f"{safe}_{uuid_str}{ext}"
+    return f"{safe_name}_{uuid_str}{ext}"
 
 
-def setup(folder_path: str) -> None:
-    if os.path.exists(folder_path):
-        shutil.rmtree(folder_path)
-    os.makedirs(folder_path, exist_ok=True)
+def _file_path_for(folder_path: Path, data_dict: dict[str, Any]) -> Path:
+    return (
+        folder_path
+        / data_dict["tree_type"]
+        / data_dict["category"]
+        / make_valid_filename(data_dict["name"], data_dict["tree"]["uuid"], ".json")
+    )
 
 
-def _filename_for(data_dict: dict[str, Any]) -> str:
-    return make_valid_filename(data_dict["name"], data_dict["tree"]["uuid"], ".json")
+def write_trees_to(folder_path: Path, data_dicts: dict[str, config.ExportDict]) -> None:
 
+    # Write all data_dicts that have changes
+    for data_dict in data_dicts.values():
 
-def write_trees_to(folder_path: str, data_dicts: dict[str, dict[str, Any]]) -> None:
-
-    previous_data_dicts = read_trees_from(folder_path)
-
-    # Delete JSON files that are not in the current export
-    for uuid, old_dict in previous_data_dicts.items():
-        if uuid not in data_dicts:
-            log.info(f"Removing old file: {old_dict['name']}")
-
-            filepath = os.path.join(folder_path, _filename_for(old_dict))
-            os.remove(filepath)
-
-    for uuid, data_dict in data_dicts.items():
-        if data_dict != previous_data_dicts.get(uuid, {}):
-            directory = os.path.join(
-                folder_path, data_dict["tree_type"], data_dict["category"]
-            )
-            os.makedirs(directory, exist_ok=True)
-            filepath = os.path.join(directory, _filename_for(data_dict))
+        file_path = _file_path_for(folder_path, data_dict)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with file_path.open("w") as f:
             json.dump(
                 data_dict,
-                open(filepath, "w"),
+                f,
                 indent=4,
             )
 
     # Clean up empty folders
-    for root, dirs, files in os.walk(folder_path, topdown=False):
-        for dir in dirs:
-            dir_path = os.path.join(root, dir)
-            if not os.listdir(dir_path):
-                log.info(f"Removing empty folder: {dir_path}")
-                os.rmdir(dir_path)
+    for root in folder_path.rglob("*/"):
+        if root.is_dir() and not any(root.iterdir()):
+            root.rmdir()
 
 
-def read_trees_from(folder_path: str) -> dict[str, dict[str, Any]]:
+def remove_unreferenced_jsons(folder_path: Path, uuids: list[str]) -> None:
+    for file in folder_path.rglob("*.json"):
+        with file.open("r") as f:
+            data_dict = json.load(f)
+        if data_dict["tree"]["uuid"] not in uuids:
+            log.info(f"Removing unreferenced JSON file: {file}")
+            file.unlink()
+        if (
+            file.resolve()
+            != (folder_path / _file_path_for(folder_path, data_dict)).resolve()
+        ):
+            log.info(f"Removing JSON file with wrong name: {file.name}")
+            file.unlink()
+
+
+def read_data_dicts_from(folder: Path) -> dict[str, config.ExportDict]:
     data_dicts = {}
-    for file in os.listdir(folder_path):
-        if file.endswith(".json"):
-            with open(f"{folder_path}/{file}", "r") as f:
-                data_dict = json.load(f)
-                data_dicts[data_dict["tree"]["uuid"]] = data_dict
-        if os.path.isdir(f"{folder_path}/{file}"):
-            subfolder_data = read_trees_from(f"{folder_path}/{file}")
-            data_dicts.update(subfolder_data)
+    for file in folder.rglob("*.json"):
+        with file.open("r") as f:
+            data_dict = json.load(f)
+        data_dicts[data_dict["tree"]["uuid"]] = data_dict
+
     return data_dicts
 
 
 def validate_path(folder_path: str) -> str:
-    folder_path = abspath(folder_path)
+    folder_path_obj = Path(abspath(folder_path))
     try:
         if not folder_path:
             return "Select a directory to store the JSON files"
-        elif not os.path.exists(folder_path):
+        elif not folder_path_obj.exists():
             return "Path does not exist"
-        elif not os.path.isdir(folder_path):
+        elif not folder_path_obj.is_dir():
             return "Path is not a directory"
         else:
-            return _check_folder_structure(folder_path)
+            return _check_folder_structure(folder_path_obj)
     except Exception as e:
         log.error(f"Error validating path {folder_path}: {e}")
         return "An internal error occurred while validating the path"
 
 
-def _check_folder_structure(folder_path: str) -> str:
-    for tree_type in os.listdir(folder_path):
-        if tree_type == config.ASSETS_FOLDER:
-            for asset_type in os.listdir(os.path.join(folder_path, tree_type)):
-                if asset_type not in config.ASSET_TYPES:
-                    return f"Unexpected asset type folder '{asset_type}' found in '{tree_type}'"
-                for asset_file in os.listdir(
-                    os.path.join(folder_path, tree_type, asset_type)
-                ):
-                    if not asset_file.endswith(".blend"):
-                        return f"Unexpected file '{asset_file}' found in '{tree_type}:{asset_type}'"
-        elif tree_type not in config.SUPPORTED_TREE_TYPES:
-            return f"Unexpected folder '{tree_type}' found"
+def _check_folder_structure(folder_path: Path) -> str:
+    for tree_type in folder_path.iterdir():
+        if not tree_type.is_dir():
+            continue
+        tree_type_name = tree_type.name
+        if tree_type_name == config.ASSETS_FOLDER:
+            for asset_type in tree_type.iterdir():
+                if not asset_type.is_dir():
+                    continue
+                asset_type_name = asset_type.name
+                if asset_type_name not in config.ASSET_TYPES:
+                    return f"Unexpected asset type folder '{asset_type_name}' found in '{tree_type_name}'"
+                for asset_file in asset_type.iterdir():
+                    if asset_file.is_file() and not asset_file.name.endswith(".blend"):
+                        return f"Unexpected file '{asset_file.name}' found in '{tree_type_name}:{asset_type_name}'"
+        elif tree_type_name not in config.SUPPORTED_TREE_TYPES:
+            return f"Unexpected folder '{tree_type_name}' found"
         else:
-            for category in os.listdir(os.path.join(folder_path, tree_type)):
-                if category not in [config.CATEGORY_TESTS, config.CATEGORY_GROUPS]:
-                    return f"Unexpected category '{category}' found in '{tree_type}'"
+            for category in tree_type.iterdir():
+                if not category.is_dir():
+                    continue
+                category_name = category.name
+                if category_name not in [config.CATEGORY_TESTS, config.CATEGORY_GROUPS]:
+                    return f"Unexpected category '{category_name}' found in '{tree_type_name}'"
 
-                for file in os.listdir(os.path.join(folder_path, tree_type, category)):
-                    if not (file.endswith(".json") or file.endswith(".blend")):
-                        return f"Unexpected file '{file}' found in '{tree_type}:{category}'"
-                    elif _check_json(
-                        os.path.join(folder_path, tree_type, category, file)
-                    ):
-                        return f"Invalid JSON structure in file '{file}' in '{tree_type}:{category}'"
+                for file in category.iterdir():
+                    if file.is_file():
+                        if not (
+                            file.name.endswith(".json") or file.name.endswith(".blend")
+                        ):
+                            return f"Unexpected file '{file.name}' found in '{tree_type_name}:{category_name}'"
+                        elif file.name.endswith(".json"):
+                            error_msg = _check_json(file)
+                            if error_msg:
+                                return f"Invalid JSON structure in file '{file.name}' in '{tree_type_name}:{category_name}'"
     return ""
 
 
 def number_of_files(folder_path: str, ext: str) -> int:
     counter = 0
     if not bpy.context.scene.node_kit.directory_error:
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                if file.endswith(ext):
-                    counter += 1
+        folder_path_obj = Path(folder_path)
+        for file in folder_path_obj.rglob(f"*{ext}"):
+            counter += 1
     return counter
 
 
 def folder_is_empty(folder_path: str) -> bool:
-    return len(os.listdir(folder_path)) == 0
+    folder_path_obj = Path(folder_path)
+    return not any(folder_path_obj.iterdir())
 
 
-def _check_json(file_path: str) -> str:
+def _check_json(file_path: Path) -> str:
     try:
-        with open(file_path, "r") as file:
+        with file_path.open("r") as file:
             json_dict = json.load(file)
         if not _is_typed_dict(json_dict, config.ExportDict):
             return f"Invalid JSON structure in file {file_path}"

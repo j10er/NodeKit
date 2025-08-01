@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import argparse
+import logging
 import os
 import shutil
 import subprocess
-import logging
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)

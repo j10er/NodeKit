@@ -1,6 +1,8 @@
-from bpy.types import NodeTreeInterfaceSocket, NodeTreeInterfacePanel
-from typing import Any
 import logging
+from typing import Any
+
+from bpy.types import NodeTreeInterfacePanel, NodeTreeInterfaceSocket
+
 from ..attributes import attributes
 from .base_class import Data
 
@@ -10,7 +12,7 @@ log = logging.getLogger(__name__)
 class InterfaceItemData(Data):
 
     def __init__(
-        self, attributes: dict[str, Any], attribute_types: dict[str, Any]
+        self, attributes: dict[str, Any], attribute_types: dict[str, str]
     ) -> None:
         super().__init__(attributes, attribute_types)
 
@@ -43,7 +45,7 @@ class InterfaceSocketData(InterfaceItemData):
     def __init__(
         self,
         attributes: dict[str, Any],
-        attribute_types: dict[str, Any],
+        attribute_types: dict[str, str],
         parent_index: int,
         bl_idname: str,
     ) -> None:
@@ -123,7 +125,7 @@ class InterfacePanelData(InterfaceItemData):
     def __init__(
         self,
         attributes: dict[str, Any],
-        attribute_types: dict[str, Any],
+        attribute_types: dict[str, str],
         items: list[InterfaceItemData],
     ) -> None:
         super().__init__(attributes, attribute_types)

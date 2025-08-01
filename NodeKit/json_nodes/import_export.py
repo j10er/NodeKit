@@ -1,18 +1,46 @@
-import bpy
-from typing import Any
-from pprint import pprint
-from . import file, assets
-from .representations.node_tree import NodeTreeData
-from .. import config
-import uuid
 import logging
+import uuid
+from pathlib import Path
+from typing import Any
+
+import bpy
+
+from . import assets, file
+from .. import config
+from .representations.node_tree import NodeTreeData
 
 log = logging.getLogger(__name__)
 
 
-def _tree_setup(folder_path) -> None:
+def export_to(folder_path_str: str, include_assets: bool):
+    folder = Path(folder_path_str)
+    log.info(f"Exporting all node groups to {folder.resolve()}")
+    if include_assets:
+        log.info("Exporting assets...")
+        assets_dict = assets.export_to(folder)
+    else:
+        assets_dict = assets.collect_assets()
 
+    blend_data_dicts = _get_blend_data_dicts()
+
+    log.info(f"Found {len(blend_data_dicts)} node groups to export.")
+    json_data_dicts = file.read_data_dicts_from(folder)
+    export_data_dicts = {
+        uuid: data_dict
+        for uuid, data_dict in blend_data_dicts.items()
+        if json_data_dicts.get(uuid, {}) != data_dict
+    }
+    file.write_trees_to(folder, export_data_dicts)
+    num_of_assets = sum(len(assets_set) for assets_set in assets_dict.values())
+    return f"Exported {len(blend_data_dicts)} ({len(blend_data_dicts) - len(export_data_dicts)} unchanged) node groups and {num_of_assets} ({0 if include_assets else num_of_assets} unchanged) assets to {folder}"
+
+
+def _get_blend_data_dicts() -> dict[str, config.ExportDict]:
+
+    # Prepare all node groups and nodes with needed attributes
     for tree in bpy.data.node_groups:
+        if tree.bl_idname not in config.SUPPORTED_TREE_TYPES:
+            continue
         if not tree.get("uuid"):
             tree["uuid"] = str(uuid.uuid4())
         for node in tree.nodes:
@@ -20,21 +48,8 @@ def _tree_setup(folder_path) -> None:
                 input["index"] = i
             for i, output in enumerate(node.outputs):
                 output["index"] = i
+    data_dicts = {}
 
-
-def export_to(folder_path: str, include_assets: bool):
-    log.info(
-        f"Exporting {len(bpy.data.node_groups)} node group{'s' if len(bpy.data.node_groups) != 1 else ''} to {folder_path}"
-    )
-    _tree_setup(folder_path)
-
-    if include_assets:
-        log.info("Exporting assets...")
-        assets.export_to(folder_path)
-
-    data_dicts: dict[str, config.ExportDict] = {}
-
-    # Process each tree
     for tree in bpy.data.node_groups:
         if tree.bl_idname not in config.SUPPORTED_TREE_TYPES:
             continue
@@ -53,52 +68,52 @@ def export_to(folder_path: str, include_assets: bool):
                 else config.CATEGORY_GROUPS
             ),
         }
-    log.info(f"Writing {len(data_dicts)} node groups to JSON files.")
-    file.write_trees_to(folder_path, data_dicts)
-    return f"Exported {len(data_dicts)} node group{'s' if len(data_dicts) != 1 else ''} to {folder_path}"
+    return data_dicts
 
 
-def import_from(folder_path: str, append: bool, include_assets: bool):
-    log.info(f"Importing all node groups from {folder_path}")
+def import_from(folder_path_str: str, append: bool, include_assets: bool):
+    folder = Path(folder_path_str)
+    log.info(f"Importing all node groups from {folder}")
 
     if include_assets:
         log.info("Importing assets...")
-        error = assets.import_from(folder_path, append=append)
+        error = assets.import_from(folder, append=append)
         if error:
             log.info(error)
             return error
 
     log.info("Reading json files...")
-    data_dicts = file.read_trees_from(folder_path)
-    log.info(f"Found {len(data_dicts)} node groups to import.")
+    json_data_dicts = file.read_data_dicts_from(folder)
+    log.info(f"Found {len(json_data_dicts)} node groups.")
 
-    tree_datas = {
-        uuid: NodeTreeData.from_dict(data_dict["tree"])
-        for uuid, data_dict in data_dicts.items()
+    blend_data_dicts = _get_blend_data_dicts()
+
+    new_tree_datas = {
+        uuid: NodeTreeData.from_dict(export_dict["tree"])
+        for uuid, export_dict in json_data_dicts.items()
+        if uuid not in blend_data_dicts or export_dict != blend_data_dicts[uuid]
     }
-
-    _setup_existing_trees(tree_datas, append)
-
-    if not tree_datas:
-        return "No groups imported, all groups already exist."
-
-    _create_trees(tree_datas)
-
-    return f"Imported {len(tree_datas)} node group{'s' if len(tree_datas) != 1 else ''} from {folder_path}."
-
-
-def _setup_existing_trees(tree_datas: dict[str, NodeTreeData], append: bool):
+    log.info(f"Of these, {len(new_tree_datas)} have changes.")
     for tree in bpy.data.node_groups:
+        uuid = tree.get("uuid")
         if append:
-            if tree.get("uuid") in tree_datas:
+            if uuid in new_tree_datas:
                 log.info(f"Tree {tree.name} already exists, skipping.")
-                tree_datas.pop(tree.get("uuid"))
+                new_tree_datas.pop(uuid)
         else:
             if (
-                tree.bl_idname == config.SUPPORTED_TREE_TYPES
-                and tree.get("uuid") not in tree_datas
+                tree.bl_idname in config.SUPPORTED_TREE_TYPES
+                and uuid not in json_data_dicts
             ):
+                log.info(f"Removing existing tree: {tree.name}")
                 bpy.data.node_groups.remove(tree, do_unlink=True)
+
+    if not new_tree_datas:
+        return "No groups imported, all groups are already up to date."
+
+    _create_trees(new_tree_datas)
+
+    return f"Imported {len(json_data_dicts)} node groups, of which {len(json_data_dicts) - len(new_tree_datas)} were unchanged, from {folder}."
 
 
 def _create_trees(tree_datas: dict[str, NodeTreeData]):

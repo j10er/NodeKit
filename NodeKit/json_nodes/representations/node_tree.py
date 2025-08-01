@@ -1,13 +1,15 @@
+import logging
+import uuid
+from typing import Any
+
 import bpy
 from bpy.types import NodeTree
-from typing import Any
-import logging
+
+from ... import config
 from ..attributes import attributes
 from .base_class import Data
 from .interface_item import InterfaceItemData
 from .node import NodeData, EXCLUDED_NODE_TYPES
-from ... import config
-
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +20,7 @@ class NodeTreeData(Data):
     def __init__(
         self,
         attributes: dict[str, Any],
-        attribute_types: dict[str, Any],
+        attribute_types: dict[str, str],
         uuid: str,
         nodes: dict[str, "NodeData"],
         interface_items: list[InterfaceItemData],
@@ -30,7 +32,6 @@ class NodeTreeData(Data):
 
     @classmethod
     def from_tree(cls, tree: NodeTree) -> "NodeTreeData":
-
         attribute_types = attributes.types_for(
             base_class_name=cls.base_class_name, class_name=tree.bl_idname
         )
@@ -71,7 +72,6 @@ class NodeTreeData(Data):
         )
 
     def to_dict(self) -> dict[str, Any]:
-        log.debug(f"{self.name}: Converting to dict")
         return {
             **self.attributes,
             "uuid": self.uuid,
@@ -84,8 +84,6 @@ class NodeTreeData(Data):
         }
 
     def _reset_tree(self):
-        log.info(f"Resetting existing node tree '{self.name}' with UUID {self.uuid}")
-
         for node in self.tree.nodes:
             self.tree.nodes.remove(node)
         self.tree.interface.clear()
@@ -94,36 +92,34 @@ class NodeTreeData(Data):
         self.tree.color_tag = "NONE"
         self.tree.description = ""
 
-    def create_tree_hull(self) -> NodeTree:
-        try:
-            if [
+    def create_tree_hull(self):
+
+        existing_tree = next(
+            (
                 tree
                 for tree in bpy.data.node_groups.values()
                 if tree.get("uuid", "") == self.uuid
-            ]:
-                self.tree = bpy.data.node_groups[self.name]
-                self._reset_tree()
-            else:
-                log.debug(f"{self.name}: Creating new node tree")
-                self.tree = bpy.data.node_groups.new(
-                    name=self.name, type=self.bl_idname
-                )
-            self.tree = self.tree
-            self.tree["uuid"] = self.uuid
-            attributes.set_on_element(self.tree, self.attributes, self.attribute_types)
-            for item_data in self.interface_items:
-                log.debug(f"{self.name}: Creating interface item {item_data.name}")
-                item = item_data.to_item(self.tree.interface)
-            log.debug(
-                f"{self.name}: Created {len(self.tree.interface.items_tree)} interface items"
+            ),
+            None,
+        )
+        if existing_tree:
+            log.info(
+                f"{self.name}: Overwriting existing node tree {existing_tree.name}"
             )
-        except Exception as e:
-            if self.tree:
-                return self.tree
-                bpy.data.node_groups.remove(self.tree, do_unlink=True)
-            log.error(f"{self.name}: Error creating tree hull: {e}")
-            raise e
-        return self.tree
+            self.tree = existing_tree
+            self._reset_tree()
+        else:
+            log.debug(f"{self.name}: Creating new node tree")
+            self.tree = bpy.data.node_groups.new(name=self.name, type=self.bl_idname)
+        self.tree = self.tree
+        self.tree["uuid"] = self.uuid
+        attributes.set_on_element(self.tree, self.attributes, self.attribute_types)
+        for item_data in self.interface_items:
+            log.debug(f"{self.name}: Creating interface item {item_data.name}")
+            item = item_data.to_item(self.tree.interface)
+        log.debug(
+            f"{self.name}: Created {len(self.tree.interface.items_tree)} interface items"
+        )
 
     def add_nodes(self):
         log.debug("=" * 40)
@@ -131,7 +127,7 @@ class NodeTreeData(Data):
         tree = self.tree
 
         for node_data in self.nodes.values():
-            log.debug(f"{self.name}:{node_data.name}: Creating node")
+            # log.debug(f"{self.name}:{node_data.name}: Creating node")
             node = node_data.to_node(tree)
         log.debug(f"{self.name}: Created {len(tree.nodes)} nodes")
         for node_data in self.nodes.values():
@@ -150,23 +146,23 @@ class NodeTreeData(Data):
                         from_node = tree.nodes.get(input_data.from_node[i])
                         from_socket = from_node.outputs[input_data.from_socket_index[i]]
 
-                        log.debug(
-                            f"{self.name}:{from_node.name}: Linking socket {from_socket.name} to {node_data.name}:{to_socket.name}"
-                        )
+                        # log.debug(
+                        #     f"{self.name}:{from_node.name}: Linking socket {from_socket.name} to {node_data.name}:{to_socket.name}"
+                        # )
                         tree.links.new(from_socket, to_socket)
 
     def set_socket_attributes(self):
         log.debug(f"{self.name}: Setting interface item attributes")
         for item_data in self.interface_items:
-            log.debug(
-                f"{self.name}: - Setting interface item attributes for {item_data.name}"
-            )
+            # log.debug(
+            #     f"{self.name}: - Setting interface item attributes for {item_data.name}"
+            # )
             item_data.set_attributes()
         log.debug(f"{self.name}: - Setting NodeSocket attributes")
         for node_data in self.nodes.values():
-            log.debug(
-                f"{self.name}: -- Setting socket attributes for node {node_data.name}"
-            )
+            # log.debug(
+            #     f"{self.name}: -- Setting socket attributes for node {node_data.name}"
+            # )
             node_data.set_socket_attributes()
         log.debug(f"{self.name}: Done.")
         log.debug("=" * 40)

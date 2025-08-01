@@ -1,9 +1,10 @@
-import os
-from bpy.path import abspath
-import bpy
-from .json_nodes import file
-from . import config
 import logging
+
+import bpy
+from bpy.path import abspath
+
+from . import config
+from .json_nodes import file
 
 log = logging.getLogger(__name__)
 

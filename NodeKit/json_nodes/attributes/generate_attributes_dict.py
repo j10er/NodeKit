@@ -1,10 +1,12 @@
-import bpy
-from typing import Any
-from pprint import pprint
-from .base_dict import CLASSES
-import os
-import logging
 import inspect
+import logging
+import os
+from pprint import pprint
+from typing import Any
+
+import bpy
+
+from .base_dict import CLASSES
 
 log = logging.getLogger(__name__)
 
