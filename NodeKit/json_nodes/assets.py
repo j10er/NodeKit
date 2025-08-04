@@ -23,7 +23,7 @@ def export_to(folder_path: Path) -> None:
     return assets
 
 
-def collect_assets():
+def collect_assets() -> dict[str, set[Any]]:
     assets = {asset_type: set() for asset_type in config.ASSET_TYPES}
 
     for node_tree in bpy.data.node_groups:
@@ -72,11 +72,13 @@ def _write_assets_to(folder_path: Path, assets: dict[str, set[Any]]) -> None:
             asset.name = asset["name"]
 
 
-def import_from(folder_path: Path, append: bool = False) -> str:
+def import_from(
+    folder_path: Path, append: bool = False
+) -> tuple[str, dict[str, set[Any]]]:
     assets_path = folder_path / config.ASSETS_FOLDER
     if not assets_path.exists() or not assets_path.is_dir():
         log.info(f"No assets found in {assets_path}, skipping asset import.")
-        return ""
+        return "", {}
 
     uuids = _all_uuids(assets_path)
 
@@ -85,7 +87,10 @@ def import_from(folder_path: Path, append: bool = False) -> str:
         for data_block in getattr(bpy.data, config.ASSET_TYPES[data_type]):
             if append:
                 if data_block.get("uuid", False) in uuids[data_type]:
-                    return f"Asset {data_block.name} with uuid {data_block['uuid']} already exists, cannot append. Remove it in the current file or delete it from the assets folder."
+                    return (
+                        f"Asset {data_block.name} with uuid {data_block['uuid']} already exists, cannot append. Remove it in the current file or delete it from the assets folder.",
+                        {},
+                    )
             else:
                 if data_block.get("uuid", False):
                     log.debug(
@@ -134,6 +139,7 @@ def import_from(folder_path: Path, append: bool = False) -> str:
         for col in assets["Collection"]:
             if col.name not in assets_collection.children:
                 assets_collection.children.link(col)
+    return "", assets
 
 
 def _all_uuids(assets_path: Path) -> dict[str, list[str]]:

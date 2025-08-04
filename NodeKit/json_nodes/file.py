@@ -20,21 +20,21 @@ def make_valid_filename(name: str, uuid_str: str, ext: str) -> str:
     return f"{safe_name}_{uuid_str}{ext}"
 
 
-def _file_path_for(folder_path: Path, data_dict: dict[str, Any]) -> Path:
+def _file_path_for(folder: Path, data_dict: dict[str, Any]) -> Path:
     return (
-        folder_path
+        folder
         / data_dict["tree_type"]
         / data_dict["category"]
         / make_valid_filename(data_dict["name"], data_dict["tree"]["uuid"], ".json")
     )
 
 
-def write_trees_to(folder_path: Path, data_dicts: dict[str, config.ExportDict]) -> None:
+def write_data_dicts_to(folder: Path, data_dicts: dict[str, config.ExportDict]) -> None:
 
     # Write all data_dicts that have changes
     for data_dict in data_dicts.values():
 
-        file_path = _file_path_for(folder_path, data_dict)
+        file_path = _file_path_for(folder, data_dict)
         file_path.parent.mkdir(parents=True, exist_ok=True)
         with file_path.open("w") as f:
             json.dump(
@@ -43,41 +43,39 @@ def write_trees_to(folder_path: Path, data_dicts: dict[str, config.ExportDict]) 
                 indent=4,
             )
 
-    # Clean up empty folders
-    for root in folder_path.rglob("*/"):
-        if root.is_dir() and not any(root.iterdir()):
-            root.rmdir()
-
-
-def remove_unreferenced_jsons(folder_path: Path, uuids: list[str]) -> None:
-    for file in folder_path.rglob("*.json"):
-        with file.open("r") as f:
-            data_dict = json.load(f)
-        if data_dict["tree"]["uuid"] not in uuids:
-            log.info(f"Removing unreferenced JSON file: {file}")
-            file.unlink()
-        if (
-            file.resolve()
-            != (folder_path / _file_path_for(folder_path, data_dict)).resolve()
-        ):
-            log.info(f"Removing JSON file with wrong name: {file.name}")
-            file.unlink()
-
 
 def read_data_dicts_from(folder: Path) -> dict[str, config.ExportDict]:
+    """Read data dictionaries from JSON files"""
     data_dicts = {}
     for file in folder.rglob("*.json"):
         with file.open("r") as f:
             data_dict = json.load(f)
         data_dicts[data_dict["tree"]["uuid"]] = data_dict
-
     return data_dicts
 
 
-def validate_path(folder_path: str) -> str:
-    folder_path_obj = Path(abspath(folder_path))
+def remove_empty_folders(folder: Path) -> None:
+    for root in folder.rglob("*/"):
+        if root.is_dir() and not any(root.iterdir()):
+            root.rmdir()
+
+
+def remove_unreferenced_jsons(folder: Path, uuids: list[str]) -> None:
+    for file in folder.rglob("*.json"):
+        with file.open("r") as f:
+            data_dict = json.load(f)
+        if data_dict["tree"]["uuid"] not in uuids:
+            log.info(f"Removing unreferenced JSON file: {file}")
+            file.unlink()
+        if file.resolve() != (folder / _file_path_for(folder, data_dict)).resolve():
+            log.info(f"Removing JSON file with wrong name: {file.name}")
+            file.unlink()
+
+
+def validate_path(folder: str) -> str:
+    folder_path_obj = Path(abspath(folder))
     try:
-        if not folder_path:
+        if not folder:
             return "Select a directory to store the JSON files"
         elif not folder_path_obj.exists():
             return "Path does not exist"
@@ -86,12 +84,12 @@ def validate_path(folder_path: str) -> str:
         else:
             return _check_folder_structure(folder_path_obj)
     except Exception as e:
-        log.error(f"Error validating path {folder_path}: {e}")
+        log.error(f"Error validating path {folder}: {e}")
         return "An internal error occurred while validating the path"
 
 
-def _check_folder_structure(folder_path: Path) -> str:
-    for tree_type in folder_path.iterdir():
+def _check_folder_structure(folder: Path) -> str:
+    for tree_type in folder.iterdir():
         if not tree_type.is_dir():
             continue
         tree_type_name = tree_type.name
@@ -128,28 +126,28 @@ def _check_folder_structure(folder_path: Path) -> str:
     return ""
 
 
-def number_of_files(folder_path: str, ext: str) -> int:
+def number_of_files(folder: str, ext: str) -> int:
     counter = 0
     if not bpy.context.scene.node_kit.directory_error:
-        folder_path_obj = Path(folder_path)
+        folder_path_obj = Path(folder)
         for file in folder_path_obj.rglob(f"*{ext}"):
             counter += 1
     return counter
 
 
-def folder_is_empty(folder_path: str) -> bool:
-    folder_path_obj = Path(folder_path)
+def folder_is_empty(folder: str) -> bool:
+    folder_path_obj = Path(folder)
     return not any(folder_path_obj.iterdir())
 
 
-def _check_json(file_path: Path) -> str:
+def _check_json(file: Path) -> str:
     try:
-        with file_path.open("r") as file:
-            json_dict = json.load(file)
+        with file.open("r") as f:
+            json_dict = json.load(f)
         if not _is_typed_dict(json_dict, config.ExportDict):
-            return f"Invalid JSON structure in file {file_path}"
+            return f"Invalid JSON structure in file {file}"
     except json.JSONDecodeError as e:
-        return f"Invalid JSON in file {file_path}: {e}"
+        return f"Invalid JSON in file {file}: {e}"
     return ""
 
 
