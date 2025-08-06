@@ -32,3 +32,4 @@ class NODEKIT_PT_MainPanel(bpy.types.Panel):
             layout.separator()
             layout.operator("nodekit.surprise")
             layout.operator("nodekit.generate_default_values")
+            layout.operator("nodekit.compare")

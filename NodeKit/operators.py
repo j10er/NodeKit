@@ -1,5 +1,6 @@
 import bpy
-
+from pprint import pprint
+from pathlib import Path
 from . import config
 from .json_nodes import file
 from .json_nodes.attributes import generate_attributes_dict
@@ -130,9 +131,10 @@ class NODEKIT_OT_Surprise(bpy.types.Operator):
 
     def execute(self, context):
         import cProfile
+        from deepdiff import DeepDiff
+        from .json_nodes.data.blend_data import BlendData
+        from .json_nodes.data.file_data import FileData
 
-        # cProfile.run("bpy.ops.nodekit.export_json()")
-        print(__package__)
         return {"FINISHED"}
 
 
@@ -142,4 +144,31 @@ class NODEKIT_OT_GenerateDefaultValues(bpy.types.Operator):
 
     def execute(self, context):
         attributes = generate_attributes_dict.generate_attributes_dict()
+        return {"FINISHED"}
+
+
+class NODEKIT_OT_Compare(bpy.types.Operator):
+    bl_idname = "nodekit.compare"
+    bl_label = "Compare"
+
+    def execute(self, context):
+        import cProfile
+        from deepdiff import DeepDiff
+        from .json_nodes.data.blend_data import BlendData
+        from .json_nodes.data.file_data import FileData
+
+        blend_data_dicts = BlendData().get_data_dicts()
+        file_data_dicts = FileData(
+            Path(bpy.path.abspath(bpy.context.scene.node_kit.folder_path))
+        ).get_data_dicts()
+        print(blend_data_dicts)
+        for uuid, blend_data_dict in blend_data_dicts.items():
+            file_data_dict = file_data_dicts.get(uuid, {})
+            if not file_data_dict:
+                print(f"UUID {uuid} not found in file data")
+                continue
+            if blend_data_dict != file_data_dict:
+                print(f"Difference found for node group {blend_data_dict['name']}")
+                pprint(DeepDiff(blend_data_dict, file_data_dict))
+
         return {"FINISHED"}

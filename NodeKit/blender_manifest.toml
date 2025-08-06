@@ -33,7 +33,7 @@ license = ["SPDX:GPL-3.0-or-later"]
 # platforms = ["windows-x64", "macos-arm64", "linux-x64"]
 # Other supported platforms: "windows-arm64", "macos-x64"
 
-wheels = []
+wheels = ["./wheels/deepdiff-8.5.0-py3-none-any.whl", "./wheels/orderly_set-5.5.0-py3-none-any.whl"]
 
 # Optional: add-ons can list which resources they will require:
 # * files (for access of any filesystem operations)
