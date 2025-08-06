@@ -12,9 +12,13 @@ log = logging.getLogger(__name__)
 class InterfaceItemData(Data):
 
     def __init__(
-        self, attributes: dict[str, Any], attribute_types: dict[str, str]
+        self,
+        attributes: dict[str, Any],
+        attribute_types: dict[str, str],
+        parent_index: int,
     ) -> None:
         super().__init__(attributes, attribute_types)
+        self.parent_index = parent_index
 
     @classmethod
     def from_item(
@@ -34,9 +38,6 @@ class InterfaceItemData(Data):
             case "PANEL":
                 return InterfacePanelData.from_panel_dict(item_dict)
 
-    def __eq__(self, value):
-        return super().__eq__(value)
-
 
 class InterfaceSocketData(InterfaceItemData):
 
@@ -49,8 +50,8 @@ class InterfaceSocketData(InterfaceItemData):
         parent_index: int,
         bl_idname: str,
     ) -> None:
-        super().__init__(attributes, attribute_types)
-        self.parent_index = parent_index
+        super().__init__(attributes, attribute_types, parent_index)
+
         self.bl_idname = bl_idname
 
     @classmethod
@@ -108,16 +109,6 @@ class InterfaceSocketData(InterfaceItemData):
             attribute_types=self.attribute_types,
         )
 
-    def __eq__(self, value: object) -> bool:
-        equal = (
-            super().__eq__(value)
-            and self.parent_index == value.parent_index
-            and self.bl_idname == value.bl_idname
-        )
-        if not equal:
-            log.debug(f"InterfaceSocketData __eq__ failed: {self.name} != {value.name}")
-        return equal
-
 
 class InterfacePanelData(InterfaceItemData):
     base_class_name = "NodeTreeInterfacePanel"
@@ -127,8 +118,9 @@ class InterfacePanelData(InterfaceItemData):
         attributes: dict[str, Any],
         attribute_types: dict[str, str],
         items: list[InterfaceItemData],
+        parent_index: int,
     ) -> None:
-        super().__init__(attributes, attribute_types)
+        super().__init__(attributes, attribute_types, parent_index)
         self.items = items
 
     @classmethod
@@ -141,6 +133,7 @@ class InterfacePanelData(InterfaceItemData):
             ),
             attribute_types=attribute_types,
             items=[InterfaceItemData.from_item(item) for item in panel.interface_items],
+            parent_index=panel.parent.index if panel.parent else -1,
         )
 
     @classmethod
@@ -153,18 +146,28 @@ class InterfacePanelData(InterfaceItemData):
                 InterfaceItemData.from_dict(item)
                 for item in panel_dict.get("items", [])
             ],
+            parent_index=panel_dict.get("parent_index", -1),
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
             **self.attributes,
+            **({"parent_index": self.parent_index} if self.parent_index != -1 else {}),
             **(
                 {"items": [item.to_dict() for item in self.items]} if self.items else {}
             ),
         }
 
     def to_item(self, interface: Any) -> NodeTreeInterfacePanel:
-        panel = interface.new_panel(self.name)
+        panel = interface.new_panel(
+            name=self.name,
+        )
+        parent = (
+            interface.items_tree[self.parent_index] if self.parent_index != -1 else None
+        )
+
+        if parent:
+            interface.move_to_parent(panel, parent, 0)
         attributes.set_on_element(
             element=panel,
             attributes=self.attributes,

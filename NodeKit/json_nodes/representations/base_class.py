@@ -20,18 +20,3 @@ class Data:
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{name}'"
         )
-
-    def __eq__(self, value: object) -> bool:
-        for attribute_name in self.attributes:
-            if attribute_name not in value.attributes:
-                log.error(
-                    f"Attribute '{attribute_name}' not found in {value.__class__.__name__}"
-                )
-            elif self.attributes[attribute_name] != value.attributes[attribute_name]:
-                log.error(
-                    f"Attribute '{attribute_name}' does not match: {self.attributes[attribute_name]} != {value.attributes[attribute_name]}"
-                )
-        return (
-            self.attributes == value.attributes
-            and self.attribute_types == value.attribute_types
-        )

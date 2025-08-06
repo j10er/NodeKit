@@ -166,15 +166,3 @@ class NodeTreeData(Data):
             node_data.set_socket_attributes()
         log.debug(f"{self.name}: Done.")
         log.debug("=" * 40)
-
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, NodeTreeData):
-            return False
-        return (
-            super().__eq__(other)
-            and self.uuid == other.uuid
-            and sorted(self.nodes.values(), key=lambda node_data: node_data.name)
-            == sorted(other.nodes.values(), key=lambda node_data: node_data.name)
-            and sorted(self.interface_items, key=lambda item_data: item_data.name)
-            == sorted(other.interface_items, key=lambda item_data: item_data.name)
-        )
