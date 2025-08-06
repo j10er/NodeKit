@@ -59,7 +59,6 @@ def fixture_test_trees():
 
     bpy.ops.nodekit.export_json()
 
-    # Import to new file
     _open_new_file()
     bpy.ops.nodekit.import_json()
 
@@ -78,14 +77,13 @@ def test_fixture():
 
 
 @pytest.fixture(scope="module")
-def get_data_dicts():
+def capture_original_data():
     _open_test_trees_file()
-    old_data_dicts = BlendData().get_data_dicts()
+    data_dicts = BlendData().get_data_dicts()
     bpy.ops.nodekit.export_json()
     _open_new_file()
     bpy.ops.nodekit.import_json()
-    new_data_dicts = BlendData().get_data_dicts()
 
-    yield old_data_dicts, new_data_dicts
+    yield data_dicts
 
     _open_new_file()

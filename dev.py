@@ -106,7 +106,9 @@ def _install_test_deps(blender_path, version):
     major_version = version[:3]
     python_dir = f"{blender_path}/blender-{version}/{major_version}/python/bin/"
     python_executable = f"{python_dir}/{next(name for name in os.listdir(python_dir) if name.startswith('python3.'))}"
-    subprocess.run([python_executable, "-m", "pip", "install", "pytest", "-q", "-q"])
+    subprocess.run(
+        [python_executable, "-m", "pip", "install", "pytest", "deepdiff", "-q", "-q"]
+    )
 
 
 def test():
