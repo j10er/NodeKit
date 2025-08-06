@@ -1,10 +1,6 @@
-"""Data source for JSON files on disk"""
-
 from pathlib import Path
 from typing import Dict
 
-import bpy
-import json
 from .data_source import DataSource
 from ..representations.node_tree import NodeTreeData
 from .. import file
@@ -44,6 +40,7 @@ class FileData(DataSource):
             )
         file.write_data_dicts_to(self.folder, data_dicts_to_write)
         file.remove_empty_folders(self.folder)
+
         return {
             "success": True,
             "total_trees": len(source_data_dicts),

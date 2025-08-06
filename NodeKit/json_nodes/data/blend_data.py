@@ -1,5 +1,3 @@
-"""Data source for current Blender scene"""
-
 import uuid
 from typing import Dict
 
@@ -21,17 +19,17 @@ class BlendData(DataSource):
         self.data_dicts = self._calculate_data_dicts()
 
     def write(self, source: DataSource, append: bool) -> dict:
-
+        """Apply NodeTreeData from the given source to the blender scene. Deletes all trees that are not in the source data, skips unchanged trees for performance reasons."""
         source_data_dicts = source.get_data_dicts()
         uuids_to_write = self._uuids_to_write(source_data_dicts)
 
         tree_datas_to_write = {
             uuid: tree_data
             for uuid, tree_data in source.get_tree_datas().items()
-            if uuid in uuids_to_write
+            # if uuid in uuids_to_write
         }
         for tree in bpy.data.node_groups:
-            uuid = tree.get("uuid")
+            uuid = tree.get("uuid", "")
             if append:
                 if uuid in tree_datas_to_write:
                     log.info(f"Tree {tree.name} already exists, skipping.")
@@ -39,7 +37,7 @@ class BlendData(DataSource):
             else:
                 if (
                     tree.bl_idname in config.SUPPORTED_TREE_TYPES
-                    and uuid not in uuids_to_write
+                    and uuid not in source_data_dicts
                 ):
                     log.info(f"Removing existing tree: {tree.name}")
                     bpy.data.node_groups.remove(tree, do_unlink=True)

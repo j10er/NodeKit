@@ -3,6 +3,7 @@ import shutil
 
 import bpy
 import pytest
+from bl_ext.user_default.nodekit.json_nodes.data.blend_data import BlendData
 
 test_tree_names = [
     "test_compare_node",
@@ -12,6 +13,7 @@ test_tree_names = [
     "test_interface_sockets",
     "test_links",
     "test_nested_menu",
+    "test_nested_panels",
     "test_nodeframe",
     "test_reroute",
     "test_subgroups",
@@ -24,34 +26,41 @@ other_tree_names = [
     "test_subgroups_subgroup",
 ]
 
+folder_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "test_trees_json"
+)
+
 
 def _open_test_trees_file():
     """Open the test trees file."""
+    _clear_test_trees_folder()
     filepath = os.path.join(
         os.path.dirname(__file__),
         "test_trees.blend",
     )
     bpy.ops.wm.open_mainfile(filepath=filepath)
+    bpy.context.scene.node_kit.folder_path = folder_path
+
+
+def _clear_test_trees_folder():
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+    os.makedirs(folder_path, exist_ok=True)
+
+
+def _open_new_file():
+    bpy.ops.wm.read_homefile(use_empty=True)
+    bpy.context.scene.node_kit.folder_path = folder_path
 
 
 @pytest.fixture(scope="module")
 def fixture_test_trees():
     _open_test_trees_file()
 
-    folder_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "test_trees_json"
-    )
-    if os.path.exists(folder_path):
-        shutil.rmtree(folder_path)
-    os.makedirs(folder_path, exist_ok=True)
-    # Export the JSON nodes to test_trees_json folder.
-    bpy.context.scene.node_kit.folder_path = folder_path
-    print(bpy.context.scene.node_kit.folder_path)
     bpy.ops.nodekit.export_json()
 
     # Import to new file
-    bpy.ops.wm.read_homefile(use_empty=True)
-    bpy.context.scene.node_kit.folder_path = folder_path
+    _open_new_file()
     bpy.ops.nodekit.import_json()
 
     # Test execution after import
@@ -66,4 +75,13 @@ def test_fixture():
             tree_name in bpy.data.node_groups
         ), f"{tree_name} should be in the node groups"
 
-    bpy.ops.wm.read_homefile(use_empty=True)
+
+@pytest.fixture
+def get_data_dicts(scope="module"):
+    _open_test_trees_file()
+    old_data_dicts = BlendData().get_data_dicts()
+    bpy.ops.nodekit.export_json()
+    _open_new_file()
+    bpy.ops.nodekit.import_json()
+    new_data_dicts = BlendData().get_data_dicts()
+    yield old_data_dicts, new_data_dicts

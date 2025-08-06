@@ -131,7 +131,8 @@ class NODEKIT_OT_Surprise(bpy.types.Operator):
     def execute(self, context):
         import cProfile
 
-        cProfile.run("bpy.ops.nodekit.export_json()")
+        # cProfile.run("bpy.ops.nodekit.export_json()")
+        print(__package__)
         return {"FINISHED"}
 
 
@@ -149,5 +150,5 @@ class NODEKIT_OT_TestConversion(bpy.types.Operator):
     bl_label = "Test Conversion"
 
     def execute(self, context):
-        compare.test_conversion()
+        compare.test_import()
         return {"FINISHED"}

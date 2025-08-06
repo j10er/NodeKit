@@ -23,6 +23,7 @@ def export_to(folder_path_str: str, include_assets: bool) -> str:
         assets_dict = assets.collect_assets()
 
     status = FileData(folder).write(BlendData(), append=False)
+
     if status["success"]:
         num_assets = sum(len(assets_set) for assets_set in assets_dict.values())
 
@@ -36,7 +37,6 @@ def import_from(folder_path_str: str, append: bool, include_assets: bool) -> str
     folder = Path(folder_path_str)
     log.info(f"Importing all node groups from {folder}")
 
-    # Handle assets
     if include_assets:
         log.info("Importing assets...")
         error, assets_dict = assets.import_from(folder, append=append)
@@ -44,8 +44,9 @@ def import_from(folder_path_str: str, append: bool, include_assets: bool) -> str
             return error
 
     status = BlendData().write(FileData(folder), append=append)
-    num_assets = sum(len(assets_set) for assets_set in assets_dict.values())
+
     if status["success"]:
+        num_assets = sum(len(assets_set) for assets_set in assets_dict.values())
         return f"Imported {status['total_trees']} ({status['total_trees'] - status['updated_trees']} unchanged) node groups and {num_assets} ({0 if include_assets else num_assets} unchanged) assets from {folder.resolve()}"
     else:
         return "Import failed. Please check the console for errors."
