@@ -63,8 +63,9 @@ def fixture_test_trees():
     _open_new_file()
     bpy.ops.nodekit.import_json()
 
-    # Test execution after import
     yield
+
+    _open_new_file()
 
 
 def test_fixture():
@@ -76,12 +77,15 @@ def test_fixture():
         ), f"{tree_name} should be in the node groups"
 
 
-@pytest.fixture
-def get_data_dicts(scope="module"):
+@pytest.fixture(scope="module")
+def get_data_dicts():
     _open_test_trees_file()
     old_data_dicts = BlendData().get_data_dicts()
     bpy.ops.nodekit.export_json()
     _open_new_file()
     bpy.ops.nodekit.import_json()
     new_data_dicts = BlendData().get_data_dicts()
+
     yield old_data_dicts, new_data_dicts
+
+    _open_new_file()
