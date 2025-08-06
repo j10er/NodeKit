@@ -9,13 +9,14 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 # Should match the addon name in blender_manifest.toml
-addon_name = "NodeKit"
+ADDON_NAME = "NodeKit"
+ADDON_ID = "nodekit"
 
 
 def build():
-
-    source_dir = f"./{addon_name}"
-    filename = addon_name
+    _update_mock_module()
+    source_dir = f"./{ADDON_NAME}"
+    filename = ADDON_NAME
     config_path = f"{source_dir}/config.py"
     debug_line = "DEBUG = False"
     with open(config_path, "a") as file:
@@ -56,7 +57,7 @@ def _run_tests(blender_executable):
             "-r",
             "user_default",
             "-e",
-            f"{addon_name}.zip",
+            f"{ADDON_NAME}.zip",
         ]
     )
     # Run tests
@@ -109,6 +110,22 @@ def _install_test_deps(blender_path, version):
     subprocess.run(
         [python_executable, "-m", "pip", "install", "pytest", "deepdiff", "-q", "-q"]
     )
+
+
+def _update_mock_module() -> None:
+    """
+    Copies the addon contents to the mock module directory for linting purposes.
+    """
+    source_dir = f"./{ADDON_NAME}"
+    destination_dir = f"./bl_ext/user_default/{ADDON_ID}"
+    if os.path.exists(destination_dir):
+        shutil.rmtree(destination_dir)
+    shutil.copytree(source_dir, destination_dir)
+    with open("bl_ext/__init__.py", "w") as f:
+        pass
+    with open("bl_ext/user_default/__init__.py", "w") as f:
+        pass
+    print(f"Copied {source_dir} to {destination_dir} for linting.")
 
 
 def test():
