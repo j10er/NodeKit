@@ -2,7 +2,7 @@ schema_version = "1.0.0"
 
 # Example of manifest file for a Blender extension
 # Change the values according to your extension
-id = "NodeKit"
+id = "nodekit"
 version = "0.1.0"
 name = "NodeKit"
 tagline = "Tools for building better Blender node trees"
@@ -33,7 +33,7 @@ license = ["SPDX:GPL-3.0-or-later"]
 # platforms = ["windows-x64", "macos-arm64", "linux-x64"]
 # Other supported platforms: "windows-arm64", "macos-x64"
 
-wheels = []
+wheels = ["./wheels/deepdiff-8.5.0-py3-none-any.whl", "./wheels/orderly_set-5.5.0-py3-none-any.whl"]
 
 # Optional: add-ons can list which resources they will require:
 # * files (for access of any filesystem operations)
