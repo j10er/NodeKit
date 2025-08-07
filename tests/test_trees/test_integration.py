@@ -2,7 +2,7 @@ import bmesh
 import bpy
 import pytest
 
-from .test_trees_fixture import fixture_test_trees, test_tree_names
+from .fixtures import fixture_test_trees, test_tree_names
 
 
 def _create_single_vertex_object(name: str = "test_object"):

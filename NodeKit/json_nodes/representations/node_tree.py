@@ -1,11 +1,9 @@
 import logging
-import uuid
 from typing import Any
 
 import bpy
 from bpy.types import NodeTree
 
-from ... import config
 from ..attributes import attributes
 from .base_class import Data
 from .interface_item import InterfaceItemData
@@ -22,7 +20,7 @@ class NodeTreeData(Data):
         attributes: dict[str, Any],
         attribute_types: dict[str, str],
         uuid: str,
-        nodes: dict[str, "NodeData"],
+        nodes: dict[str, NodeData],
         interface_items: list[InterfaceItemData],
     ) -> None:
         super().__init__(attributes, attribute_types)
@@ -87,10 +85,6 @@ class NodeTreeData(Data):
         for node in self.tree.nodes:
             self.tree.nodes.remove(node)
         self.tree.interface.clear()
-        self.tree.bl_icon = "NODETREE"
-        self.tree.bl_label = ""
-        self.tree.color_tag = "NONE"
-        self.tree.description = ""
 
     def create_tree_hull(self):
 

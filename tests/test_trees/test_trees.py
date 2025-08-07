@@ -1,6 +1,6 @@
 import bpy
 
-from .test_trees_fixture import fixture_test_trees, other_tree_names, test_tree_names
+from .fixtures import fixture_test_trees, other_tree_names, test_tree_names
 
 
 def test_trees_exist(fixture_test_trees):

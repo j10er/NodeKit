@@ -6,4 +6,5 @@ __pycache__
 blender
 bl_ext
 NodeKit.zip
-tests/test_trees_json
+tests/test_trees/test_trees_json
+tests/test_assets/test_assets_json

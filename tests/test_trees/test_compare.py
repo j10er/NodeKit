@@ -6,7 +6,7 @@ from deepdiff import DeepDiff
 
 from bl_ext.user_default.nodekit.json_nodes.data.blend_data import BlendData
 
-from .test_trees_fixture import capture_original_data, test_tree_names
+from .fixtures import capture_original_data, test_tree_names
 
 
 @pytest.mark.parametrize("tree_name", test_tree_names)

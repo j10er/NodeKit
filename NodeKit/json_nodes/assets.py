@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import bpy
-
+import shutil
 from . import file
 from .. import config
 
@@ -51,6 +51,7 @@ def collect_assets() -> dict[str, set[Any]]:
 
 def _write_assets_to(folder_path: Path, assets: dict[str, set[Any]]) -> None:
     assets_folder = folder_path / config.ASSETS_FOLDER
+    shutil.rmtree(assets_folder, ignore_errors=True)
     for asset_type in assets:
         asset_type_folder = assets_folder / asset_type
         for asset in assets[asset_type]:

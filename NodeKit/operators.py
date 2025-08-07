@@ -9,7 +9,7 @@ from .json_nodes.import_export import export_to, import_from
 
 class NODEKIT_OT_ImportJSON(bpy.types.Operator):
     bl_idname = "nodekit.import_json"
-    bl_label = "Import from JSON"
+    bl_label = "Import Nodes from JSON"
     bl_description = "Import node groups and assets from JSON files"
 
     @classmethod
@@ -46,7 +46,7 @@ class NODEKIT_OT_ImportJSON(bpy.types.Operator):
 
 class NODEKIT_OT_ExportJSON(bpy.types.Operator):
     bl_idname = "nodekit.export_json"
-    bl_label = "Export to JSON"
+    bl_label = "Export Nodes to JSON"
     bl_description = "Export node groups to JSON files"
 
     @classmethod
@@ -75,7 +75,7 @@ class NODEKIT_OT_ExportJSON(bpy.types.Operator):
 
 class NODEKIT_OT_ExportUpdateAssets(bpy.types.Operator):
     bl_idname = "nodekit.export_update_assets"
-    bl_label = "Export to JSON (Update assets)"
+    bl_label = "Export Nodes to JSON (Update assets)"
     bl_description = "Export assets to JSON files"
 
     @classmethod
@@ -101,7 +101,7 @@ class NODEKIT_OT_ExportUpdateAssets(bpy.types.Operator):
 
 class NODEKIT_OT_AppendJSON(bpy.types.Operator):
     bl_idname = "nodekit.append_json"
-    bl_label = "Append JSON from"
+    bl_label = "Append Nodes from JSON"
     bl_description = "Pick a folder to append its node groups"
 
     directory: bpy.props.StringProperty(
