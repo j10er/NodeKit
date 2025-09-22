@@ -39,7 +39,16 @@ ATTRIBUTE_TYPE_MAPPING = {
 
 
 def _get_pointer(element: Any) -> str:
-    return element["uuid"] if element else None
+    if not element:
+        return None
+    
+    try:
+        return element.get("uuid")
+    except AttributeError:
+        try:
+            return element["uuid"]
+        except (KeyError, TypeError):
+            return None
 
 
 def _set_items(element, name, value):
