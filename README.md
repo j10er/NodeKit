@@ -1,3 +1,6 @@
+## ⚠️ This project currently is not developed actively, but will its functionality will be merged with [Tree Clipper](https://github.com/Algebraic-UG/tree_clipper) 
+
+
 # NodeKit
 
 [![Blender](https://img.shields.io/badge/Blender-4.3%2B-orange)](https://www.blender.org/)
