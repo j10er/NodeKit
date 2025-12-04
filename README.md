@@ -1,4 +1,4 @@
-## ⚠️ This project currently is not developed actively, but will its functionality will be merged with [Tree Clipper](https://github.com/Algebraic-UG/tree_clipper) 
+## ⚠️ This project is not developed actively anymore, but its functionality will be merged with [Tree Clipper](https://github.com/Algebraic-UG/tree_clipper) 
 
 
 # NodeKit
